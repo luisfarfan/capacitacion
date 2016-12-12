@@ -1,0 +1,146 @@
+{% extends 'base/base.html' %}
+{% load staticfiles %}
+{% block content %}
+    <div class="panel panel-flat">
+        <div class="panel-heading">
+            <h5 class="panel-title">Asistencia</h5>
+            <div class="heading-elements">
+                <ul class="icons-list">
+                    <li>
+                        <a data-action="collapse"></a>
+                    </li>
+                    <li>
+                        <a data-action="close"></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Local</label>
+                        <select id="local" class="select form-control">
+                            <option value="">Seleccione</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-5">
+        <div class="panel panel-flat">
+            <div class="panel-heading">
+                <h5 class="panel-title">Detalle Ambientes por Local</h5>
+                <div class="heading-elements">
+                    <ul class="icons-list">
+                        <li>
+                            <a data-action="collapse"></a>
+                        </li>
+                        <li>
+                            <a data-action="close"></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="table-responsive">
+                        <table id="tabla_detalle_ambientes" class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th>N°</th>
+                                <th>Número Ambiente</th>
+                                <th>Capacidad</th>
+                                <th>Ambiente</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-7">
+        <div class="panel panel-flat">
+            <div class="panel-heading">
+                <h5 class="panel-title">PEA por Aula</h5>
+                <div class="heading-elements">
+                    <ul class="icons-list">
+                        <li>
+                            <a data-action="collapse"></a>
+                        </li>
+                        <li>
+                            <a data-action="close"></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <form action="" class="form-horizontal">
+                        <fieldset class="content-group">
+                            <div class="form-group">
+                                <label class="control-label col-lg-2">Fechas: </label>
+                                <div class="col-lg-7">
+                                    <select id="fechas" class="select form-control">
+
+                                    </select>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </form>
+                </div>
+                <div class="row">
+                    <button onclick="saveAsistencia()" class="btn btn-primary">Guardar</button>
+                </div>
+                <div class="row">
+                    <div class="table-responsive">
+                        <table id="tabla_pea" class="table table-responsive table-bordered">
+                            <thead>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block sidebar %}
+    <ul class="navigation navigation-main navigation-accordion">
+        <!-- Main -->
+        <li class="navigation-header"><span>Main</span> <i class="icon-menu" title="Main pages"></i>
+        </li>
+        <li>
+            <a href="#"><i class="icon-stack"></i> <span>Capacitación</span></a>
+            <ul>
+                <li><a href="{% url 'modulo_registro' %}">Modulo de Registro de Local</a>
+                </li>
+                <li><a href="{% url 'distribucion' %}">Modulo Distribucion de PEA</a></li>
+                <li class="active"><a href="{% url 'asistencia' %}">Modulo de Asistencia</a></li>
+            </ul>
+        </li>
+        <!-- /main -->
+    </ul>
+{% endblock %}
+
+{% block js %}
+    <script type="text/javascript" src="assets/js/plugins/loaders/pace.min.js"></script>
+    <script type="text/javascript" src="{% static "assets/js/plugins/tables/datatables/datatables.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "assets/js/plugins/loaders/blockui.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "assets/js/plugins/forms/selects/select2.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "assets/js/plugins/notifications/sweet_alert.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "assets/js/core/app.js" %}"></script>
+    <script type="text/javascript" src="{% static "dist/capacitacion/asistencia/asistencia.js" %}"></script>
+{% endblock %}

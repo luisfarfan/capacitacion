@@ -1,0 +1,24 @@
+{
+  "name": "intranet",
+  "version": "1.0.0",
+  "description": "Intranet de Aplicaciones ",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "babel-cli": "^6.18.0",
+    "babel-preset-latest": "^6.16.0"
+  },
+  "scripts": {
+    "build":"babel capacitacion/js/ --watch --out-dir static/assets"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/luisfarfan/capacitacion_v2.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/luisfarfan/capacitacion_v2/issues"
+  },
+  "homepage": "https://github.com/luisfarfan/capacitacion_v2#readme"
+}

@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% load staticfiles %}
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Intranet de Aplicaciones - INEI</title>
+    <!-- Global stylesheets -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,100,500,700,900" rel="stylesheet"
+          type="text/css">
+    <link href="{% static "assets/css/icons/icomoon/styles.css" %}" rel="stylesheet" type="text/css">
+    <link href="{% static "assets/css/bootstrap.css" %}" rel="stylesheet" type="text/css">
+    <link href="{% static "assets/css/core.css" %}" rel="stylesheet" type="text/css">
+    <link href="{% static "assets/css/components.css" %}" rel="stylesheet" type="text/css">
+    <link href="{% static "assets/css/colors.css" %}" rel="stylesheet" type="text/css">
+    <!-- /global stylesheets -->
+    <!-- Core JS files -->
+    <script type="text/javascript" src="{% static "assets/js/core/libraries/jquery.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "assets/js/core/libraries/bootstrap.min.js" %}"></script>
+
+    <!-- /core JS files -->
+    <!-- Theme JS files -->
+    <script type="text/javascript" src="{% static "assets/js/plugins/tables/datatables/datatables.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "assets/js/plugins/forms/validation/validate.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "assets/js/plugins/notifications/sweet_alert.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "assets/js/plugins/forms/selects/select2.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "assets/js/plugins/forms/styling/uniform.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "assets/js/plugins/ui/moment/moment.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "assets/js/plugins/pickers/daterangepicker.js" %}"></script>
+    <script type="text/javascript" src="{% static "assets/js/core/app.js" %}"></script>
+    <script type="text/javascript" src="{% static "assets/js/plugins/ui/ripple.min.js" %}"></script>
+    <!-- /theme JS files -->
+</head>
+
+<body>
+<!-- Main navbar -->
+<div class="navbar navbar-inverse bg-primary">
+    <div class="navbar-header">
+        {#        <a class="navbar-brand" href="index.html"><img src="{% static "assets/images/logo_light.png" %}" alt=""></a>#}
+        <ul class="nav navbar-nav visible-xs-block">
+            <li><a data-toggle="collapse" data-target="#navbar-mobile"><i class="icon-tree5"></i></a></li>
+            <li><a class="sidebar-mobile-main-toggle"><i class="icon-paragraph-justify3"></i></a></li>
+        </ul>
+    </div>
+    <div class="navbar-collapse collapse" id="navbar-mobile">
+        <ul class="nav navbar-nav">
+            <li><a class="sidebar-control sidebar-main-toggle hidden-xs"><i class="icon-paragraph-justify3"></i></a>
+            </li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+            <!--<li><a href="#">Text link</a></li>
+            <li>
+                <a href="#">
+                    <i class="icon-cog3"></i>
+                    <span class="visible-xs-inline-block position-right">Icon link</span>
+                </a>
+            </li>-->
+            <li class="dropdown dropdown-user">
+                <a class="dropdown-toggle" data-toggle="dropdown">
+                    <img src="{% static "assets/images/image.png" %}" alt="">
+                    <span>Capacitación</span>
+                    <i class="caret"></i>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-right">
+                    <!--<li><a href="#"><i class="icon-user-plus"></i> My profile</a></li>
+                    <li><a href="#"><i class="icon-coins"></i> My balance</a></li>
+                    <li><a href="#"><span class="badge badge-warning pull-right">58</span> <i class="icon-comment-discussion"></i> Messages</a></li>
+                    <li class="divider"></li>
+                    <li><a href="#"><i class="icon-cog5"></i> Account settings</a></li>-->
+                    <li><a href="#"><i class="icon-switch2"></i> Cerrar Sesión</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+</div>
+<!-- /main navbar -->
+<!-- Page container -->
+<div class="page-container">
+    <!-- Page content -->
+    <div class="page-content">
+        <!-- Main sidebar -->
+        <div class="sidebar sidebar-main sidebar-default">
+            <div class="sidebar-content">
+                <!-- User menu -->
+                <div class="sidebar-user">
+                    <div class="category-content">
+                        <div class="media">
+                            <a href="#" class="media-left"><img src="{% static "assets/images/image.png" %}"
+                                                                class="img-circle img-sm" alt=""></a>
+                            <div class="media-body">
+                                <span class="media-heading text-semibold">Capacitación</span>
+                                <div class="text-size-mini text-muted">
+                                    <i class="icon-pin text-size-small"></i> &nbsp;Nacional
+                                </div>
+                            </div>
+                            <!--<div class="media-right media-middle">
+                                <ul class="icons-list">
+                                    <li>
+                                        <a href="#"><i class="icon-cog3"></i></a>
+                                    </li>
+                                </ul>
+                            </div>-->
+                        </div>
+                    </div>
+                </div>
+                <!-- /user menu -->
+                <!-- Main navigation -->
+                <div class="sidebar-category sidebar-category-visible">
+                    <div class="category-content no-padding">
+                        <ul class="navigation navigation-main navigation-accordion">
+                            <!-- Main -->
+                            <li class="navigation-header"><span>Main</span> <i class="icon-menu" title="Main pages"></i>
+                            </li>
+                            <li>
+                                <a href="#"><i class="icon-stack"></i> <span>Capacitación</span></a>
+                                <ul>
+                                    <li class="active"><a href="intranet.html">Modulo de Registro</a></li>
+                                    <li><a href="intranet.html">Cursos y Evaluaciones</a></li>
+                                </ul>
+                            </li>
+                            <li><a href="../changelog.html"><i class="icon-list-unordered"></i>
+                                <span>Changelog</span></a></li>
+                            <!-- /main -->
+                        </ul>
+                    </div>
+                </div>
+                <!-- /main navigation -->
+            </div>
+        </div>
+        <!-- /main sidebar -->
+        <!-- Main content -->
+        <div class="content-wrapper">
+            <!-- Page header -->
+            <div class="page-header page-header-default">
+                <div class="page-header-content">
+                    <div class="page-title">
+                        <h4><i class="icon-arrow-left52 position-left"></i> <span
+                                class="text-semibold">Capacitación</span> Modulo de Registro</h4>
+                    </div>
+                </div>
+                <!--<div class="breadcrumb-line">
+                    <ul class="breadcrumb">
+                        <li><a href="index.html"><i class="icon-home2 position-left"></i> Home</a></li>
+                        <li><a href="2_col.html">Starters</a></li>
+                        <li class="active">2 columns</li>
+                    </ul>
+                    <ul class="breadcrumb-elements">
+                        <li><a href="#"><i class="icon-comment-discussion position-left"></i> Link</a></li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                <i class="icon-gear position-left"></i> Dropdown
+                                <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-right">
+                                <li><a href="#"><i class="icon-user-lock"></i> Account security</a></li>
+                                <li><a href="#"><i class="icon-statistics"></i> Analytics</a></li>
+                                <li><a href="#"><i class="icon-accessibility"></i> Accessibility</a></li>
+                                <li class="divider"></li>
+                                <li><a href="#"><i class="icon-gear"></i> All settings</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>-->
+            </div>
+            <!-- /page header -->
+            <!-- Content area -->
+            <div class="content">
+                <!-- Simple panel -->
+                <div class="panel panel-flat">
+                    <div class="panel-heading">
+                        <h5 class="panel-title">Ubigeo</h5>
+                        <div class="heading-elements">
+                            <ul class="icons-list">
+                                <li>
+                                    <a data-action="collapse"></a>
+                                </li>
+                                <li>
+                                    <a data-action="close"></a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Departamentos</label>
+                                    <select id="departamentos" class="select">
+                                        <option value="">Seleccione</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Provincias</label>
+                                    <select id="provincias" class="select">
+                                        <option value="">Seleccione</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Distritos</label>
+                                    <select id="distritos" class="select">
+                                        <option value="">Seleccione</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="text-left">
+                                <button type="button" class="btn btn-primary btn-sm" data-toggle="modal"
+                                        data-target="#modal_localesbyubigeo" id="buscarlocal" class="btn btn-primary">
+                                    Buscar Local <i
+                                        class="icon-arrow-right14 position-right"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-flat">
+                    <div class="panel-heading">
+                        <h5 class="panel-title">Registrar Local</h5>
+                        <div class="heading-elements">
+                            <ul class="icons-list">
+                                <li>
+                                    <a data-action="collapse"></a>
+                                </li>
+                                <li>
+                                    <a data-action="close"></a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <form class="form-validate-jquery" action="#">
+                            <input type="hidden" id="id_local">
+                            <div id="localdata">
+                                <fieldset class="content-group">
+                                    <legend class="text-bold">Etapa y Curso</legend>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label>Etapa</label>
+                                                <select id="etapa" class="select" onchange="getCursos(this.value)">
+                                                    <option value="1">CENSO EXPERIMENTAL</option>
+                                                    <option value="2">Empadronamiento</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label>Cursos</label>
+                                                <select id="cursos" name="id_curso" class="select">
+                                                    <option value="">Seleccione</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                                <fieldset class="content-group">
+                                    <legend class=" text-bold">Dirección</legend>
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>Nombre de Local</label>
+                                                <input type="text" required="required" name="nombre_local"
+                                                       class="form-control" placeholder="">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>Tipo de Via</label>
+                                                <select name="tipo_via" class="select" id="tipo_via">
+                                                    <option value="">Seleccione</option>
+                                                    <option value="1">AVENIDA</option>
+                                                    <option value="2">CALLE</option>
+                                                    <option value="3">JIRÓN</option>
+                                                    <option value="4">PASAJE</option>
+                                                    <option value="5">CARRETARA</option>
+                                                    <option value="6">OTRO</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>Nombre de Via (Dirección)</label>
+                                                <input type="text" required="required" name="nombre_via"
+                                                       class="form-control" placeholder="">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>Referencia</label>
+                                                <input type="text" required="required" name="referencia"
+                                                       class="form-control" placeholder="">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-2">
+                                            <div class="form-group">
+                                                <label>N°Puerta</label>
+                                                <input type="text" required="required" name="n_direccion"
+                                                       class="form-control" placeholder="">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div class="form-group">
+                                                <label>MZ</label>
+                                                <input type="text" name="mz_direccion"
+                                                       class="form-control" placeholder="">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div class="form-group">
+                                                <label>Lote</label>
+                                                <input type="text" name="lote_direccion"
+                                                       class="form-control" placeholder="">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div class="form-group">
+                                                <label>KM</label>
+                                                <input type="text" name="km_direccion"
+                                                       class="form-control" placeholder="">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div class="form-group">
+                                                <label>Piso</label>
+                                                <input type="text" required="required" name="piso_direccion"
+                                                       class="form-control" placeholder="">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Teléfono Fijo</label>
+                                                <input type="text" name="telefono_local_fijo"
+                                                       class="form-control" placeholder="">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Teléfono Celular</label>
+                                                <input type="text" name="telefono_local_celular"
+                                                       class="form-control" placeholder="">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                                <fieldset class="content-group">
+                                    <legend class="text-bold">Programación y Capacidad de Local</legend>
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>Fecha Inicio</label>
+                                                <input type="text" required="required" name="fecha_inicio"
+                                                       class="daterange-single form-control" placeholder="">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>Fecha Fin</label>
+                                                <input type="text" required="required" name="fecha_fin"
+                                                       class="daterange-single form-control" placeholder="">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>Turno de Uso Local</label>
+                                                <select name="turno_uso_local" class="select">
+                                                    <option value="0">MAÑANA</option>
+                                                    <option value="1">TARDE</option>
+                                                    <option value="2">NOCHE</option>
+                                                    <option value="3">TODO EL DIA</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>Capacidad de Local</label>
+                                                <input type="text" required="required" name="capacidad_local"
+                                                       class="form-control" placeholder="">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                                <fieldset class="content-group">
+                                    <legend class="text-bold">Datos de Funcionario del INEI</legend>
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>Apellidos y Nombres</label>
+                                                <input type="text" required="required" name="funcionario_nombre"
+                                                       class="form-control" placeholder="">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>Email</label>
+                                                <input type="text" required="required" name="funcionario_email"
+                                                       class="form-control" placeholder="">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>Teléfono Fijo</label>
+                                                <input type="text" name="funcionario_telefono"
+                                                       class="form-control" placeholder="">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>Teléfono Celular</label>
+                                                <input type="text" name="funcionario_celular"
+                                                       class="form-control" placeholder="">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                                <fieldset class="content-group">
+                                    <legend class="text-bold">Datos del Responsable del Local</legend>
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>Apellidos y Nombres</label>
+                                                <input type="text" required="required" name="responsable_nombre"
+                                                       class="form-control" placeholder="">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>Email</label>
+                                                <input type="text" required="required" name="responsable_email"
+                                                       class="form-control" placeholder="">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>Teléfono Fijo</label>
+                                                <input type="text" name="responsable_telefono"
+                                                       class="form-control" placeholder="">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>Teléfono Celular</label>
+                                                <input type="text" name="responsable_celular"
+                                                       class="form-control" placeholder="">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </div>
+                            <fieldset class="content-group" id="ambientesdata">
+                                <legend class="text-bold">Ambientes Disponibles</legend>
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" id="aula" class="styled">
+                                                Aulas
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <div class="form-group">
+                                            <label>Disponible</label>
+                                            <input type="text" name="cantidad_disponible_aulas"
+                                                   id="cantidad_disponible_aulas"
+                                                   class="form-control" value="0" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <div class="form-group">
+                                            <label>A usar</label>
+                                            <input type="text" name="cantidad_usar_aulas"
+                                                   id="cantidad_usar_aulas"
+                                                   class="form-control" value="0" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" id="auditorio" class="styled">
+                                                Auditorios
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <div class="form-group">
+                                            <label>Disponible</label>
+                                            <input type="text" name="cantidad_disponible_auditorios"
+                                                   id="cantidad_disponible_auditorios"
+                                                   class="form-control" value="0" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <div class="form-group">
+                                            <label>A usar</label>
+                                            <input type="text" name="cantidad_usar_auditorios"
+                                                   id="cantidad_usar_auditorios"
+                                                   class="form-control" value="0" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" id="sala" class="styled">
+                                                Sala Reunion
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <div class="form-group">
+                                            <label>Disponible</label>
+                                            <input type="text"
+                                                   name="cantidad_disponible_sala" class="form-control"
+                                                   id="cantidad_disponible_sala"
+                                                   value="0" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <div class="form-group">
+                                            <label>A usar</label>
+                                            <input type="text"
+                                                   name="cantidad_usar_sala" class="form-control"
+                                                   id="cantidad_usar_sala"
+                                                   value="0" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" id="oficina" class="styled">
+                                                Oficina Administrativa
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <div class="form-group">
+                                            <label>Disponible</label>
+                                            <input type="text" name="cantidad_disponible_oficina"
+                                                   id="cantidad_disponible_oficina"
+                                                   class="form-control" value="0" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <div class="form-group">
+                                            <label>A usar</label>
+                                            <input type="text" name="cantidad_usar_oficina"
+                                                   id="cantidad_usar_oficina"
+                                                   class="form-control" value="0" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" id="otros" class="styled">
+                                                Otros
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <div class="form-group">
+                                            <label>Disponible</label>
+                                            <input type="text" name="cantidad_disponible_otros"
+                                                   id="cantidad_disponible_otros"
+                                                   class="form-control" value="0" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <div class="form-group">
+                                            <label>A usar</label>
+                                            <input type="text" name="cantidad_usar_otros"
+                                                   id="cantidad_usar_otros"
+                                                   class="form-control" value="0" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                            </fieldset>
+                            <div class="row">
+                                <div class="text-left">
+                                    <button type="reset" class="btn btn-default" id="reset">Limpiar <i
+                                            class="icon-reload-alt position-right"></i></button>
+                                    <button type="button" id="registrar" class="btn btn-primary">Registrar <i
+                                            class="icon-arrow-right14 position-right"></i></button>
+                                    <button type="button" id="registrar_aulas" disabled class="btn btn-primary">
+                                        Registrar
+                                        Aulas <i
+                                            class="icon-arrow-right14 position-right"></i></button>
+                                </div>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+                <!-- /simple panel -->
+                <!-- Footer -->
+                <div class="footer text-muted">
+                </div>
+                <div id="modal_localesbyubigeo" class="modal fade">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header bg-primary">
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                <h6 class="modal-title">LOCALES POR UBIGEO</h6>
+                            </div>
+
+                            <div class="modal-body">
+                                <table class="table datatable-basic table-bordered" id="table_localesubigeo">
+                                    <thead>
+                                    <tr>
+                                        <th>Nombre Local</th>
+                                        <th>Nombre de Via</th>
+                                        <th>Referencia</th>
+                                        <th>Acción</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary">Save changes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /footer -->
+            </div>
+            <!-- /content area -->
+        </div>
+        <!-- /main content -->
+    </div>
+    <!-- /page content -->
+</div>
+<!-- /page container -->
+</body>
+
+</html>

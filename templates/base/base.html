@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load staticfiles %}
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}{% endblock %}</title>
+    {% block css %}
+    {% endblock %}
+    <!-- Global stylesheets -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,100,500,700,900" rel="stylesheet"
+          type="text/css">
+    <link href="{% static "assets/css/icons/icomoon/styles.css" %}" rel="stylesheet" type="text/css">
+    <link href="{% static "assets/css/bootstrap.css" %}" rel="stylesheet" type="text/css">
+    <link href="{% static "assets/css/core.css" %}" rel="stylesheet" type="text/css">
+    <link href="{% static "assets/css/components.css" %}" rel="stylesheet" type="text/css">
+    <link href="{% static "assets/css/colors.css" %}" rel="stylesheet" type="text/css">
+    <!-- /global stylesheets -->
+    <!-- Core JS files -->
+    <script type="text/javascript" src="{% static "assets/js/core/libraries/jquery.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "assets/js/core/libraries/bootstrap.min.js" %}"></script>
+    <style>
+        #map-canvas {
+            width: 700px;
+            height: 580px;
+        }
+    </style>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            height: 100%;
+        }
+
+        .controls {
+            margin-top: 10px;
+            border: 1px solid transparent;
+            border-radius: 2px 0 0 2px;
+            box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            height: 32px;
+            outline: none;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        #pac-input {
+            background-color: #fff;
+            font-family: Roboto;
+            font-size: 15px;
+            font-weight: 300;
+            margin-left: 12px;
+            padding: 0 11px 0 13px;
+            text-overflow: ellipsis;
+            width: 300px;
+        }
+
+        #pac-input:focus {
+            border-color: #4d90fe;
+        }
+
+        .pac-container {
+            font-family: Roboto;
+            z-index: 9999;
+            position: fixed;
+            display: inline-block;
+            float: left;
+        }
+
+        #type-selector {
+            color: #fff;
+            background-color: #4d90fe;
+            padding: 5px 11px 0px 11px;
+        }
+
+        #type-selector label {
+            font-family: Roboto;
+            font-size: 13px;
+            font-weight: 300;
+        }
+
+    </style>
+    <!-- /core JS files -->
+</head>
+
+<body>
+<div class="navbar navbar-inverse bg-primary">
+    <div class="navbar-header">
+        <ul class="nav navbar-nav visible-xs-block">
+            <li><a data-toggle="collapse" data-target="#navbar-mobile"><i class="icon-tree5"></i></a></li>
+            <li><a class="sidebar-mobile-main-toggle"><i class="icon-paragraph-justify3"></i></a></li>
+        </ul>
+    </div>
+    <div class="navbar-collapse collapse" id="navbar-mobile">
+        <ul class="nav navbar-nav">
+            <li><a class="sidebar-control sidebar-main-toggle hidden-xs"><i class="icon-paragraph-justify3"></i></a>
+            </li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+            <li class="dropdown dropdown-user">
+                <a class="dropdown-toggle" data-toggle="dropdown">
+                    <img src="{% static "assets/images/image.png" %}" alt="">
+                    <span>Capacitación</span>
+                    <i class="caret"></i>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-right">
+                    <li><a href="#"><i class="icon-switch2"></i> Cerrar Sesión</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+</div>
+<!-- /main navbar -->
+<!-- Page container -->
+<div class="page-container">
+    <!-- Page content -->
+    <div class="page-content">
+        <!-- Main sidebar -->
+        <div class="sidebar sidebar-main sidebar-default">
+            <div class="sidebar-content">
+                <!-- User menu -->
+                <div class="sidebar-user">
+                    <div class="category-content">
+                        <div class="media">
+                            <a href="#" class="media-left"><img src="{% static "assets/images/image.png" %}"
+                                                                class="img-circle img-sm" alt=""></a>
+                            <div class="media-body">
+                                <span class="media-heading text-semibold">Capacitación</span>
+                                <div class="text-size-mini text-muted">
+                                    <i class="icon-pin text-size-small"></i> &nbsp;Nacional
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /user menu -->
+                <!-- Main navigation -->
+
+                <div class="sidebar-category sidebar-category-visible">
+                    <div class="category-content no-padding">
+                        {% block sidebar %}
+                        {% endblock %}
+                    </div>
+                </div>
+
+                <!-- /main navigation -->
+            </div>
+        </div>
+        <!-- /main sidebar -->
+        <!-- Main content -->
+        <div class="content-wrapper">
+            <!-- Page header -->
+            <div class="page-header page-header-default">
+                <div class="page-header-content">
+                    <div class="page-title">
+                        <h4><i class="icon-arrow-left52 position-left"></i> <span
+                                class="text-semibold">{{ titulo_padre }}</span> {{ titulo_hijo }}</h4>
+                    </div>
+                </div>
+            </div>
+            <!-- /page header -->
+            <!-- Content area -->
+            <div class="content">
+                {% block content %}
+                {% endblock %}
+            </div>
+            <!-- /content area -->
+        </div>
+        <!-- /main content -->
+    </div>
+    <!-- /page content -->
+</div>
+<!-- /page container -->
+
+</body>
+<script>
+    var pathArray = location.href.split('/');
+    var protocol = pathArray[0];
+    var host = pathArray[2];
+    BASEURL = protocol + '//' + host;
+    BASE_URL = protocol + '//' + host + '/';
+    session = JSON.parse(localStorage.getItem('usuario'));
+
+    function setSelect(id, json, select2 = false) {
+        $('#' + id).find('option').remove();
+        let html = '';
+        $.each(json, function (key, val) {
+            html += `<option value="${val.id}">${val.text}</option>`
+        });
+        $('#' + id).html(html);
+        select2 ? $('#' + id).select2() : '';
+    }
+    function setSelect_v2(id, json, keys = [], select2 = false) {
+        console.log(keys);
+        $('#' + id).find('option').remove();
+
+        let html = '<option>Seleccione</option>';
+
+        $.each(json, function (key, val) {
+            if (typeof val == 'string') {
+                html += `<option value="${val}">${val}</option>`
+            } else {
+                html += `<option value="${val[keys[0]]}">${val[keys[1]]}</option>`
+            }
+        });
+        $('#' + id).html(html);
+        select2 ? $('#' + id).select2() : '';
+    }
+
+    function setTable(id, json, params, datatable = false, datatable_params = {}) {
+        let html = '';
+        $('#' + id).find('tbody').empty();
+        if (datatable) {
+            ('#' + id).DataTable({datatable_params})
+            ('#' + id).dataTable().fnDestroy();
+        }
+        if (json.html) {
+            html = json.html;
+        } else {
+            $.each(json, (key, val)=> {
+                html += '<tr>';
+                html += `<td>${key + 1}</td>`;
+                for (let i in params) {
+                    if (params[i].pk) {
+                        html += `<td><button onclick="getPEA(${val[params[i].pk]})" type="button">PEA</button></td>`;
+                    } else {
+                        html += `<td>${val[params[i]]}</td>`;
+                    }
+                }
+                html += '</tr>';
+            });
+        }
+
+        $('#' + id).find('tbody').html(html);
+
+        if (datatable) {
+            ('#' + id).DataTable({datatable_params})
+        }
+    }
+
+</script>
+
+{% block js %}
+{% endblock %}
+
+</html>

@@ -1,0 +1,244 @@
+{% extends "base/base.html" %}
+
+{% load staticfiles %}
+{% block title %}
+    Cursos y Evaluaciones
+{% endblock %}
+
+{% block sidebar %}
+    <ul class="navigation navigation-main navigation-accordion">
+        <!-- Main -->
+        <li class="navigation-header"><span>Main</span> <i class="icon-menu" title="Main pages"></i>
+        </li>
+        <li>
+            <a href="#"><i class="icon-stack"></i> <span>Capacitación</span></a>
+            <ul>
+                <li><a href="http://192.168.200.123:3000/modulo_registro">Modulo de Registro</a></li>
+                <li class="active"><a href="http://192.168.200.123:3000/cursos_evaluaciones">Cursos y Evaluaciones</a>
+                </li>
+            </ul>
+        </li>
+        <!-- /main -->
+    </ul>
+{% endblock %}
+
+{% block content %}
+    <div class="panel panel-flat">
+        <div class="panel-heading">
+            <h5 class="panel-title">Cursos</h5>
+            <div class="heading-elements">
+                <ul class="icons-list">
+                    <li>
+                        <a data-action="collapse"></a>
+                    </li>
+                    <li>
+                        <a data-action="close"></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label>Etapa</label>
+                        <select id="etapa" class="form-control" onchange="getCursos(this.value)">
+                            <option value="1">Censo Experimental</option>
+                            <option value="2">Empadronamiento</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <button id="btn_registrar_criterio" type="button" class="btn btn-primary btn-rounded legitRipple">
+                        Registrar Criterios de
+                        Evaluación
+                    </button>
+                    <button type="button" class="btn btn-primary btn-rounded legitRipple">
+                        Programar Curso
+                    </button>
+                </div>
+
+            </div>
+            <div class="row">
+                <div class="table-responsive">
+                    <table id="tabla_curso" class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th>Curso</th>
+                            <th>Descripción</th>
+                            <th>Acción</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--  MODALS!  -->
+    <div id="modal_registrar_criterio" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h6 class="modal-title">Registrar Criterio de Evaluación</h6>
+                </div>
+
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 col-lg-offset-3">
+                            <button id="btn_registrarcriterio" type="button"
+                                    class="btn btn-primary btn-rounded legitRipple">
+                                Agregar Evaluación
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="table-table-responsive">
+                            <table id="tabla_criterios" class="table table-bordered table-responsive">
+                                <thead>
+                                <tr>
+                                    <th>N°</th>
+                                    <th>Criterio de Criterio</th>
+                                    <th>Descripción de Criterio</th>
+                                    <th>Acción</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="modalform_registrar_criterio" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h6 class="modal-title">Registrar Criterio de Evaluación</h6>
+                </div>
+
+                <div id="modalform_addcriterio" class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <form id="form_registrarcriterio" class="form-horizontal">
+                                <input type="hidden" id="id_criterio" value="">
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Nombre Evaluación</label>
+                                    <div class="col-md-8">
+                                        <input id="nombre_criterio" value="" required name="nombre_criterio"
+                                               type="text" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Descripcion de Evaluación</label>
+                                    <div class="col-md-8">
+                                        <input id="descripcion_criterio" value="" required
+                                               name="descripcion_criterio" type="text" class="form-control">
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link" data-dismiss="modal">Cerrar</button>
+                    <button id="submit_registrarcriterio" class="btn btn-primary">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal_evaluacioncurso" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h6 class="modal-title">Evaluaciones del Curso</h6>
+                </div>
+
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="form-group">
+                            <label class="control-label col-lg-4">Nota Mínima del Curso</label>
+                            <div class="col-lg-6">
+                                <div class="input-group">
+                                    <input type="number" name="nota_minima" ID="nota_minima" class="form-control"
+                                           placeholder="Nota Minima">
+                                    <span class="input-group-btn">
+													<button id="btn_guardarnotaminima" class="btn bg-teal legitRipple"
+                                                            type="button">Guardar</button>
+												</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <input type="hidden" name="id_curso" id="id_curso">
+                            <form class="form-horizontal" id="form_cursocriterio">
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Criterios</label>
+                                    <input type="hidden" id="id_cursocriterio">
+                                    <div class="col-md-8">
+                                        <select name="id_criterio" id="id_criterio2" class="form-control">
+
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Ponderación</label>
+                                    <div class="col-md-8">
+                                        <input id="ponderacion" required
+                                               name="ponderacion" type="text" class="form-control">
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <button id="btn_registrar_criterio_curso" class="btn btn-primary">Guardar</button>
+                        <button id="limpiar_formcursocriterio" class="btn btn-primary">Limpiar</button>
+                    </div>
+                    <div class="row">
+                        <div class="table-responsive">
+                            <table id="tabla_cursocriterio" class="table table-bordered table-responsive">
+                                <thead>
+                                <tr>
+                                    <th>N°</th>
+                                    <th>Criterio de Evaluación</th>
+                                    <th>Ponderación</th>
+                                    <th>Accion</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- END MODALS!  -->
+{% endblock %}
+
+{% block js %}
+    <script type="text/javascript" src="{% static "assets/js/plugins/notifications/bootbox.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "assets/js/plugins/tables/datatables/datatables.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "assets/js/plugins/forms/validation/validate.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "assets/js/plugins/notifications/sweet_alert.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "assets/js/plugins/forms/selects/select2.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "assets/js/core/app.js" %}"></script>
+    <script type="text/javascript" src="{% static "assets/js/capacitacion/cursos_evaluaciones.js" %}"></script>
+{% endblock %}
+
