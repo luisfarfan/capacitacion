@@ -84,7 +84,7 @@ WSGI_APPLICATION = 'intranet.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'sql_server.pyodbc',
-        'NAME': 'CPV_CAPACITACION',
+        'NAME': 'CPV_CAPACITACION2',
         'USER': 'us_capacitacion_web',
         'PASSWORD': 'cap5wegU$re',
         'HOST': '172.18.1.41',

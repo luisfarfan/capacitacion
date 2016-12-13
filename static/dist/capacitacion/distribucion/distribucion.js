@@ -9,6 +9,10 @@ $(function () {
 });
 // -- END DOCUEMTNT ON READY
 
+//VARIABLES COMUNES
+var id_curso;
+//
+
 $('#local').change(e => {
     "use strict";
     getAmbientes($('#local').val());
@@ -41,8 +45,8 @@ function getAmbientes(id_local) {
         url: `${BASEURL}/localambiente/${id_local}/`,
         type: 'GET',
         success: response => {
-            console.log(response);
-            setTable('tabla_detalle_ambientes', response, ['numero', 'capacidad', 'nombre_ambiente', {pk: 'id_localambiente'}]);
+            id_curso = response.id_curso;
+            setTable('tabla_detalle_ambientes', response.ambientes, ['numero', 'capacidad', 'nombre_ambiente', {pk: 'id_localambiente'}]);
         },
         error: error => {
             console.log('ERROR!!', error);
@@ -57,7 +61,7 @@ function getPEA(id_ambiente) {
         type: 'GET',
         success: response => {
             console.log(response)
-            setTable('tabla_pea', response.pea, ['dni', 'ape_paterno', 'ape_materno', 'nombre', 'cargo']);
+            setTable('tabla_pea', response.pea, ['dni', 'ape_paterno', 'ape_materno', 'nombre', {'cargo': ['id_cargofuncional', 'nombre_funcionario']}]);
         },
         error: error => {
             console.log('ERROR!!', error)
@@ -92,7 +96,7 @@ function getSobrantes() {
     $.ajax({
         url: `${BASEURL}/sobrantes_zona/`,
         type: 'POST',
-        data: {ubigeo: ubigeo, zona: `${session.zona}`},
+        data: {ubigeo: ubigeo, zona: `${session.zona}`, id_curso: id_curso},
         success: response => {
             console.log(response);
             $('#tabla_pea_sobrante').DataTable({

@@ -227,6 +227,7 @@ function dataSave() {
             getLocalAmbientes();
             $('#id_localambiente').val('');
             $('#msg_error').hide();
+            validarMetaPea();
         }
     });
 }

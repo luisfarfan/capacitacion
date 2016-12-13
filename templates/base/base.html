@@ -227,6 +227,8 @@
                 for (let i in params) {
                     if (params[i].pk) {
                         html += `<td><button onclick="getPEA(${val[params[i].pk]})" type="button">PEA</button></td>`;
+                    } else if (params[i]['cargo']) {
+                        html += `<td>${val.id_cargofuncional.nombre_funcionario}</td>`;
                     } else {
                         html += `<td>${val[params[i]]}</td>`;
                     }

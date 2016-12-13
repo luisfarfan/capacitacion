@@ -3,6 +3,8 @@
  */
 //BASE_URL = `http://localhost:8000/`;
 
+var meta_pea = 0;
+$('#div_cant_meta').hide();
 function resetForm(idform) {
     "use strict";
     $('#' + idform + ' :input').map(function () {
@@ -65,6 +67,11 @@ $('#distritos').change(function () {
 
 $('#buscarlocal').click(function () {
     getLocalesbyUbigeo();
+});
+
+$('#cursos').change(()=> {
+    "use strict";
+    getMetaPea();
 });
 
 function getDepartamentos() {
@@ -452,7 +459,10 @@ $('#registrar').on('click', function () {
                         success: function (data) {
                             resetForm('form_local');
                             validator.resetForm();
+                            $('#div_cant_meta').hide();
                             $('#tabla_aulas').dataTable().fnDestroy();
+                            $('#tabla_aulas').find('tbody').empty();
+                            $('#capacidad_total').text(0);
                         }
                     });
                 }
@@ -470,40 +480,18 @@ function getLocalAmbientes() {
     $.getJSON(url, function (data) {
         let capacidad_total = 0;
         $('#tabla_aulas').find('tbody').empty();
-        if (data.length > 0) {
-            $.each(data, function (key, val) {
+        if (data.ambientes.length > 0) {
+            $.each(data.ambientes, function (key, val) {
                 capacidad_total = capacidad_total + parseInt(val.capacidad);
-                let ambiente = '';
-                console.log(val);
-                switch (val.id_ambiente) {
-                    case 1:
-                        ambiente = 'Aula';
-                        break;
-                    case 2:
-                        ambiente = 'Auditorios';
-                        break;
-                    case 3:
-                        ambiente = 'Sala Reunion';
-                        break;
-                    case 4:
-                        ambiente = 'Oficina Administrativa';
-                        break;
-                    case 5:
-                        ambiente = 'Laboratorio de Computo';
-                        break;
-                    case 6:
-                        ambiente = 'Otros';
-                        break;
-                }
-                html += `<tr><td>${val.numero}</td><td>${ambiente}</td><td>${val.capacidad}</td><td><button type="button" onclick="setLocalAmbienteForm(${val.id_localambiente})">Editar</button></td></tr>`;
+                html += `<tr><td>${val.numero}</td><td>${val.nombre_ambiente}</td><td>${val.capacidad}</td><td><button type="button" onclick="setLocalAmbienteForm(${val.id_localambiente})">Editar</button></td></tr>`;
             });
-            console.log(capacidad_total);
             $('#capacidad_total').text(capacidad_total);
             $('#tabla_aulas').find('tbody').html(html);
             $('#tabla_aulas').DataTable({
                 "pageLength": 5,
                 "lengthMenu": [[5, 10, 30, -1], [5, 10, 30, "All"]]
             });
+            validarMetaPea();
         }
     });
 }
@@ -531,3 +519,43 @@ $('#cantidad_usar_otros').keyup(e => {
     "use strict";
     ($('#cantidad_usar_otros').val() == '' || $('#cantidad_usar_otros').val() == 0) ? $('#especifique_otros').prop('readonly', true) : $('#especifique_otros').prop('readonly', false)
 });
+
+function getMetaPea() {
+    "use strict";
+    let ubigeo = `${session.ccdd}${session.ccpp}${session.ccdi}`;
+    let id_curso = $('#cursos').val();
+    $.ajax({
+        url: `${BASEURL}/getMeta/`,
+        type: 'POST',
+        data: {ubigeo: ubigeo, zona: session.zona, id_curso: id_curso},
+        success: response => {
+            $('#cant_meta').text(response.cant);
+            $('#div_cant_meta').show();
+            validarMetaPea();
+        },
+        error: error => {
+            console.log('ERROR!!', error)
+        }
+    })
+}
+
+function validarMetaPea() {
+    "use strict";
+    let cant_meta = parseInt($('#cant_meta').text());
+    let msg = 'Capacidad dentro del Rango';
+    let capacidad_local = parseInt($('#capacidad_total').text());
+
+
+    if (capacidad_local > cant_meta) {
+        msg = 'Capacidad fuera del Rango de Meta';
+        $('#div_cant_meta').removeClass('alert-success');
+        $('#div_cant_meta').addClass('alert-danger');
+    } else {
+        $('#div_cant_meta').removeClass('alert-danger');
+        $('#div_cant_meta').addClass('alert-success');
+    }
+
+    $('#msg_cantidad_meta').text(msg);
+    $('#capacidad_meta_local').text(capacidad_local);
+
+}

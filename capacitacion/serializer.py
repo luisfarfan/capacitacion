@@ -39,7 +39,14 @@ class CursoCriterioSerializer(serializers.ModelSerializer):
         model = CursoCriterio
 
 
+class TipoFuncionarioSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Funcionario
+
+
 class PEASerializer(serializers.ModelSerializer):
+    id_cargofuncional = TipoFuncionarioSerializer()
+
     class Meta:
         model = PEA
 

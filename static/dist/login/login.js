@@ -1,6 +1,10 @@
 /**
  * Created by LFarfan on 01/12/2016.
  */
+var pathArray = location.href.split('/');
+var protocol = pathArray[0];
+var host = pathArray[2];
+BASEURL = protocol + '//' + host;
 $('#iniciar_sesion').click(event => {
     "use strict";
     do_login();
@@ -15,7 +19,7 @@ function do_login() {
         success: function (response) {
             if (response.length > 0) {
                 localStorage.setItem('usuario', JSON.stringify(response[0]));
-                window.location.replace('http://192.168.200.123:3000/modulo_registro');
+                window.location.replace(`${BASEURL}/modulo_registro`);
             } else {
                 alert('ERROR!')
             }

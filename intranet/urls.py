@@ -44,7 +44,8 @@ urlpatterns = [
     url('^getPeaAsistencia/$', getPeaAsistencia),
     url('^peaaulabylocalambiente/(?P<id_localambiente>.+)/$', PEA_AULAbyLocalAmbienteViewSet.as_view()),
     url('^peaaulaasistencia/(?P<id_localambiente>.+)/$', PEA_AULAViewSet.as_view()),
+    url('^getMeta/$', getMeta),
     # url('^localambiente/(?P<id_local>.+)/(?P<id_ambiente>.+)/$', LocalAmbienteByLocalAulaViewSet.as_view()),
     url('^save_asistencia/$', save_asistencia),
-
+    url('^getCriteriosCurso/(?P<id_curso>[0-9]+)/$', getCriteriosCurso),
 ]

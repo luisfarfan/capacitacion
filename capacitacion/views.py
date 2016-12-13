@@ -79,7 +79,7 @@ class DistritosList(APIView):
 class ZonasList(APIView):
     def get(self, request, ubigeo):
         zonas = list(
-            Zona.objects.filter(UBIGEO=ubigeo).values('UBIGEO', 'ZONA', 'ETIQ_ZONA').annotate(
+            Zona.objects.using('segmentacion').filter(UBIGEO=ubigeo).values('UBIGEO', 'ZONA', 'ETIQ_ZONA').annotate(
                 dcount=Count('UBIGEO', 'ZONA')))
         response = JsonResponse(zonas, safe=False)
         return response
@@ -106,7 +106,10 @@ def TbLocalAmbienteByLocalViewSet(request, id_local):
     query = LocalAmbiente.objects.filter(id_local=id_local).order_by('-capacidad').annotate(
         nombre_ambiente=F('id_ambiente__nombre_ambiente')).values(
         'id_localambiente', 'numero', 'capacidad', 'nombre_ambiente')
-    return JsonResponse(list(query), safe=False)
+    local = Local.objects.get(pk=id_local)
+    return JsonResponse(
+        {'ambientes': list(query), 'ubigeo': local.ubigeo_id, 'zona': local.zona, 'id_curso': local.id_curso_id},
+        safe=False)
 
 
 class LocalAmbienteByLocalAulaViewSet(generics.ListAPIView):
@@ -195,10 +198,27 @@ def sobrantes_zona(request):
     if request.method == "POST" and request.is_ajax():
         ubigeo = request.POST['ubigeo']
         zona = request.POST['zona']
-        sobrantes = PEA.objects.exclude(id_pea__in=PEA_AULA.objects.values('id_pea')).filter(ubigeo=ubigeo,
-                                                                                             zona=zona).order_by(
-            'ape_paterno').values('dni', 'ape_paterno', 'ape_materno', 'nombre', 'cargo')
+        id_curso = request.POST['id_curso']
+        sobrantes = PEA.objects.exclude(id_pea__in=PEA_AULA.objects.values('id_pea')).annotate(
+            cargo=F('id_cargofuncional__nombre_funcionario')).filter(ubigeo=ubigeo,
+                                                                     zona=zona,
+                                                                     id_cargofuncional__cursofuncionario__id_curso_id=id_curso).order_by(
+            'ape_paterno').values('dni', 'ape_paterno', 'ape_materno', 'nombre',
+                                  'cargo')
         return JsonResponse(list(sobrantes), safe=False)
+
+    return JsonResponse({'msg': False})
+
+
+@csrf_exempt
+def getMeta(request):
+    if request.method == "POST" and request.is_ajax():
+        id_curso = request.POST['id_curso']
+        ubigeo = request.POST['ubigeo']
+        zona = request.POST['zona']
+        meta = PEA.objects.filter(id_cargofuncional__cursofuncionario__id_curso=id_curso, ubigeo=ubigeo,
+                                  zona=zona).count()
+        return JsonResponse({'cant': meta}, safe=False)
 
     return JsonResponse({'msg': False})
 
@@ -243,7 +263,7 @@ def disponibilidad_aula(aula):
 TURNO
 0 = MANANA
 1 = TARDE
-2 = TOOD EL DIA
+2 = TODO EL DIA
 """
 
 
@@ -296,3 +316,12 @@ def save_asistencia(request):
                 pea_asistencia.save()
 
     return JsonResponse({'msg': True})
+
+
+@csrf_exempt
+def getCriteriosCurso(request, id_curso):
+    criterios = list(
+        CursoCriterio.objects.filter(id_curso=id_curso).annotate(
+            criterio=F('id_criterio__nombre_criterio')).values('id_cursocriterio', 'criterio'))
+
+    return JsonResponse(criterios, safe=False)

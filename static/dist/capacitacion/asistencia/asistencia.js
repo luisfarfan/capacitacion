@@ -82,7 +82,7 @@ function getAmbientes(id_local) {
         type: 'GET',
         success: response => {
             console.log(response);
-            setTable('tabla_detalle_ambientes', response, ['numero', 'capacidad', 'nombre_ambiente', {pk: 'id_localambiente'}]);
+            setTable('tabla_detalle_ambientes', response.ambientes, ['numero', 'capacidad', 'nombre_ambiente', {pk: 'id_localambiente'}]);
         },
         error: error => {
             console.log('ERROR!!', error);
@@ -124,6 +124,7 @@ function getPEA(id_localambiente) {
         url: `${BASEURL}/peaaulaasistencia/${id_localambiente}/`,
         type: 'GET',
         success: response => {
+            console.log(response);
             let fecha_selected = $('#fechas').val();
             console.log(fecha_selected);
             let json = {};
@@ -135,7 +136,7 @@ function getPEA(id_localambiente) {
             $.each(response, (key, val)=> {
                 html += '<tr>';
                 html += `<td>${key + 1}</td>`;
-                html += `<td>${val.id_pea.ape_paterno} ${val.id_pea.ape_materno} ${val.id_pea.nombre}</td><td>${val.id_pea.cargo}</td>`;
+                html += `<td>${val.id_pea.ape_paterno} ${val.id_pea.ape_materno} ${val.id_pea.nombre}</td><td>${val.id_pea.id_cargofuncional.nombre_funcionario}</td>`;
 
 
                 html += `<td><div name="m${fecha_selected}" class="form-group">

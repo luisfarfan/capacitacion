@@ -67,7 +67,7 @@ class CursoFuncionario(models.Model):
 
 class Funcionario(models.Model):
     id_funcionario = models.AutoField(primary_key=True, db_column='id_funcionario')
-    cod_funcionario = models.CharField(max_length=3, blank=True, null=True)
+    id_cargofuncional = models.CharField(max_length=3, blank=True, null=True)
     nombre_funcionario = models.CharField(max_length=100, blank=True, null=True)
     id_curso = models.ForeignKey('Curso', db_column='id_curso')
 
@@ -210,11 +210,12 @@ class PEA(models.Model):
     ape_paterno = models.CharField(max_length=100, blank=True, null=True, db_column='ape_paterno')
     ape_materno = models.CharField(max_length=100, blank=True, null=True, db_column='ape_materno')
     nombre = models.CharField(max_length=100, blank=True, null=True, db_column='nombre')
-    id_cargofuncional = models.IntegerField(db_column='id_cargofuncional')
-    cargo = models.CharField(max_length=50, blank=True, null=True, db_column='cargo')
+    id_cargofuncional = models.ForeignKey('Funcionario', db_column='id_cargofuncional', related_name='tipofuncionario')
     id_convocatoriacargo = models.CharField(max_length=4, blank=True, null=True, db_column='id_convocatoriacargo')
     zona = models.CharField(max_length=5, blank=True, null=True, db_column='zona')
     ubigeo = models.ForeignKey('Ubigeo', db_column='ubigeo')
+    reserva = models.IntegerField(blank=True, null=True)
+    baja_estado = models.IntegerField(null=True, blank=True)
 
     class Meta:
         managed = True
@@ -225,6 +226,7 @@ class PEA_AULA(models.Model):
     id_peaaula = models.AutoField(primary_key=True, db_column='id_peaaula')
     id_pea = models.ForeignKey('PEA', db_column='id_pea')
     id_localambiente = models.ForeignKey('LocalAmbiente', db_column='id_localambiente')
+    pea_notas = models.ManyToManyField('CursoCriterio', through='PEA_CURSOCRITERIO')
 
     class Meta:
         managed = True
@@ -241,3 +243,14 @@ class PEA_ASISTENCIA(models.Model):
     class Meta:
         managed = True
         db_table = 'PEA_ASISTENCIA'
+
+
+class PEA_CURSOCRITERIO(models.Model):
+    id_pea_cursocriterio = models.AutoField(primary_key=True, db_column='id_pea_cursocriterio')
+    id_peaaula = models.ForeignKey('PEA_AULA')
+    id_cursocriterio = models.ForeignKey('CursoCriterio')
+    nota = models.IntegerField()
+
+    class Meta:
+        managed = True
+        db_table = 'PEA_CURSOCRITERIO'
