@@ -75,7 +75,7 @@ function doAsignacion() {
     $.ajax({
         url: `${BASEURL}/asignacion/`,
         type: 'POST',
-        data: {ubigeo: ubigeo, zona: `${session.zona}`},
+        data: {ubigeo: ubigeo, zona: `${session.zona}`, id_curso: session.curso},
         success: response => {
             console.log(response);
             $('#modal_pea_sobrante').unblock();
@@ -87,20 +87,35 @@ function doAsignacion() {
         }
     })
 }
+function doAsignacionReserva() {
+    "use strict";
+    let ubigeo = `${session.ccdd}${session.ccpp}${session.ccdi}`;
+    $.ajax({
+        url: `${BASEURL}/asignacion/`,
+        type: 'POST',
+        data: {ubigeo: ubigeo, zona: `${session.zona}`, reserva: 1, id_curso: session.curso},
+        success: response => {
+            $('#modal_pea_sobrante').unblock();
+            getReserva();
+        },
+        error: error => {
+            console.log('ERROR!!', error)
+            $('#modal_pea_sobrante').unblock();
+        }
+    })
+}
 
 function getSobrantes() {
     "use strict";
     let ubigeo = `${session.ccdd}${session.ccpp}${session.ccdi}`;
-    let _id_curso = session.usuario;
+    let _id_curso = session.curso;
     $('#tabla_pea_sobrante').DataTable();
     $('#tabla_pea_sobrante').dataTable().fnDestroy();
     $.ajax({
         url: `${BASEURL}/sobrantes_zona/`,
         type: 'POST',
-        data: {ubigeo: ubigeo, zona: `${session.zona}`, id_curso: id_curso},
+        data: {ubigeo: ubigeo, zona: `${session.zona}`, id_curso: _id_curso, reserva: 0},
         success: response => {
-            console.log(response);
-
             $('#tabla_pea_sobrante').DataTable({
                 "data": response,
                 "columns": [
@@ -119,6 +134,37 @@ function getSobrantes() {
         }
     })
 }
+
+function getReserva() {
+    "use strict";
+    let ubigeo = `${session.ccdd}${session.ccpp}${session.ccdi}`;
+    let _id_curso = session.curso;
+    $('#tabla_pea_reserva').DataTable();
+    $('#tabla_pea_reserva').dataTable().fnDestroy();
+    $.ajax({
+        url: `${BASEURL}/sobrantes_zona/`,
+        type: 'POST',
+        data: {ubigeo: ubigeo, zona: `${session.zona}`, id_curso: _id_curso, reserva: 1},
+        success: response => {
+            $('#tabla_pea_reserva').DataTable({
+                "data": response,
+                "columns": [
+                    {"data": "dni"},
+                    {"data": "ape_paterno"},
+                    {"data": "ape_materno"},
+                    {"data": "nombre"},
+                    {"data": "cargo"},
+                ]
+            });
+
+            $('#modal_pea_reserva').modal('show');
+        },
+        error: error => {
+            console.log('ERROR!!', error)
+        }
+    })
+}
+
 $('#btn_do_asignar_pea').on('click', function () {
     var light_4 = $('#modal_pea_sobrante');
     $(light_4).block({

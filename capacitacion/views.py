@@ -231,10 +231,12 @@ def sobrantes_zona(request):
         ubigeo = request.POST['ubigeo']
         zona = request.POST['zona']
         id_curso = request.POST['id_curso']
+        reserva = request.POST['reserva']
         sobrantes = PEA.objects.exclude(id_pea__in=PEA_AULA.objects.values('id_pea')).annotate(
             cargo=F('id_cargofuncional__nombre_funcionario')).filter(ubigeo=ubigeo,
                                                                      zona=zona,
-                                                                     id_cargofuncional__cursofuncionario__id_curso_id=id_curso).order_by(
+                                                                     id_cargofuncional__cursofuncionario__id_curso_id=id_curso,
+                                                                     reserva=reserva).order_by(
             'ape_paterno').values('dni', 'ape_paterno', 'ape_materno', 'nombre',
                                   'cargo')
         return JsonResponse(list(sobrantes), safe=False)
@@ -267,17 +269,31 @@ def getMeta(request):
 @csrf_exempt
 def asignar(request):
     if request.method == "POST" and request.is_ajax():
-        ubigeo = request.POST['ubigeo']
-        zona = request.POST['zona']
-        locales_zona = Local.objects.filter(ubigeo=ubigeo, zona=zona)
+        data = request.POST
+        ubigeo = data['ubigeo']
+        zona = data['zona']
+        curso = data['id_curso']
+        if 'zona' in data:
+            locales_zona = Local.objects.filter(ubigeo=ubigeo, zona=zona, id_curso=curso)
+        else:
+            locales_zona = Local.objects.filter(ubigeo=ubigeo, id_curso=curso)
+
         for e in locales_zona:
             aulas_by_local = LocalAmbiente.objects.filter(id_local=e.id_local).order_by('-capacidad')
             for a in aulas_by_local:
-                if disponibilidad_aula(a.id_localambiente):
-                    pea_ubicar = PEA.objects.exclude(id_pea__in=PEA_AULA.objects.values('id_pea')).filter(
-                        ubigeo=ubigeo, zona=zona,
-                        id_cargofuncional__in=Funcionario.objects.filter(id_curso=e.id_curso)).order_by(
-                        'ape_paterno')[:a.capacidad]
+                disponibilidad = disponibilidad_aula(a.id_localambiente)
+                if disponibilidad > 0:
+                    if 'reserva' not in data:
+                        print 'entro a normal'
+                        pea_ubicar = PEA.objects.exclude(
+                            id_pea__in=PEA_AULA.objects.values('id_pea')).filter(
+                            ubigeo=ubigeo, zona=zona, reserva=0, baja_estado=0,
+                            id_cargofuncional__in=Funcionario.objects.filter(id_curso=e.id_curso)).order_by(
+                            'ape_paterno')[:a.capacidad]
+                    else:
+                        pea_ubicar = PEA.objects.exclude(
+                            id_pea__in=PEA_AULA.objects.filter(id_pea__baja_estado=0).values('id_pea')).filter(
+                            pk__in=data['reserva'])[:disponibilidad]
                     for p in pea_ubicar:
                         pea = PEA.objects.get(pk=p.id_pea)
                         aula = LocalAmbiente.objects.get(pk=a.id_localambiente)
@@ -291,13 +307,8 @@ def asignar(request):
 
 def disponibilidad_aula(aula):
     aula = LocalAmbiente.objects.get(pk=aula)
-    cantidad_asignada = PEA_AULA.objects.filter(id_localambiente=aula).count()
-    is_disponible = True
-
-    if cantidad_asignada >= aula.capacidad:
-        is_disponible = False
-
-    return is_disponible
+    cantidad_asignada = PEA_AULA.objects.filter(id_localambiente=aula, id_pea__baja_estado=0).count()
+    return aula.capacidad - cantidad_asignada
 
 
 """
