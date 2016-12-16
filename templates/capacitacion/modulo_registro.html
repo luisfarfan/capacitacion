@@ -32,28 +32,36 @@
     </style>
 {% endblock %}
 
-{% block sidebar %}
-    <ul class="navigation navigation-main navigation-accordion">
-        <!-- Main -->
-        <li class="navigation-header"><span>Main</span> <i class="icon-menu" title="Main pages"></i>
-        </li>
-        <li>
-            <a href="#"><i class="icon-stack"></i> <span>Capacitación</span></a>
-            <ul>
-                <li class="active"><a href="{% url 'modulo_registro' %}">Modulo de Registro de Local</a>
-                </li>
-                <li><a href="{% url 'distribucion' %}">Modulo Distribucion de PEA</a></li>
-                <li><a href="{% url 'asistencia' %}">Modulo de Asistencia</a></li>
-            </ul>
-        </li>
-        <!-- /main -->
-    </ul>
-{% endblock %}
 
 {% block content %}
-    <div class="panel panel-flat">
-        <div class="panel-heading">
+    <div class="row">
+        <div class="col-md-offset-8 col-md-4">
+            <div class="panel panel-flat">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr class="bg-blue">
+                            <th>CAPACIDAD DE AMBIENTES</th>
+                            <th>PEA RECLUTADA</th>
+                            <th>PEA A CAPACITAR</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td><input type="text" class="form-control" id="capacidad_ambiente"></td>
+                            <td><input type="text" class="form-control" id="cant_reclutada"></td>
+                            <td><input type="text" class="form-control" id="cant_meta"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
 
+    </div>
+    <div class="panel panel-primary panel-bordered">
+        <div class="panel-heading">
+            <h5 class="panel-title">UBICACIÓN GEOGRÁFICA</h5>
             <div class="heading-elements">
                 <ul class="icons-list">
                     <li>
@@ -78,56 +86,42 @@
             <div class="row">
                 <div class="col-md-3">
                     <div class="form-group">
-                        <label>Departamento</label>
-                        <select id="departamentos" class="select">
+                        <label class="text-bold">Departamento</label>
+                        <select disabled id="departamentos" class="select">
                             <option value="">Seleccione</option>
                         </select>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="form-group">
-                        <label>Provincia</label>
-                        <select id="provincias" class="select">
+                        <label class="text-bold">Provincia</label>
+                        <select disabled id="provincias" class="select">
                             <option value="">Seleccione</option>
                         </select>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="form-group">
-                        <label>Distrito</label>
-                        <select id="distritos" class="select">
+                        <label class="text-bold">Distrito</label>
+                        <select disabled id="distritos" class="select">
                             <option value="">Seleccione</option>
                         </select>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="form-group">
-                        <label>Zona</label>
-                        <select id="zona" class="select">
-                            <option value="">Seleccione</option>
+                        <label class="text-bold">Zona</label>
+                        <select disabled id="zona" class="select">
+                            <option value="0">Seleccione</option>
                         </select>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="row">
-        <div class="col-md-6">
-            <div id="div_cant_meta" class="alert alert-success alert-styled-right alert-arrow-right alert-bordered">
-                <button type="button" class="close" data-dismiss="alert"><span
-                        class="sr-only">Close</span>
-                </button>
-                <span id="capacidad_meta_local" class="text-semibold"></span> /
-                <span id="cant_meta" class="text-semibold"></span>
-                <span id="msg_cantidad_meta" class="text-semibold">Capacidad dentro del Rango</span>
-            </div>
-        </div>
-    </div>
-
-
-    <div class="panel panel-flat">
+    <div class="panel panel-primary panel-bordered">
         <div class="panel-heading">
-            {#            <h5 class="panel-title">Registrar Local</h5>#}
+            <h5 class="panel-title">REGISTRO DE LOCAL</h5>
             <div class="heading-elements">
                 <ul class="icons-list">
                     <li>
@@ -150,6 +144,7 @@
                                 <div class="form-group">
                                     <label>Etapa</label>
                                     <select id="etapa" class="form-control" onchange="getCursos(this.value)">
+                                        <option value="-1">Seleccione..</option>
                                         <option value="1">CENSO EXPERIMENTAL</option>
                                         <option value="2">Empadronamiento</option>
                                     </select>
@@ -163,48 +158,27 @@
                                     </select>
                                 </div>
                             </div>
-                            {#                            <div class="col-md-4">#}
-                            {#                                <table class="table table-responsive table-bordered">#}
-                            {#                                    <thead>#}
-                            {#                                    <tr>#}
-                            {#                                        <th colspan="4" scope="col">CAPACIDAD DE LOCAL</th>#}
-                            {#                                    </tr>#}
-                            {#                                    <tr>#}
-                            {#                                        <th scope="col">TOTAL</th>#}
-                            {#                                        <th scope="col">DISPONIBLE</th>#}
-                            {#                                        <th scope="col">A USAR</th>#}
-                            {#                                    </tr>#}
-                            {#                                    </thead>#}
-                            {#                                    <tbody>#}
-                            {#                                    <tr>#}
-                            {#                                        <td><input type="text" name="capacidad_local_total"#}
-                            {#                                                   id="capacidad_local_total"#}
-                            {#                                                   required class="form-control" value="0">#}
-                            {#                                        </td>#}
-                            {#                                        <td><input type="text" name="capacidad_local_disponible"#}
-                            {#                                                   id="capacidad_local_disponible" required#}
-                            {#                                                   class="form-control" value="0">#}
-                            {#                                        </td>#}
-                            {#                                        <td><input type="text" name="capacidad_local_usar"#}
-                            {#                                                   id="capacidad_local_usar" required#}
-                            {#                                                   class="form-control" value="0">#}
-                            {#                                        </td>#}
-                            {#                                    </tr>#}
-                            {#                                    </tbody>#}
-                            {#                                </table>#}
-                            {#                            </div>#}
                         </div>
                     </fieldset>
                     <fieldset class="content-group">
-                        <legend class=" text-bold"></legend>
+                        <legend class="text-bold">DIRECCIÓN</legend>
                         <div class="row">
-                            <div class="col-md-3">
+                            <div class="col-md-9">
                                 <div class="form-group">
                                     <label>Nombre de Local</label>
                                     <input type="text" required="required" name="nombre_local"
                                            class="form-control" placeholder="">
                                 </div>
                             </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>Zona N° Ubicación del local</label>
+                                    <select name="zona_ubicacion_local" class="form-control" id="zona_ubicacion_local">
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <label>Tipo de Vía</label>
@@ -219,32 +193,10 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Nombre de Vía</label>
-                                    <div class="input-group">
-												<span class="input-group-btn">
-													<button id="abrir_mapa" class="btn btn-default btn-icon legitRipple"
-                                                            type="button"><i class="glyphicon glyphicon-map-marker"></i></button>
-												</span>
-                                        <input type="text" required="required" name="nombre_via"
-                                               class="form-control" placeholder="">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label>Zona N° Ubicacion del local</label>
-                                    <select name="zona_ubicacion_local" class="form-control" id="zona_ubicacion_local">
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-7">
-                                <div class="form-group">
-                                    <label>Referencia</label>
-                                    <input type="text" name="referencia"
+                                    <input type="text" required="required" name="nombre_via"
                                            class="form-control" placeholder="">
                                 </div>
                             </div>
@@ -252,6 +204,13 @@
                                 <div class="form-group">
                                     <label>N°Puerta</label>
                                     <input type="text" required="required" name="n_direccion"
+                                           class="form-control" placeholder="">
+                                </div>
+                            </div>
+                            <div class="col-md-1">
+                                <div class="form-group">
+                                    <label>Piso</label>
+                                    <input type="text" required="required" name="piso_direccion"
                                            class="form-control" placeholder="">
                                 </div>
                             </div>
@@ -276,14 +235,17 @@
                                            class="form-control" placeholder="">
                                 </div>
                             </div>
-                            <div class="col-md-1">
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
                                 <div class="form-group">
-                                    <label>Piso</label>
-                                    <input type="text" required="required" name="piso_direccion"
+                                    <label>Referencia</label>
+                                    <input type="text" name="referencia"
                                            class="form-control" placeholder="">
                                 </div>
                             </div>
                         </div>
+
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
@@ -322,10 +284,9 @@
                                 <div class="form-group">
                                     <label>Turno de Uso Local</label>
                                     <select name="turno_uso_local" class="select">
-                                        <option value="0">MAÑANA</option>
+                                        <option value="">MAÑANA</option>
                                         <option value="1">TARDE</option>
-                                        <option value="2">NOCHE</option>
-                                        <option value="3">TODO EL DIA</option>
+                                        <option value="2">TODO EL DIA</option>
                                     </select>
                                 </div>
                             </div>
@@ -340,28 +301,35 @@
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <label>Apellidos y Nombres</label>
-                                    <input type="text" required="required" name="funcionario_nombre"
+                                    <select class="form_control select" name="funcionario_nombre"
+                                            id="funcionario_nombre">
+                                        <option value="-1">Seleccione</option>
+                                        {% for funcionario in funcionarios %}
+                                            <option value="{{ funcionario.id_per }}">
+                                                {{ funcionario.dni }} - {{ funcionario.ape_paterno }}
+                                                {{ funcionario.ape_materno }} {{ funcionario.nombre }} </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label>Cargo</label>
+                                    <input type="text" name="funcionario_cargo" disabled
                                            class="form-control" placeholder="">
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <label>Email</label>
-                                    <input type="text" required="required" name="funcionario_email"
-                                           class="form-control" placeholder="">
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="form-group">
-                                    <label>Teléfono Fijo</label>
-                                    <input type="text" name="funcionario_telefono"
+                                    <input type="text" required="required" name="funcionario_email" disabled
                                            class="form-control" placeholder="">
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <label>Teléfono Celular</label>
-                                    <input type="text" name="funcionario_celular"
+                                    <input type="text" name="funcionario_celular" disabled
                                            class="form-control" placeholder="">
                                 </div>
                             </div>
@@ -419,94 +387,93 @@
                                     <td>Aula</td>
                                     <td><input type="text" name="cantidad_total_aulas"
                                                id="cantidad_total_aulas"
-                                               class="form-control" value="0">
+                                               class="form-control" value="">
                                     </td>
                                     <td><input type="text" name="cantidad_disponible_aulas"
                                                id="cantidad_disponible_aulas"
-                                               class="form-control" value="0">
+                                               class="form-control" value="">
                                     </td>
                                     <td><input type="text" name="cantidad_usar_aulas"
                                                id="cantidad_usar_aulas"
-                                               class="form-control" value="0">
+                                               class="form-control" value="">
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>Auditorio</td>
                                     <td><input type="text" name="cantidad_total_auditorios"
                                                id="cantidad_total_auditorios"
-                                               class="form-control" value="0">
+                                               class="form-control" value="">
                                     </td>
                                     <td><input type="text" name="cantidad_disponible_auditorios"
                                                id="cantidad_disponible_auditorios"
-                                               class="form-control" value="0">
+                                               class="form-control" value="">
                                     </td>
                                     <td><input type="text" name="cantidad_usar_auditorios"
                                                id="cantidad_usar_auditorios"
-                                               class="form-control" value="0">
+                                               class="form-control" value="">
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>Sala de Reuniones</td>
                                     <td><input type="text" name="cantidad_total_sala"
                                                id="cantidad_total_sala"
-                                               class="form-control" value="0">
+                                               class="form-control" value="">
                                     </td>
                                     <td><input type="text" name="cantidad_disponible_sala"
                                                id="cantidad_disponible_sala"
-                                               class="form-control" value="0">
+                                               class="form-control" value="">
                                     </td>
                                     <td><input type="text" name="cantidad_usar_sala"
                                                id="cantidad_usar_sala"
-                                               class="form-control" value="0">
+                                               class="form-control" value="">
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>Oficina Administrativa</td>
                                     <td><input type="text" name="cantidad_total_oficina"
                                                id="cantidad_total_oficina"
-                                               class="form-control" value="0">
+                                               class="form-control" value="">
                                     </td>
                                     <td><input type="text" name="cantidad_disponible_oficina"
                                                id="cantidad_disponible_oficina"
-                                               class="form-control" value="0">
+                                               class="form-control" value="">
                                     </td>
                                     <td><input type="text" name="cantidad_usar_oficina"
                                                id="cantidad_usar_oficina"
-                                               class="form-control" value="0">
+                                               class="form-control" value="">
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>Sala de Cómputo</td>
                                     <td><input type="text" name="cantidad_total_computo"
                                                id="cantidad_total_computo"
-                                               class="form-control" value="0">
+                                               class="form-control" value="">
                                     </td>
                                     <td><input type="text" name="cantidad_disponible_computo"
                                                id="cantidad_disponible_computo"
-                                               class="form-control" value="0">
+                                               class="form-control" value="">
                                     </td>
                                     <td><input type="text" name="cantidad_usar_computo"
                                                id="cantidad_usar_computo"
-                                               class="form-control" value="0">
+                                               class="form-control" value="">
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td>Otro</td>
+                                    <td>Otro <br>Especifique: <input type="text" name="especifique_otros"
+                                                                     id="especifique_otros"
+                                                                     class="form-control" value=""></td>
                                     <td><input type="text" name="cantidad_total_otros"
                                                id="cantidad_total_otros"
-                                               class="form-control" value="0">
+                                               class="form-control" value="">
                                     </td>
                                     <td><input type="text" name="cantidad_disponible_otros"
                                                id="cantidad_disponible_otros"
-                                               class="form-control" value="0">
+                                               class="form-control" value="">
                                     </td>
                                     <td><input type="text" name="cantidad_usar_otros"
                                                id="cantidad_usar_otros"
-                                               class="form-control" value="0">
+                                               class="form-control" value="">
                                     </td>
-                                    <td>Especifique: <input type="text" name="especifique_otros"
-                                                            id="especifique_otros"
-                                                            class="form-control" value="" readonly></td>
                                 </tr>
                                 </tbody>
                             </table>
@@ -514,15 +481,17 @@
                     </div>
                 </fieldset>
                 <fieldset class="content-group">
-                    <legend></legend>
+                    <legend>REGISTRO DE AULA/S</legend>
                     <div class="row">
                         <table id="tabla_aulas" class="table table-bordered table-responsive">
                             <thead>
                             <tr>
-                                <th>Número de Aula</th>
+                                <th>N° Ord.</th>
                                 <th>Tipo de Ambiente</th>
+                                <th>N° Ambiente</th>
                                 <th>Capacidad</th>
-                                <th>Acción</th>
+                                <th>Piso</th>
+                                <th>Guardar</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -530,7 +499,7 @@
                             </tbody>
                             <tfoot>
                             <tr style="background-color:#A5C25C">
-                                <td colspan="2">TOTAL</td>
+                                <td colspan="3">TOTAL</td>
                                 <td>
                                     <span id="capacidad_total"></span>
                                 </td>
@@ -656,14 +625,19 @@
     <script type="text/javascript" src="{% static "assets/js/plugins/tables/datatables/datatables.min.js" %}"></script>
     <script type="text/javascript" src="{% static "assets/js/plugins/forms/validation/validate.min.js" %}"></script>
     <script type="text/javascript" src="{% static "assets/js/plugins/notifications/sweet_alert.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "assets/js/plugins/notifications/pnotify.min.js" %}"></script>
     <script type="text/javascript" src="{% static "assets/js/plugins/forms/selects/select2.min.js" %}"></script>
     <script type="text/javascript" src="{% static "assets/js/plugins/forms/styling/uniform.min.js" %}"></script>
     <script type="text/javascript" src="{% static "assets/js/plugins/ui/moment/moment.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "assets/js/plugins/ui/moment/moment_locales.min.js" %}"></script>
     <script type="text/javascript" src="{% static "assets/js/plugins/pickers/daterangepicker.js" %}"></script>
     <script type="text/javascript" src="{% static "assets/js/core/app.js" %}"></script>
     <script type="text/javascript" src="{% static "assets/js/plugins/ui/ripple.min.js" %}"></script>
     <script type="text/javascript" src="{% static "assets/js/capacitacion/index.js" %}"></script>
     <script type="text/javascript" src="{% static "assets/js/capacitacion/aula.js" %}"></script>
+    <script>
+        moment.locale('es');
+    </script>
     <script>
         // This example adds a search box to a map, using the Google Place Autocomplete
         // feature. People can enter geographical searches. The search box will return a

@@ -6,7 +6,7 @@ from django.template import loader
 from serializer import *
 from rest_framework import generics
 from django.views.decorators.csrf import csrf_exempt
-from django.db.models import F
+from django.db.models import F, Sum
 from datetime import datetime
 import pandas as pd
 from django.db.models.functions import Concat
@@ -16,18 +16,22 @@ import json
 
 def modulo_registro(request):
     template = loader.get_template('capacitacion/modulo_registro.html')
+    funcionarios = FuncionariosINEI.objects.using('consecucion').values('id_per', 'ape_paterno', 'ape_materno',
+                                                                        'nombre', 'dni')
     context = {
         'titulo_padre': 'Capacitacion',
-        'titulo_hijo': 'REGISTRO DE LOCAL'
+        'titulo_hijo': 'REGISTRO DE LOCAL',
+        'funcionarios': funcionarios,
     }
     return HttpResponse(template.render(context, request))
 
 
 def cursos_evaluaciones(request):
     template = loader.get_template('capacitacion/cursos_evaluaciones.html')
+
     context = {
         'titulo_padre': 'Capacitacion',
-        'titulo_hijo': 'Cursos y Evaluaciones'
+        'titulo_hijo': 'Cursos y Evaluaciones',
     }
     return HttpResponse(template.render(context, request))
 
@@ -46,6 +50,17 @@ def distribucion(request):
     context = {
         'titulo_padre': 'Capacitacion',
         'titulo_hijo': 'Modulo de Distribucion'
+    }
+    return HttpResponse(template.render(context, request))
+
+
+def evaluacion(request):
+    template = loader.get_template('capacitacion/evaluacion.html')
+
+    context = {
+        'titulo_padre': 'Capacitacion',
+        'titulo_hijo': 'Modulo de Evaluacion',
+
     }
     return HttpResponse(template.render(context, request))
 
@@ -94,6 +109,15 @@ class TbLocalByUbigeoViewSet(generics.ListAPIView):
 
 
 class TbLocalByZonaViewSet(generics.ListAPIView):
+    serializer_class = LocalSerializer
+
+    def get_queryset(self):
+        ubigeo = self.kwargs['ubigeo']
+        zona = self.kwargs['zona']
+        return Local.objects.filter(ubigeo=ubigeo, zona=zona)
+
+
+class TbLocalByZonaViewSet(generics.ListAPIView):
     serializer_class = LocalAulasSerializer
 
     def get_queryset(self):
@@ -105,7 +129,7 @@ class TbLocalByZonaViewSet(generics.ListAPIView):
 def TbLocalAmbienteByLocalViewSet(request, id_local):
     query = LocalAmbiente.objects.filter(id_local=id_local).order_by('-capacidad').annotate(
         nombre_ambiente=F('id_ambiente__nombre_ambiente')).values(
-        'id_localambiente', 'numero', 'capacidad', 'nombre_ambiente')
+        'id_localambiente', 'numero', 'capacidad', 'nombre_ambiente', 'n_piso').order_by('id_ambiente')
     local = Local.objects.get(pk=id_local)
     return JsonResponse(
         {'ambientes': list(query), 'ubigeo': local.ubigeo_id, 'zona': local.zona, 'id_curso': local.id_curso_id},
@@ -193,6 +217,14 @@ class PEA_AULAbyLocalAmbienteViewSet(generics.ListAPIView):
         return PEA_AULA.objects.filter(id_localambiente=id_localambiente)
 
 
+class PEA_CURSOCRITERIOViewSet(generics.ListAPIView):
+    serializer_class = PEA_CURSOCRITERIOSerializer
+
+    def get_queryset(self):
+        id_peaaula = self.kwargs['id_peaaula']
+        return PEA_CURSOCRITERIO.objects.filter(id_peaaula=id_peaaula)
+
+
 @csrf_exempt
 def sobrantes_zona(request):
     if request.method == "POST" and request.is_ajax():
@@ -218,7 +250,16 @@ def getMeta(request):
         zona = request.POST['zona']
         meta = PEA.objects.filter(id_cargofuncional__cursofuncionario__id_curso=id_curso, ubigeo=ubigeo,
                                   zona=zona).count()
-        return JsonResponse({'cant': meta}, safe=False)
+
+        capacidad_zona = LocalAmbiente.objects.filter(id_local__zona=zona, id_local__ubigeo=ubigeo,
+                                                      id_local__id_curso=id_curso).aggregate(
+            cantidad_zona=Sum('capacidad'))
+        capacidad_distrito = LocalAmbiente.objects.filter(id_local__ubigeo=ubigeo,
+                                                          id_local__id_curso=id_curso).aggregate(
+            cantidad_distrito=Sum('capacidad'))
+
+        return JsonResponse({'cant': meta, 'cantidad_zona': capacidad_zona['cantidad_zona'],
+                             'cantidad_distrito': capacidad_distrito['cantidad_distrito']}, safe=False)
 
     return JsonResponse({'msg': False})
 
@@ -318,10 +359,102 @@ def save_asistencia(request):
     return JsonResponse({'msg': True})
 
 
-@csrf_exempt
 def getCriteriosCurso(request, id_curso):
     criterios = list(
         CursoCriterio.objects.filter(id_curso=id_curso).annotate(
-            criterio=F('id_criterio__nombre_criterio')).values('id_cursocriterio', 'criterio'))
+            criterio=F('id_criterio__nombre_criterio')).values('id_cursocriterio', 'criterio', 'ponderacion'))
 
     return JsonResponse(criterios, safe=False)
+
+
+@csrf_exempt
+def save_notas(request):
+    if request.method == "POST" and request.is_ajax():
+        data = json.loads(request.body)
+
+        for i in data:
+            try:
+                pea = PEA_CURSOCRITERIO.objects.get(
+                    id_cursocriterio=CursoCriterio.objects.get(pk=i['id_cursocriterio']),
+                    id_peaaula=PEA_AULA.objects.get(pk=i['id_peaaula']))
+            except ObjectDoesNotExist:
+                pea = None
+
+            if pea is None:
+                pea_cursocriterio = PEA_CURSOCRITERIO(nota=i['nota'],
+                                                      id_peaaula=PEA_AULA.objects.get(pk=i['id_peaaula']),
+                                                      id_cursocriterio=CursoCriterio.objects.get(
+                                                          pk=i['id_cursocriterio']))
+                pea_cursocriterio.save()
+            else:
+                pea_cursocriterio = PEA_CURSOCRITERIO.objects.get(id_cursocriterio=CursoCriterio.objects.get(
+                    pk=i['id_cursocriterio']),
+                    id_peaaula=PEA_AULA.objects.get(pk=i['id_peaaula']))
+                pea_cursocriterio.nota = i['nota']
+                pea_cursocriterio.save()
+
+    return JsonResponse({'msg': True})
+
+
+@csrf_exempt
+def generar_ambientes(request):
+    if request.method == "POST" and request.is_ajax():
+        data = request.POST
+        ambientes = {}
+        for i in data:
+            if data[i] == '':
+                ambientes[i] = 0
+            else:
+                ambientes[i] = int(data[i])
+
+        id_local = data['id_local']
+        object = {
+            'cantidad_usar_aulas': [restar(LocalAmbiente.objects.filter(id_local=id_local, id_ambiente=1).count(),
+                                           data['cantidad_usar_aulas']), 1],
+            'cantidad_usar_auditorios': [restar(LocalAmbiente.objects.filter(id_local=id_local, id_ambiente=2).count(),
+                                                data['cantidad_usar_auditorios']), 2],
+            'cantidad_usar_sala': [restar(LocalAmbiente.objects.filter(id_local=id_local, id_ambiente=3).count(),
+                                          data['cantidad_usar_sala']), 3],
+            'cantidad_usar_oficina': [restar(LocalAmbiente.objects.filter(id_local=id_local, id_ambiente=4).count(),
+                                             data['cantidad_usar_oficina']), 4],
+            'cantidad_usar_computo': [restar(LocalAmbiente.objects.filter(id_local=id_local, id_ambiente=5).count(),
+                                             data['cantidad_usar_computo']), 5],
+            'cantidad_usar_otros': [restar(LocalAmbiente.objects.filter(id_local=id_local, id_ambiente=6).count(),
+                                           data['cantidad_usar_otros']), 6]
+        }
+
+        for i in object:
+            if object[i][0] > 0:
+                for a in range(object[i][0]):
+                    localambiente = LocalAmbiente(id_local=Local.objects.get(pk=id_local),
+                                                  id_ambiente=Ambiente.objects.get(pk=object[i][1]))
+                    localambiente.capacidad = 0
+                    localambiente.save()
+            elif object[i][0] < 0:
+                borrar = LocalAmbiente.objects.filter(id_local=Local.objects.get(pk=id_local),
+                                                      id_ambiente=Ambiente.objects.get(pk=object[i][1])). \
+                             order_by('-id_localambiente')[:(-1 * object[i][0])]
+
+                LocalAmbiente.objects.filter(pk__in=borrar).delete()
+
+    return JsonResponse({'msg': True})
+
+
+@csrf_exempt
+def get_funcionarioinei(request, id_per):
+    funcionarios = list(FuncionariosINEI.objects.using('consecucion').filter(id_per=id_per).values())
+
+    return JsonResponse(funcionarios, safe=False)
+
+
+class obj(object):
+    def __init__(self, d):
+        for a, b in d.items():
+            if isinstance(b, (list, tuple)):
+                setattr(self, a, [obj(x) if isinstance(x, dict) else x for x in b])
+            else:
+                setattr(self, a, obj(b) if isinstance(b, dict) else b)
+
+
+def restar(num, num2):
+    return int(num2) - int(num)

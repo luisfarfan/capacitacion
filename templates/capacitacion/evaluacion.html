@@ -84,21 +84,7 @@
             </div>
             <div class="panel-body">
                 <div class="row">
-                    <form action="" class="form-horizontal">
-                        <fieldset class="content-group">
-                            <div class="form-group">
-                                <label class="control-label col-lg-2">Fechas: </label>
-                                <div class="col-lg-7">
-                                    <select id="fechas" class="select form-control">
-
-                                    </select>
-                                </div>
-                            </div>
-                        </fieldset>
-                    </form>
-                </div>
-                <div class="row">
-                    <button onclick="saveAsistencia()" class="btn btn-primary">Guardar</button>
+                    <button onclick="saveNotas()" class="btn btn-primary">Guardar</button>
                 </div>
                 <div class="row">
                     <div class="table-responsive">
@@ -117,23 +103,6 @@
 {% endblock %}
 
 
-{% block sidebar %}
-    <ul class="navigation navigation-main navigation-accordion">
-        <!-- Main -->
-        <li class="navigation-header"><span>Main</span> <i class="icon-menu" title="Main pages"></i>
-        </li>
-        <li>
-            <a href="#"><i class="icon-stack"></i> <span>Capacitación</span></a>
-            <ul>
-                <li><a href="{% url 'modulo_registro' %}">Modulo de Registro de Local</a>
-                </li>
-                <li><a href="{% url 'distribucion' %}">Modulo Distribucion de PEA</a></li>
-                <li class="active"><a href="{% url 'asistencia' %}">Modulo de Asistencia</a></li>
-            </ul>
-        </li>
-        <!-- /main -->
-    </ul>
-{% endblock %}
 
 {% block js %}
     <script type="text/javascript" src="{% static "assets/js/plugins/tables/datatables/datatables.min.js" %}"></script>
@@ -141,5 +110,5 @@
     <script type="text/javascript" src="{% static "assets/js/plugins/forms/selects/select2.min.js" %}"></script>
     <script type="text/javascript" src="{% static "assets/js/plugins/notifications/sweet_alert.min.js" %}"></script>
     <script type="text/javascript" src="{% static "assets/js/core/app.js" %}"></script>
-    <script type="text/javascript" src="{% static "dist/capacitacion/distribucion/distribucion.js" %}"></script>
+    <script type="text/javascript" src="{% static "dist/capacitacion/evaluacion/evaluacion.js" %}"></script>
 {% endblock %}

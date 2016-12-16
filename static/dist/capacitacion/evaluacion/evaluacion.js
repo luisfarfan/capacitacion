@@ -8,10 +8,9 @@ $(function () {
     getLocales();
 });
 
-var turno;
-var rangofechas = [];
+var criterios = [];
 var aula_selected;
-
+var id_curso;
 $('#local').change(e=> {
     "use strict";
     let id_local = $('#local').val();
@@ -39,7 +38,8 @@ function getAmbientes(id_local) {
         url: `${BASEURL}/localambiente/${id_local}/`,
         type: 'GET',
         success: response => {
-            console.log(response);
+            id_curso = response.id_curso;
+            getCriterios();
             setTable('tabla_detalle_ambientes', response.ambientes, ['numero', 'capacidad', 'nombre_ambiente', {pk: 'id_localambiente'}]);
         },
         error: error => {
@@ -48,27 +48,18 @@ function getAmbientes(id_local) {
     })
 }
 
-function setCheckedTurnoManana(obj, fecha, val) {
+function getCriterios() {
     "use strict";
-    let checked = '';
-    $.each(obj, (key, value)=> {
-        if (value.fecha == fecha) {
-            checked = value.turno_manana == val ? 'checked' : '';
-            value.turno_manana == val ? console.log(value) : '';
+    $.ajax({
+        url: `${BASEURL}/getCriteriosCurso/${id_curso}/`,
+        type: 'GET',
+        success: response => {
+            criterios = response;
+        },
+        error: error => {
+            console.log('ERROR!!', error);
         }
-    });
-    return checked;
-}
-
-function setCheckedTurnoTarde(obj, fecha, val) {
-    "use strict";
-    let checked = '';
-    $.each(obj, (key, value)=> {
-        if (value.fecha == fecha) {
-            checked = value.turno_tarde == val ? 'checked' : '';
-        }
-    });
-    return checked;
+    })
 }
 
 function getPEA(id_localambiente) {
@@ -77,45 +68,111 @@ function getPEA(id_localambiente) {
     if ($.fn.DataTable.isDataTable('#tabla_pea')) {
         $('#tabla_pea').dataTable().fnDestroy();
     }
+    let json = {};
+    let body = '';
+    let thead = `<tr><th>N°</th><th>Nombre Completo</th><th>Cargo</th>`;
+    for (let i in criterios) {
+        thead += `<th>${criterios[i].criterio}</th>`;
+    }
+    thead += `<th>Nota Final</th></tr>`;
+    var notas = [];
     $.ajax({
         url: `${BASEURL}/peaaulaasistencia/${id_localambiente}/`,
         type: 'GET',
+        success: response => {
+            console.log(response);
+            let count = 1;
+            for (let i in response) {
+                $.ajax({
+                    async: false,
+                    url: `${BASEURL}/pea_notas/${response[i].id_peaaula}/`,
+                    type: 'GET',
+                    success: function (nota) {
+                        notas = nota
+                    }
+                });
+                body += `<tr>
+                    <input type="hidden" name="id_peaaula" value="${response[i].id_peaaula}">   
+                    <td>${count++}</td>
+                    <td>${response[i].id_pea.ape_paterno} ${response[i].id_pea.ape_materno} ${response[i].id_pea.nombre}</td>
+                    <td>${response[i].id_pea.id_cargofuncional.nombre_funcionario}</td>`;
+                for (let k in criterios) {
+                    body += `<td><input name="${criterios[k].id_cursocriterio}" value="${findInObject(notas, criterios[k].id_cursocriterio)}" class="form_control"></td>`;
+                }
+                body += `<td><input name="nota_final" disabled class="form_control"></td>`;
+            }
+            json.html = body;
+            $('#tabla_pea').find('thead').html(thead);
+            setTable('tabla_pea', json);
+
+            for (let i in criterios) {
+                $(`input[name="${criterios[i].id_cursocriterio}"]`).keyup(function () {
+                    calcularPromedio(this);
+                })
+            }
+            for (let i in criterios) {
+                $(`input[name="${criterios[i].id_cursocriterio}"]`).trigger('keyup');
+            }
+
+        },
     })
 }
 
-function saveAsistencia() {
+function findInObject(obj, search) {
     "use strict";
-    let tabla_pea = $('#tabla_pea').dataTable();
-    let fecha_selected = $('#fechas').val();
-    let div_data = tabla_pea.$('div[name="m' + fecha_selected + '"]');
-    let data = [];
+    let nota = 0;
+    console.log(obj);
+    if (obj.length > 0) {
+        $.each(obj, (key, val)=> {
+            if (val['id_cursocriterio'] == search) {
+                nota = val['nota'];
+            }
+        });
+    }
+    return nota;
+}
+
+function calcularPromedio(input) {
+    "use strict";
+    let rowindex = $(input).parent().parent()[0];
+    rowindex = parseInt(rowindex.rowIndex) - 1;
+    let promedio = 0;
+    for (let i in criterios) {
+        let input_nota = $($(`input[name="${criterios[i].id_cursocriterio}"]`)[rowindex]).val();
+        input_nota == '' ? input_nota = 0 : '';
+        promedio = promedio + (parseInt(input_nota) * (parseInt(criterios[i].ponderacion) / 100));
+    }
+    $($(`input[name="nota_final"]`)[rowindex]).val(promedio);
+}
+
+function saveNotas() {
+    "use strict";
+    let data_send = [];
     let faltantes = 0;
-    $.each(div_data, (key, val)=> {
-        let turno_manana = $(val).find('input[name^="turno_manana"]:checked').val();
-        let id_peaaula = $(val).find(`input[name^="id_peaaula"]`).val();
-        let input_tarde = tabla_pea.$(`input[name="id_peaaula${id_peaaula}"]`)[1];
-        let turno_tarde = $(input_tarde).parent().find('input[name^="turno_tarde"]:checked').val();
-        let json = {};
-        if (turno_manana != undefined || turno_tarde != undefined) {
-            json = {
-                fecha: fecha_selected,
-                turno_manana: turno_manana,
-                turno_tarde: turno_tarde,
-                id_peaaula: id_peaaula
-            };
-            data.push(json);
-        } else {
-            faltantes++;
-        }
+    $.each(criterios, (i, v)=> {
+        let criterio_input = $(`input[name="${criterios[i].id_cursocriterio}"]`);
+        $.each(criterio_input, (k, v)=> {
+            if ($(criterio_input[k]).val() != '') {
+                let json = {
+                    nota: $(criterio_input[k]).val(),
+                    id_peaaula: $(criterio_input[k]).parent().parent().find('input[name="id_peaaula"]').val(),
+                    id_cursocriterio: criterios[i].id_cursocriterio,
+                };
+                data_send.push(json);
+            } else {
+                faltantes++;
+            }
+        });
     });
-    let title = 'Asistencia Completa, Guardar?';
+
+    let title = 'Registro de Notas Completo, Guardar?';
     let type = 'success';
     if (faltantes > 0) {
-        title = 'Aun tiene personas que ha marcado su asistencia, desea guardar?';
+        title = 'Aun tiene personas que no ha registrado sus Notas, desea guardar?';
         type = 'warning';
     }
     swal({
-        title: 'Guardar Asistencia',
+        title: 'Guardar Notas',
         text: title,
         type: type,
         showCancelButton: true,
@@ -128,9 +185,9 @@ function saveAsistencia() {
     }, confirm => {
         if (confirm) {
             $.ajax({
-                url: `${BASEURL}/save_asistencia/`,
+                url: `${BASEURL}/save_notas/`,
                 type: 'POST',
-                data: JSON.stringify(data),
+                data: JSON.stringify(data_send),
                 success: function (response) {
                     swal({
                         title: "Asistencia Guardada con éxito!",
@@ -140,4 +197,5 @@ function saveAsistencia() {
             });
         }
     });
+
 }

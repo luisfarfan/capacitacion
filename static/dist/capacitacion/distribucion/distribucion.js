@@ -91,14 +91,16 @@ function doAsignacion() {
 function getSobrantes() {
     "use strict";
     let ubigeo = `${session.ccdd}${session.ccpp}${session.ccdi}`;
-    $('#tabla_pea_sobrante').DataTable()
-    $('#tabla_pea_sobrante').dataTable().fnDestroy()
+    let _id_curso = session.usuario;
+    $('#tabla_pea_sobrante').DataTable();
+    $('#tabla_pea_sobrante').dataTable().fnDestroy();
     $.ajax({
         url: `${BASEURL}/sobrantes_zona/`,
         type: 'POST',
         data: {ubigeo: ubigeo, zona: `${session.zona}`, id_curso: id_curso},
         success: response => {
             console.log(response);
+
             $('#tabla_pea_sobrante').DataTable({
                 "data": response,
                 "columns": [

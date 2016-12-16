@@ -102,6 +102,17 @@ DATABASES = {
             'driver': 'SQL Server',
         },
     },
+    'consecucion': {
+        'ENGINE': 'sql_server.pyodbc',
+        'NAME': 'INEI_BDRRHH_CONSECUCION',
+        'USER': 'rvila',
+        'PASSWORD': 'inei1202',
+        'HOST': '192.168.200.250',
+        'OPTIONS': {
+            'driver': 'SQL Server',
+            'unicode_results': True,
+        },
+    },
 }
 
 """

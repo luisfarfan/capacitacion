@@ -12,3 +12,4 @@ class User(models.Model):
     ccpp = models.CharField(max_length=2)
     ccdi = models.CharField(max_length=2)
     zona = models.CharField(max_length=5)
+    curso = models.IntegerField(null=True, blank=True)

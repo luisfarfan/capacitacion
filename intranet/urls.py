@@ -1,17 +1,17 @@
 """intranet URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/1.10/topics/http/urls/
+https://docs.djangoproject.com/en/1.10/topics/http/urls/
 Examples:
 Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  url(r'^$', views.home, name='home')
+1. Add an import:  from my_app import views
+2. Add a URL to urlpatterns:  url(r'^$', views.home, name='home')
 Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  url(r'^$', Home.as_view(), name='home')
+1. Add an import:  from other_app.views import Home
+2. Add a URL to urlpatterns:  url(r'^$', Home.as_view(), name='home')
 Including another URLconf
-    1. Import the include() function: from django.conf.urls import url, include
-    2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
+1. Import the include() function: from django.conf.urls import url, include
+2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 from django.conf.urls import url, include
 from django.contrib import admin
@@ -30,12 +30,14 @@ urlpatterns = [
     url(r'^asistencia/$', asistencia, name='asistencia'),
     url(r'^cursos_evaluaciones/$', cursos_evaluaciones, name='cursos_evaluaciones'),
     url(r'^distribucion/$', distribucion, name='distribucion'),
+    url(r'^evaluacion/$', evaluacion, name='evaluacion'),
     url(r'^departamentos/$', DepartamentosList.as_view()),
     url(r'^provincias/(?P<ccdd>[0-9]+)/$', ProvinciasList.as_view()),
     url(r'^distritos/(?P<ccdd>[0-9]+)/(?P<ccpp>[0-9]+)/$',
         DistritosList.as_view()),
     url(r'^zonas/(?P<ubigeo>[0-9]+)/$', ZonasList.as_view()),
     url('^localubigeo/(?P<ubigeo>.+)/$', TbLocalByUbigeoViewSet.as_view()),
+    url('^localzona/(?P<ubigeo>.+)/(?P<zona>.+)/$', TbLocalByZonaViewSet.as_view()),
     url('^localambiente/(?P<id_local>.+)/$', TbLocalAmbienteByLocalViewSet),
     url('^cursobyetapa/(?P<id_etapa>.+)/$', CursobyEtapaViewSet.as_view()),
     url('^cursocriteriobycurso/(?P<id_curso>.+)/$', CursoCriteriobyCursoViewSet.as_view()),
@@ -48,4 +50,9 @@ urlpatterns = [
     # url('^localambiente/(?P<id_local>.+)/(?P<id_ambiente>.+)/$', LocalAmbienteByLocalAulaViewSet.as_view()),
     url('^save_asistencia/$', save_asistencia),
     url('^getCriteriosCurso/(?P<id_curso>[0-9]+)/$', getCriteriosCurso),
+    url('^save_notas/$', save_notas),
+    url('^pea_notas/(?P<id_peaaula>.+)/$', PEA_CURSOCRITERIOViewSet.as_view()),
+    url('^generar_ambientes/$', generar_ambientes),
+    url('^get_funcionarioinei/(?P<id_per>.+)/$', get_funcionarioinei),
+
 ]

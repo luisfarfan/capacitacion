@@ -108,7 +108,8 @@
                     <i class="caret"></i>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-right">
-                    <li><a href="#"><i class="icon-switch2"></i> Cerrar Sesión</a></li>
+                    <li><a href="http://192.168.200.123:3000"><i class="icon-switch2"></i> Cerrar Sesión</a>
+                    </li>
                 </ul>
             </li>
         </ul>
@@ -129,9 +130,9 @@
                             <a href="#" class="media-left"><img src="{% static "assets/images/image.png" %}"
                                                                 class="img-circle img-sm" alt=""></a>
                             <div class="media-body">
-                                <span class="media-heading text-semibold">Capacitación</span>
+                                <span id="usuario" class="media-heading text-semibold">Capacitación</span>
                                 <div class="text-size-mini text-muted">
-                                    <i class="icon-pin text-size-small"></i> &nbsp;Nacional
+                                    <i id="tipo_cargo" class="icon-pin text-size-small"></i> &nbsp;
                                 </div>
                             </div>
                         </div>
@@ -142,8 +143,27 @@
 
                 <div class="sidebar-category sidebar-category-visible">
                     <div class="category-content no-padding">
-                        {% block sidebar %}
-                        {% endblock %}
+                        <ul class="navigation navigation-main navigation-accordion">
+                            <!-- Main -->
+                            <li class="navigation-header"><span>Main</span> <i class="icon-menu" title="Main pages"></i>
+                            </li>
+                            <li>
+                                <a href="#"><i class="icon-stack"></i> <span>Capacitación</span></a>
+                                <ul>
+                                    <li id="modulo_registro"><a href="{% url 'modulo_registro' %}">Modulo de Registro de
+                                        Local</a>
+                                    </li>
+                                    <li id="distribucion"><a href="{% url 'distribucion' %}">Modulo Distribucion de
+                                        PEA</a></li>
+                                    <li id="asistencia" class="active"><a href="{% url 'asistencia' %}">Modulo de
+                                        Asistencia</a></li>
+                                    <li id="notas"><a href="{% url 'evaluacion' %}">Modulo de Registro de Notas y
+                                        Resultado</a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <!-- /main -->
+                        </ul>
                     </div>
                 </div>
 
@@ -248,5 +268,38 @@
 
 {% block js %}
 {% endblock %}
+<script>
+    $.extend(true, $.fn.dataTable.defaults, {
+        "language": {
+            "sProcessing": "Procesando...",
+            "sLengthMenu": "Mostrar _MENU_ registros",
+            "sZeroRecords": "No se encontraron resultados",
+            "sEmptyTable": "Ningún dato disponible en esta tabla",
+            "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+            "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
+            "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
+            "sInfoPostFix": "",
+            "sSearch": "Buscar:",
+            "sUrl": "",
+            "sInfoThousands": ",",
+            "sLoadingRecords": "Cargando...",
+            "oPaginate": {
+                "sFirst": "Primero",
+                "sLast": "Último",
+                "sNext": "Siguiente",
+                "sPrevious": "Anterior"
+            },
+            "oAria": {
+                "sSortAscending": ": Activar para ordenar la columna de manera ascendente",
+                "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+            }
+        }
+    });
+    if (session.curso == '1') {
+        $('#tipo_cargo').text('Jefe Distrital')
+    } else {
+        $('#tipo_cargo').text('Jefe Zonal')
+    }
 
+</script>
 </html>

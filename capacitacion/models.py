@@ -89,25 +89,9 @@ class LocalAmbiente(models.Model):
     id_localambiente = models.AutoField(primary_key=True, db_column='id_localambiente')
     id_local = models.ForeignKey('Local')
     id_ambiente = models.ForeignKey('Ambiente')
-    mesas_cant = models.IntegerField(blank=True, null=True)
-    sillas_cant = models.IntegerField(blank=True, null=True)
-    carpindividuales_cant = models.IntegerField(blank=True, null=True)
-    carpbipersonales_cant = models.IntegerField(blank=True, null=True)
     numero = models.IntegerField(blank=True, null=True)
     n_piso = models.IntegerField(blank=True, null=True)
     capacidad = models.IntegerField(blank=True, null=True)
-    puerta_chapa = models.IntegerField(blank=True, null=True)
-    puerta_pestillocandado = models.IntegerField(blank=True, null=True)
-    puerta_notiene = models.IntegerField(blank=True, null=True)
-    sshh = models.IntegerField(blank=True, null=True)
-    alumbrado_electrico = models.IntegerField(blank=True, null=True)
-    pizarra_acrilica = models.IntegerField(blank=True, null=True)
-    pizarra_cemento = models.IntegerField(blank=True, null=True)
-    proyector = models.IntegerField(blank=True, null=True)
-    computadora = models.IntegerField(blank=True, null=True)
-    acceso_internet = models.IntegerField(blank=True, null=True)
-    aireacondicionado = models.IntegerField(blank=True, null=True)
-    ventiladores = models.IntegerField(blank=True, null=True)
     pea = models.ManyToManyField('PEA', through='PEA_AULA')
 
     class Meta:
@@ -115,9 +99,9 @@ class LocalAmbiente(models.Model):
         db_table = 'LOCAL_AMBIENTE'
 
     def save(self, *args, **kwargs):
-        self.numero = LocalAmbiente.objects.filter(id_local=self.id_local, id_ambiente=self.id_ambiente).count()
-        self.numero = self.numero + 1
-
+        if self.id_localambiente is None:
+            self.numero = LocalAmbiente.objects.filter(id_local=self.id_local, id_ambiente=self.id_ambiente).count()
+            self.numero = self.numero + 1
         return super(LocalAmbiente, self).save(*args, **kwargs)
 
 
@@ -148,6 +132,7 @@ class Local(models.Model):
     funcionario_nombre = models.CharField(max_length=100, blank=True, null=True)
     funcionario_email = models.CharField(max_length=100, blank=True, null=True)
     funcionario_telefono = models.CharField(max_length=100, blank=True, null=True)
+    funcionario_cargo = models.CharField(max_length=100, blank=True, null=True)
     funcionario_celular = models.CharField(max_length=100, blank=True, null=True)
     responsable_nombre = models.CharField(max_length=100, blank=True, null=True)
     responsable_email = models.CharField(max_length=100, blank=True, null=True)
@@ -226,7 +211,6 @@ class PEA_AULA(models.Model):
     id_peaaula = models.AutoField(primary_key=True, db_column='id_peaaula')
     id_pea = models.ForeignKey('PEA', db_column='id_pea')
     id_localambiente = models.ForeignKey('LocalAmbiente', db_column='id_localambiente')
-    pea_notas = models.ManyToManyField('CursoCriterio', through='PEA_CURSOCRITERIO')
 
     class Meta:
         managed = True
@@ -247,10 +231,26 @@ class PEA_ASISTENCIA(models.Model):
 
 class PEA_CURSOCRITERIO(models.Model):
     id_pea_cursocriterio = models.AutoField(primary_key=True, db_column='id_pea_cursocriterio')
-    id_peaaula = models.ForeignKey('PEA_AULA')
+    id_peaaula = models.ForeignKey('PEA_AULA', related_name='pea_cursocriterios')
     id_cursocriterio = models.ForeignKey('CursoCriterio')
     nota = models.IntegerField()
 
     class Meta:
         managed = True
         db_table = 'PEA_CURSOCRITERIO'
+
+
+class FuncionariosINEI(models.Model):
+    id_per = models.IntegerField(primary_key=True)
+    dni = models.CharField(max_length=8, blank=True, null=True)
+    ape_paterno = models.CharField(max_length=100, blank=True, null=True, db_column='ape_paterno')
+    ape_materno = models.CharField(max_length=100, blank=True, null=True, db_column='ape_materno')
+    nombre = models.CharField(max_length=100, blank=True, null=True, db_column='nombre')
+    cargo = models.CharField(max_length=100, blank=True, null=True)
+    correo = models.CharField(max_length=100, blank=True, null=True)
+    telefono = models.CharField(max_length=100, blank=True, null=True)
+    celular = models.CharField(max_length=100, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'v_personal_contratado_cpv'
