@@ -2,7 +2,7 @@
  * Created by LFarfan on 21/11/2016.
  */
 //BASE_URL = `http://localhost:8000/`;
-if (session.usuario == 'distrital') {
+if (session.curso == '1') {
     $('#zona').parent().hide();
 } else {
     $('#zona').parent().show();
@@ -65,6 +65,7 @@ $(function () {
     });
     getDepartamentos();
     getCursos(1);
+    getMetaPea()
 });
 $('#departamentos').change(function () {
     $('#provincias').find('option').remove();
@@ -139,7 +140,7 @@ function getZonas() {
         });
         $('#zona').select2({data: array_zonas});
         $('#zona_ubicacion_local').select2({data: array_zonas});
-        if (session.usuario != 'distrital') {
+        if (session.curso != '1') {
             $('#zona').val(session.zona).trigger('change');
         }
     });
@@ -148,15 +149,15 @@ function getZonas() {
 
 function getLocalesbyUbigeo() {
     var ubigeo = `${$('#departamentos').val()}${$('#provincias').val()}${$('#distritos').val()}`;
-    let url = session.curso == '1' ? `${BASE_URL}localubigeo/${ubigeo}` : `${BASE_URL}localzona/${ubigeo}/${session.zona}`;
+    let url = session.curso == '1' ? `${BASE_URL}localubigeo/${ubigeo}/${session.curso}/` : `${BASE_URL}localzona/${ubigeo}/${session.zona}/${session.curso}/`;
     $.ajax({
         async: false,
         url: url,
         success: function (data) {
             var html = '';
             $.each(data, function (key, val) {
-                html += `<tr><td>${val.nombre_local}</td><td>${val.nombre_via}</td><td>${val.referencia}</td><td>
-                    <button onclick="getLocal(${val.id_local})" type="button"class="btn btn-info btn-float btn-rounded btn-loading" data-loading-text="<i class='icon-spinner4 spinner'></i>">
+                html += `<tr><td>${val.nombre_local}</td><td>${val.nombre_via}</td><td>${val.referencia}</td><td>${val.zona}</td>
+                    <td><button onclick="getLocal(${val.id_local})" type="button"class="btn btn-info btn-float btn-rounded btn-loading" data-loading-text="<i class='icon-spinner4 spinner'></i>">
                     <i class="icon-spinner4"></i></button></button></td></tr>`;
             });
 
@@ -501,9 +502,9 @@ function getLocalAmbientes() {
         $('#tabla_aulas').find('tbody').empty();
         if (data.ambientes.length > 0) {
             $.each(data.ambientes, function (key, val) {
-                capacidad_total = capacidad_total + parseInt(val.capacidad);
+                capacidad_total = capacidad_total + parseInt(val.capacidad == null ? 0 : val.capacidad);
                 html += `<tr><td>${parseInt(key) + 1}</td><td>${val.nombre_ambiente}</td><td>${val.numero}</td>
-                <td><input type="text" name="capacidad_ambiente" class="form-control" value="${val.capacidad}"></td>
+                <td><input type="text" name="capacidad_ambiente" class="form-control" value="${val.capacidad == null ? '' : val.capacidad}"></td>
                 <td><input type="text" name="piso_ambiente" class="form-control" value="${val.n_piso == null ? '' : val.n_piso}"></td>
                 <td>
                     <ul class="icons-list">
@@ -544,7 +545,7 @@ function AddEditAula() {
 function getMetaPea() {
     "use strict";
     let ubigeo = `${session.ccdd}${session.ccpp}${session.ccdi}`;
-    let id_curso = $('#cursos').val();
+    let id_curso = session.curso;
     $.ajax({
         url: `${BASEURL}/getMeta/`,
         type: 'POST',
@@ -552,7 +553,7 @@ function getMetaPea() {
         success: response => {
             $('#cant_meta').val(response.cant);
             $('#cant_reclutada').val(1500);
-            if (session.usuario == 'distrital') {
+            if (session.curso == '1') {
                 $('#capacidad_ambiente').val(response.cantidad_distrito)
             } else {
                 $('#capacidad_ambiente').val(response.cantidad_zona)
@@ -638,10 +639,11 @@ function saveLocalambiente(element, id_localambiente) {
                 let capacidad_total = 0;
                 if (data.ambientes.length > 0) {
                     $.each(data.ambientes, function (key, val) {
-                        capacidad_total = capacidad_total + parseInt(val.capacidad);
+                        capacidad_total = capacidad_total + parseInt(val.capacidad == null ? 0 : val.capacidad);
                     });
                     $('#capacidad_total').text(capacidad_total);
                     validarMetaPea();
+                    getMetaPea();
                 }
             });
         }

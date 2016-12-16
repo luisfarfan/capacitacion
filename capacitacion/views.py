@@ -38,9 +38,11 @@ def cursos_evaluaciones(request):
 
 def asistencia(request):
     template = loader.get_template('capacitacion/asistencia.html')
+    instructores = Instructor.objects.all()
     context = {
         'titulo_padre': 'Capacitacion',
-        'titulo_hijo': 'Modulo de Asistencia'
+        'titulo_hijo': 'Modulo de Asistencia',
+        'instructores': instructores
     }
     return HttpResponse(template.render(context, request))
 
@@ -105,7 +107,8 @@ class TbLocalByUbigeoViewSet(generics.ListAPIView):
 
     def get_queryset(self):
         ubigeo = self.kwargs['ubigeo']
-        return Local.objects.filter(ubigeo=ubigeo)
+        id_curso = self.kwargs['id_curso']
+        return Local.objects.filter(ubigeo=ubigeo, id_curso=id_curso)
 
 
 class TbLocalByZonaViewSet(generics.ListAPIView):
@@ -114,16 +117,17 @@ class TbLocalByZonaViewSet(generics.ListAPIView):
     def get_queryset(self):
         ubigeo = self.kwargs['ubigeo']
         zona = self.kwargs['zona']
-        return Local.objects.filter(ubigeo=ubigeo, zona=zona)
+        id_curso = self.kwargs['id_curso']
+        return Local.objects.filter(ubigeo=ubigeo, zona=zona, id_curso=id_curso)
 
 
-class TbLocalByZonaViewSet(generics.ListAPIView):
-    serializer_class = LocalAulasSerializer
-
-    def get_queryset(self):
-        ubigeo = self.kwargs['ubigeo']
-        zona = self.kwargs['zona']
-        return Local.objects.filter(ubigeo=ubigeo, zona=zona)
+# class TbLocalByZonaViewSet(generics.ListAPIView):
+#     serializer_class = LocalAulasSerializer
+#
+#     def get_queryset(self):
+#         ubigeo = self.kwargs['ubigeo']
+#         zona = self.kwargs['zona']
+#         return Local.objects.filter(ubigeo=ubigeo, zona=zona)
 
 
 def TbLocalAmbienteByLocalViewSet(request, id_local):
@@ -199,6 +203,11 @@ class PEA_BY_AULAViewSet(viewsets.ModelViewSet):
 class PEA_ASISTENCIAViewSet(viewsets.ModelViewSet):
     queryset = PEA_ASISTENCIA.objects.all()
     serializer_class = PEA_ASISTENCIASerializer
+
+
+class PEAViewSet(viewsets.ModelViewSet):
+    queryset = PEA.objects.all()
+    serializer_class = PEA_Serializer
 
 
 class PEA_AULAViewSet(generics.ListAPIView):
@@ -281,6 +290,7 @@ def asignar(request):
         for e in locales_zona:
             aulas_by_local = LocalAmbiente.objects.filter(id_local=e.id_local).order_by('-capacidad')
             for a in aulas_by_local:
+                print a.id_localambiente
                 disponibilidad = disponibilidad_aula(a.id_localambiente)
                 if disponibilidad > 0:
                     if 'reserva' not in data:
@@ -308,6 +318,8 @@ def asignar(request):
 def disponibilidad_aula(aula):
     aula = LocalAmbiente.objects.get(pk=aula)
     cantidad_asignada = PEA_AULA.objects.filter(id_localambiente=aula, id_pea__baja_estado=0).count()
+    if aula.capacidad == None:
+        return 0
     return aula.capacidad - cantidad_asignada
 
 
@@ -421,17 +433,17 @@ def generar_ambientes(request):
         id_local = data['id_local']
         object = {
             'cantidad_usar_aulas': [restar(LocalAmbiente.objects.filter(id_local=id_local, id_ambiente=1).count(),
-                                           data['cantidad_usar_aulas']), 1],
+                                           ambientes['cantidad_usar_aulas']), 1],
             'cantidad_usar_auditorios': [restar(LocalAmbiente.objects.filter(id_local=id_local, id_ambiente=2).count(),
-                                                data['cantidad_usar_auditorios']), 2],
+                                                ambientes['cantidad_usar_auditorios']), 2],
             'cantidad_usar_sala': [restar(LocalAmbiente.objects.filter(id_local=id_local, id_ambiente=3).count(),
-                                          data['cantidad_usar_sala']), 3],
+                                          ambientes['cantidad_usar_sala']), 3],
             'cantidad_usar_oficina': [restar(LocalAmbiente.objects.filter(id_local=id_local, id_ambiente=4).count(),
-                                             data['cantidad_usar_oficina']), 4],
+                                             ambientes['cantidad_usar_oficina']), 4],
             'cantidad_usar_computo': [restar(LocalAmbiente.objects.filter(id_local=id_local, id_ambiente=5).count(),
-                                             data['cantidad_usar_computo']), 5],
+                                             ambientes['cantidad_usar_computo']), 5],
             'cantidad_usar_otros': [restar(LocalAmbiente.objects.filter(id_local=id_local, id_ambiente=6).count(),
-                                           data['cantidad_usar_otros']), 6]
+                                           ambientes['cantidad_usar_otros']), 6]
         }
 
         for i in object:
@@ -439,7 +451,6 @@ def generar_ambientes(request):
                 for a in range(object[i][0]):
                     localambiente = LocalAmbiente(id_local=Local.objects.get(pk=id_local),
                                                   id_ambiente=Ambiente.objects.get(pk=object[i][1]))
-                    localambiente.capacidad = 0
                     localambiente.save()
             elif object[i][0] < 0:
                 borrar = LocalAmbiente.objects.filter(id_local=Local.objects.get(pk=id_local),
@@ -456,6 +467,13 @@ def get_funcionarioinei(request, id_per):
     funcionarios = list(FuncionariosINEI.objects.using('consecucion').filter(id_per=id_per).values())
 
     return JsonResponse(funcionarios, safe=False)
+
+
+@csrf_exempt
+def update_peaaula(request, id_localambiente, id_instructor):
+    PEA_AULA.objects.filter(id_localambiente=id_localambiente).update(id_instructor=id_instructor)
+
+    return JsonResponse({'msg': True}, safe=False)
 
 
 class obj(object):

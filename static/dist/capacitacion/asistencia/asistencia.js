@@ -62,10 +62,11 @@ function getRangoFechas(id_local) {
 }
 
 function getLocales() {
-    "use strict";
     let ubigeo = `${session.ccdd}${session.ccpp}${session.ccdi}`;
+    let url = session.curso == '1' ? `${BASE_URL}localubigeo/${ubigeo}/${session.curso}/` : `${BASE_URL}localzona/${ubigeo}/${session.zona}/${session.curso}/`;
+    "use strict";
     $.ajax({
-        url: `${BASEURL}/localbyzona/${ubigeo}/${session.zona}/`,
+        url: url,
         type: 'GET',
         success: response => {
             setSelect_v2('local', response, ['id_local', 'nombre_local'])
@@ -118,15 +119,14 @@ function getPEA(id_localambiente) {
     aula_selected = id_localambiente;
     if ($.fn.DataTable.isDataTable('#tabla_pea')) {
         $('#tabla_pea').dataTable().fnDestroy();
-
     }
     $.ajax({
         url: `${BASEURL}/peaaulaasistencia/${id_localambiente}/`,
         type: 'GET',
         success: response => {
             console.log(response);
+            response[0].id_instructor != null ? $('#instructor').val(response[0].id_instructor) : $('#instructor').val(-1);
             let fecha_selected = $('#fechas').val();
-            console.log(fecha_selected);
             let json = {};
             let html = '';
             let thead = `<tr>
@@ -144,7 +144,7 @@ function getPEA(id_localambiente) {
 										<div class="checkbox checkbox-right">
 											<label>
 												<input type="radio" name="turno_manana${key}${fecha_selected}" ${setCheckedTurnoManana(val.peaaulas, fecha_selected, "0")} value="0">
-												Normal
+												Puntual
 											</label>
 										</div>
 
@@ -166,7 +166,7 @@ function getPEA(id_localambiente) {
 										<div class="checkbox checkbox-right">
 											<label>
 												<input type="radio" name="turno_tarde${key}${fecha_selected}" ${setCheckedTurnoTarde(val.peaaulas, fecha_selected, "0")} value="0">
-												Normal
+												Puntual
 											</label>
 										</div>
 
@@ -247,6 +247,16 @@ function saveAsistencia() {
     }, confirm => {
         if (confirm) {
             $.ajax({
+                url: `${BASEURL}/update_peaaula/${aula_selected}/${$('#instructor').val()}/`,
+                type: 'GET',
+                success: function (response) {
+                    console.log(response);
+                },
+                error: function (error) {
+
+                }
+            });
+            $.ajax({
                 url: `${BASEURL}/save_asistencia/`,
                 type: 'POST',
                 data: JSON.stringify(data),
@@ -258,5 +268,14 @@ function saveAsistencia() {
                 }
             });
         }
+    });
+}
+
+function darBaja() {
+    "use strict";
+    let id_pea = [];
+    let inputs_idea_pea = $('input[name="id_pea"]')
+    $.each(inputs_idea_pea, (key, val)=> {
+
     });
 }

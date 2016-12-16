@@ -375,7 +375,7 @@
                         <div class="col-md-8 col-md-offset-2">
                             <table class="table table-responsive table-bordered">
                                 <thead>
-                                <tr>
+                                <tr class="bg-blue">
                                     <th>Tipo de Ambiente</th>
                                     <th>Total</th>
                                     <th>Disponible</th>
@@ -459,9 +459,9 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td>Otro <br>Especifique: <input type="text" name="especifique_otros"
-                                                                     id="especifique_otros"
-                                                                     class="form-control" value=""></td>
+                                    <td>Otro (Especifique): <input type="text" name="especifique_otros"
+                                                                   id="especifique_otros"
+                                                                   class="form-control" value=""></td>
                                     <td><input type="text" name="cantidad_total_otros"
                                                id="cantidad_total_otros"
                                                class="form-control" value="">
@@ -515,12 +515,6 @@
                                 class="icon-reload-alt position-right"></i></button>
                         <button type="button" id="registrar" class="btn btn-primary">Guardar <i
                                 class="icon-arrow-right14 position-right"></i></button>
-                        <button type="button" id="registrar_aulas_modal" data-toggle="modal"
-                                data-target="#modal_registroaula"
-                                disabled class="btn btn-primary">
-                            Registrar
-                            Aulas <i
-                                class="icon-arrow-right14 position-right"></i></button>
                     </div>
                 </div>
             </form>
@@ -541,10 +535,11 @@
                 <div class="modal-body">
                     <table class="table datatable-basic table-bordered" id="table_localesubigeo">
                         <thead>
-                        <tr>
+                        <tr class="bg-blue">
                             <th>Nombre Local</th>
                             <th>Nombre de Via</th>
                             <th>Referencia</th>
+                            <th>Zona</th>
                             <th>Acción</th>
                         </tr>
                         </thead>

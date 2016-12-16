@@ -25,10 +25,11 @@ $('#ambiente').change(e => {
 });
 
 function getLocales() {
-    "use strict";
     let ubigeo = `${session.ccdd}${session.ccpp}${session.ccdi}`;
+    let url = session.curso == '1' ? `${BASE_URL}localubigeo/${ubigeo}/${session.curso}/` : `${BASE_URL}localzona/${ubigeo}/${session.zona}/${session.curso}/`;
+    "use strict";
     $.ajax({
-        url: `${BASEURL}/localbyzona/${ubigeo}/${session.zona}/`,
+        url: url,
         type: 'GET',
         success: response => {
             setSelect_v2('local', response, ['id_local', 'nombre_local'])

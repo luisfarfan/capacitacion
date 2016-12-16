@@ -250,7 +250,7 @@
                     } else if (params[i]['cargo']) {
                         html += `<td>${val.id_cargofuncional.nombre_funcionario}</td>`;
                     } else {
-                        html += `<td>${val[params[i]]}</td>`;
+                        html += `<td>${val[params[i]] == null ? 0 : val[params[i]]}</td>`;
                     }
                 }
                 html += '</tr>';
@@ -296,7 +296,7 @@
         }
     });
     if (session.curso == '1') {
-        $('#tipo_cargo').text('Jefe Distrital')
+        $('#tipo_cargo').text('Capacitación')
     } else {
         $('#tipo_cargo').text('Jefe Zonal')
     }

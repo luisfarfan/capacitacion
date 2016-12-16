@@ -36,8 +36,8 @@ urlpatterns = [
     url(r'^distritos/(?P<ccdd>[0-9]+)/(?P<ccpp>[0-9]+)/$',
         DistritosList.as_view()),
     url(r'^zonas/(?P<ubigeo>[0-9]+)/$', ZonasList.as_view()),
-    url('^localubigeo/(?P<ubigeo>.+)/$', TbLocalByUbigeoViewSet.as_view()),
-    url('^localzona/(?P<ubigeo>.+)/(?P<zona>.+)/$', TbLocalByZonaViewSet.as_view()),
+    url('^localubigeo/(?P<ubigeo>.+)/(?P<id_curso>.+)/$', TbLocalByUbigeoViewSet.as_view()),
+    url('^localzona/(?P<ubigeo>.+)/(?P<zona>.+)/(?P<id_curso>.+)/$', TbLocalByZonaViewSet.as_view()),
     url('^localambiente/(?P<id_local>.+)/$', TbLocalAmbienteByLocalViewSet),
     url('^cursobyetapa/(?P<id_etapa>.+)/$', CursobyEtapaViewSet.as_view()),
     url('^cursocriteriobycurso/(?P<id_curso>.+)/$', CursoCriteriobyCursoViewSet.as_view()),
@@ -54,5 +54,6 @@ urlpatterns = [
     url('^pea_notas/(?P<id_peaaula>.+)/$', PEA_CURSOCRITERIOViewSet.as_view()),
     url('^generar_ambientes/$', generar_ambientes),
     url('^get_funcionarioinei/(?P<id_per>.+)/$', get_funcionarioinei),
+    url('^update_peaaula/(?P<id_localambiente>.+)/(?P<id_instructor>.+)/$', update_peaaula),
 
 ]

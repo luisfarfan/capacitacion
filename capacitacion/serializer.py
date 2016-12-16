@@ -24,6 +24,11 @@ class LocalAmbienteSerializer(serializers.ModelSerializer):
         model = LocalAmbiente
 
 
+class PEA_Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = PEA
+
+
 class CursoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Curso

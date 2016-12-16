@@ -211,6 +211,7 @@ class PEA_AULA(models.Model):
     id_peaaula = models.AutoField(primary_key=True, db_column='id_peaaula')
     id_pea = models.ForeignKey('PEA', db_column='id_pea')
     id_localambiente = models.ForeignKey('LocalAmbiente', db_column='id_localambiente')
+    id_instructor = models.ForeignKey('Instructor', blank=True, null=True)
 
     class Meta:
         managed = True
@@ -254,3 +255,13 @@ class FuncionariosINEI(models.Model):
     class Meta:
         managed = False
         db_table = 'v_personal_contratado_cpv'
+
+
+class Instructor(models.Model):
+    id_instructor = models.AutoField(primary_key=True)
+    nombre_completo = models.CharField(max_length=100, blank=True, null=True)
+    dni = models.CharField(max_length=8, blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = 'INSTRUCTOR'
