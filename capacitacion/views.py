@@ -260,7 +260,7 @@ def getMeta(request):
         ubigeo = request.POST['ubigeo']
         zona = request.POST['zona']
         meta = PEA.objects.filter(id_cargofuncional__cursofuncionario__id_curso=id_curso, ubigeo=ubigeo,
-                                  zona=zona).count()
+                                  zona=zona, reserva=0).count()
 
         capacidad_zona = LocalAmbiente.objects.filter(id_local__zona=zona, id_local__ubigeo=ubigeo,
                                                       id_local__id_curso=id_curso).aggregate(
@@ -385,7 +385,8 @@ def save_asistencia(request):
 def getCriteriosCurso(request, id_curso):
     criterios = list(
         CursoCriterio.objects.filter(id_curso=id_curso).annotate(
-            criterio=F('id_criterio__nombre_criterio')).values('id_cursocriterio', 'criterio', 'ponderacion'))
+            criterio=F('id_criterio__nombre_criterio')).values('id_cursocriterio', 'criterio', 'ponderacion',
+                                                               'id_criterio'))
 
     return JsonResponse(criterios, safe=False)
 

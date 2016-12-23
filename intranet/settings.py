@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'intranetapp',
     'capacitacion',
     'login',
+    'reportes',
     'rest_framework',
 ]
 

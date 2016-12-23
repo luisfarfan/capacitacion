@@ -224,7 +224,11 @@
             if (typeof val == 'string') {
                 html += `<option value="${val}">${val}</option>`
             } else {
-                html += `<option value="${val[keys[0]]}">${val[keys[1]]}</option>`
+                if (typeof keys[1] == 'object') {
+                    html += `<option value="${val[keys[0]]}">${val[keys[1][0]]} - ${val[keys[1][1]]}</option>`;
+                } else {
+                    html += `<option value="${val[keys[0]]}">${val[keys[1]]}</option>`;
+                }
             }
         });
         $('#' + id).html(html);

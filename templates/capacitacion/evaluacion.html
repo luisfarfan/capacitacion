@@ -17,7 +17,7 @@
         </div>
         <div class="panel-body">
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-5">
                     <div class="form-group">
                         <label>Local</label>
                         <select id="local" class="select form-control">
@@ -25,49 +25,22 @@
                         </select>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-5">
-        <div class="panel panel-primary panel-bordered">
-            <div class="panel-heading">
-                <h5 class="panel-title">Detalle Ambientes por Local</h5>
-                <div class="heading-elements">
-                    <ul class="icons-list">
-                        <li>
-                            <a data-action="collapse"></a>
-                        </li>
-                        <li>
-                            <a data-action="close"></a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            <div class="panel-body">
-                <div class="row">
-                    <div class="table-responsive">
-                        <table id="tabla_detalle_ambientes" class="table table-bordered">
-                            <thead>
-                            <tr>
-                                <th>N°</th>
-                                <th>Número Ambiente</th>
-                                <th>Capacidad</th>
-                                <th>Ambiente</th>
-                                <th></th>
-                            </tr>
-                            </thead>
-                            <tbody>
-
-                            </tbody>
-                        </table>
+                <div class="col-md-5">
+                    <div class="form-group">
+                        <label>Aulas</label>
+                        <select id="aulas" class="select form-control">
+                            <option value="">Seleccione</option>
+                        </select>
                     </div>
-
+                </div>
+                <div class="col-md-2">
+                    <button id="btn_getpea" class="btn btn-primary">Mostrar PEA</button>
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-md-7">
+
+    <div class="col-md-12">
         <div class="panel panel-primary panel-bordered">
             <div class="panel-heading">
                 <h5 class="panel-title">PEA por Aula</h5>

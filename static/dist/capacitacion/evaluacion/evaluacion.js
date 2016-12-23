@@ -17,6 +17,11 @@ $('#local').change(e=> {
     getAmbientes(id_local);
 });
 
+$('#btn_getpea').click(event => {
+    "use strict";
+    aula_selected = $('#aulas').val();
+    getPEA(aula_selected);
+});
 
 function getLocales() {
     let ubigeo = `${session.ccdd}${session.ccpp}${session.ccdi}`;
@@ -41,7 +46,8 @@ function getAmbientes(id_local) {
         success: response => {
             id_curso = response.id_curso;
             getCriterios();
-            setTable('tabla_detalle_ambientes', response.ambientes, ['numero', 'capacidad', 'nombre_ambiente', {pk: 'id_localambiente'}]);
+            setSelect_v2('aulas', response.ambientes, ['id_localambiente', ['numero', 'nombre_ambiente']]);
+            //setTable('tabla_detalle_ambientes', response.ambientes, ['numero', 'capacidad', 'nombre_ambiente', {pk: 'id_localambiente'}]);
         },
         error: error => {
             console.log('ERROR!!', error);
@@ -75,7 +81,7 @@ function getPEA(id_localambiente) {
     for (let i in criterios) {
         thead += `<th>${criterios[i].criterio}</th>`;
     }
-    thead += `<th>Nota Final</th></tr>`;
+    thead += `<th>Nota Final</th><th>Aptos</th></tr>`;
     var notas = [];
     $.ajax({
         url: `${BASEURL}/peaaulaasistencia/${id_localambiente}/`,
@@ -93,14 +99,39 @@ function getPEA(id_localambiente) {
                     }
                 });
                 body += `<tr>
-                    <input type="hidden" name="id_peaaula" value="${response[i].id_peaaula}">   
+                    <input type="hidden" name=  "id_peaaula" value="${response[i].id_peaaula}">   
                     <td>${count++}</td>
                     <td>${response[i].id_pea.ape_paterno} ${response[i].id_pea.ape_materno} ${response[i].id_pea.nombre}</td>
                     <td>${response[i].id_pea.id_cargofuncional.nombre_funcionario}</td>`;
+                let nota_asistencia = 18;
                 for (let k in criterios) {
-                    body += `<td><input name="${criterios[k].id_cursocriterio}" value="${findInObject(notas, criterios[k].id_cursocriterio)}" class="form_control"></td>`;
+                    if (criterios[k].id_criterio == 2) {
+                        for (let a in response[i].peaaulas) {
+                            switch (response[i].peaaulas[a].turno_manana) {
+                                case 1:
+                                    nota_asistencia = nota_asistencia - 0.5;
+                                    break;
+                                case 2:
+                                    nota_asistencia = nota_asistencia - 1;
+                                    break;
+                            }
+                            switch (response[i].peaaulas[a].turno_tarde) {
+                                case 1:
+                                    nota_asistencia = nota_asistencia - 0.5;
+                                    break;
+                                case 2:
+                                    nota_asistencia = nota_asistencia - 1;
+                                    break;
+                            }
+                        }
+                        body += `<td><input type="number" min="0" max="20" maxlength="2" disabled name="${criterios[k].id_cursocriterio}" value="${nota_asistencia}" class="form_control"></td>`;
+                    } else {
+                        body += `<td><input type="number" min="0" max="20" maxlength="2" name="${criterios[k].id_cursocriterio}" value="${findInObject(notas, criterios[k].id_cursocriterio)}" class="form_control"></td>`;
+                    }
+
                 }
-                body += `<td><input name="nota_final" disabled class="form_control"></td>`;
+                body += `<td><input type="number" name="nota_final" disabled class="form_control"></td>`;
+                body += `<td><input type="checkbox" name="aptos" value="${response[i].id_peaaula}"></td>`;
             }
             json.html = body;
             $('#tabla_pea').find('thead').html(thead);
@@ -143,7 +174,7 @@ function calcularPromedio(input) {
         input_nota == '' ? input_nota = 0 : '';
         promedio = promedio + (parseInt(input_nota) * (parseInt(criterios[i].ponderacion) / 100));
     }
-    $($(`input[name="nota_final"]`)[rowindex]).val(promedio);
+    $($(`input[name="nota_final"]`)[rowindex]).val(Math.round(promedio));
 }
 
 function saveNotas() {
