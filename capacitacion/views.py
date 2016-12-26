@@ -496,6 +496,7 @@ def darAltaPea(request):
     for i in id_pea:
         pea = PEA.objects.get(pk=i)
         pea.contingencia = 0
+        pea.alta_estado = 1
         pea.save()
 
     return JsonResponse({'msg': True}, safe=False)

@@ -10,34 +10,34 @@ var rangofechas = [];
 var peaaula = [];
 var aula_selected;
 
-$('#local').change(e=> {
+$('#local').change(e => {
     "use strict";
     let id_local = $('#local').val();
     getAmbientes(id_local);
     getRangoFechas(id_local);
 });
 
-$('#fechas').change(e=> {
+$('#fechas').change(e => {
     "use strict";
     getPEA(aula_selected);
 });
 
 function disabledTurnos(turno) {
     if (turno == '0') {
-        $('input[name^="turno_manana"]').map((key, val)=> {
+        $('input[name^="turno_manana"]').map((key, val) => {
             "use strict";
             $(val).prop('disabled', false);
         });
-        $('input[name^="turno_tarde"]').map((key, val)=> {
+        $('input[name^="turno_tarde"]').map((key, val) => {
             "use strict";
             $(val).prop('disabled', true);
         });
     } else if (turno == '1') {
-        $('input[name^="turno_manana"]').map((key, val)=> {
+        $('input[name^="turno_manana"]').map((key, val) => {
             "use strict";
             $(val).prop('disabled', true);
         });
-        $('input[name^="turno_tarde"]').map((key, val)=> {
+        $('input[name^="turno_tarde"]').map((key, val) => {
             "use strict";
             $(val).prop('disabled', false);
         });
@@ -94,7 +94,7 @@ function getAmbientes(id_local) {
 function setCheckedTurnoManana(obj, fecha, val) {
     "use strict";
     let checked = '';
-    $.each(obj, (key, value)=> {
+    $.each(obj, (key, value) => {
         if (value.fecha == fecha) {
             checked = value.turno_manana == val ? 'checked' : '';
             value.turno_manana == val ? console.log(value) : '';
@@ -106,7 +106,7 @@ function setCheckedTurnoManana(obj, fecha, val) {
 function setCheckedTurnoTarde(obj, fecha, val) {
     "use strict";
     let checked = '';
-    $.each(obj, (key, value)=> {
+    $.each(obj, (key, value) => {
         if (value.fecha == fecha) {
             checked = value.turno_tarde == val ? 'checked' : '';
         }
@@ -133,7 +133,7 @@ function getPEA(id_localambiente) {
                             <th>N°</th>
                             <th>Nombre Completo</th>
                             <th>Cargo</th>`;
-            $.each(response, (key, val)=> {
+            $.each(response, (key, val) => {
                 html += '<tr>';
                 html += `<td>${key + 1}</td>`;
                 html += `<td>${val.id_pea.ape_paterno} ${val.id_pea.ape_materno} ${val.id_pea.nombre}</td><td>${val.id_pea.id_cargofuncional.nombre_funcionario}</td>`;
@@ -209,7 +209,7 @@ function saveAsistencia() {
     let div_data = tabla_pea.$('div[name="m' + fecha_selected + '"]');
     let data = [];
     let faltantes = 0;
-    $.each(div_data, (key, val)=> {
+    $.each(div_data, (key, val) => {
         let turno_manana = $(val).find('input[name^="turno_manana"]:checked').val();
         let id_peaaula = $(val).find(`input[name^="id_peaaula"]`).val();
         let input_tarde = tabla_pea.$(`input[name="id_peaaula${id_peaaula}"]`)[1];
@@ -271,11 +271,11 @@ function saveAsistencia() {
     });
 }
 
-function darBaja() {
+function fn_darBaja() {
     "use strict";
     let id_pea = [];
     let inputs_checked_idpea = $('input[name="check_id_pea"]')
-    $.each(inputs_checked_idpea, (key, val)=> {
+    $.each(inputs_checked_idpea, (key, val) => {
         if ($(val).is(':checked')) {
             id_pea.push($(val).val());
         }
@@ -285,17 +285,17 @@ function darBaja() {
         type: 'POST',
         data: {'id_peas': id_pea},
         success: response => {
-            console.log(response);
+            getPEA(aula_selected)
+            setTablaDarBaja();
         }
-    })
-    console.log(id_pea);
+    });
 }
 
-function darAlta() {
+function fn_darAlta() {
     "use strict";
     let id_pea = [];
     let inputs_checked_idpea = $('input[name="check_id_pea_dar_alta"]')
-    $.each(inputs_checked_idpea, (key, val)=> {
+    $.each(inputs_checked_idpea, (key, val) => {
         if ($(val).is(':checked')) {
             id_pea.push($(val).val());
         }
@@ -308,6 +308,15 @@ function darAlta() {
             console.log(response);
         }
     });
+}
+
+function darAlta() {
+    "use strict";
+    alert_confirm(fn_darAlta);
+}
+function darBaja() {
+    "use strict";
+    alert_confirm(fn_darBaja);
 }
 
 function getContingencia() {
@@ -324,7 +333,7 @@ function getContingencia() {
             $('#modal_pea_dar_alta').modal('show');
             let html = '';
             $('#tabla_pea_dar_alta').find('tbody').empty();
-            $.each(response, (key, val)=> {
+            $.each(response, (key, val) => {
                 html += `<tr>`;
                 html += `<td>${val.dni}</td>`;
                 html += `<td>${val.ape_paterno}</td>`;
@@ -344,18 +353,23 @@ function getContingencia() {
 }
 
 function setTablaDarBaja() {
-    $('#modal_pea_dar_baja').modal('show');
-    let html = '';
-    $('#tabla_pea_dar_baja').find('tbody').empty();
-    $.each(peaaula, (key, val)=> {
-        html += `<tr>`;
-        html += `<td>${val.id_pea.dni}</td>`;
-        html += `<td>${val.id_pea.ape_paterno}</td>`;
-        html += `<td>${val.id_pea.ape_materno}</td>`;
-        html += `<td>${val.id_pea.nombre}</td>`;
-        html += `<td><input type="checkbox" name="check_id_pea" value="${val.id_pea.id_pea}"></td>`;
-        html += `</tr>`;
-    });
-    $('#tabla_pea_dar_baja').find('tbody').html(html);
+    if (peaaula.length) {
+        $('#modal_pea_dar_baja').modal('show');
+        let html = '';
+        $('#tabla_pea_dar_baja').find('tbody').empty();
+        $.each(peaaula, (key, val) => {
+            html += `<tr>`;
+            html += `<td>${val.id_pea.dni}</td>`;
+            html += `<td>${val.id_pea.ape_paterno}</td>`;
+            html += `<td>${val.id_pea.ape_materno}</td>`;
+            html += `<td>${val.id_pea.nombre}</td>`;
+            html += `<td><input type="checkbox" name="check_id_pea" value="${val.id_pea.id_pea}"></td>`;
+            html += `</tr>`;
+        });
+        $('#tabla_pea_dar_baja').find('tbody').html(html);
+    } else {
+        alert('Debe seleccionar un aula');
+    }
+
     //$('#tabla_pea_dar_baja').dataTable();
 }

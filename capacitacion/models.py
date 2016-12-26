@@ -201,6 +201,8 @@ class PEA(models.Model):
     ubigeo = models.ForeignKey('Ubigeo', db_column='ubigeo')
     contingencia = models.IntegerField(blank=True, null=True)
     baja_estado = models.IntegerField(null=True, blank=True)
+    alta_estado = models.IntegerField(null=True, blank=True, default=0)
+    apto = models.IntegerField(null=True, blank=True, default=0)
 
     class Meta:
         managed = True

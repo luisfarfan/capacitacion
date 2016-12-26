@@ -18,73 +18,16 @@
     <link href="{% static "assets/css/colors.css" %}" rel="stylesheet" type="text/css">
     <!-- /global stylesheets -->
     <!-- Core JS files -->
+    <script type="text/javascript" src="{% static "assets/js/plugins/loaders/pace.min.js" %}"></script>
     <script type="text/javascript" src="{% static "assets/js/core/libraries/jquery.min.js" %}"></script>
     <script type="text/javascript" src="{% static "assets/js/core/libraries/bootstrap.min.js" %}"></script>
-    <style>
-        #map-canvas {
-            width: 700px;
-            height: 580px;
-        }
-    </style>
-    <style>
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-        }
-
-        #map {
-            height: 100%;
-        }
-
-        .controls {
-            margin-top: 10px;
-            border: 1px solid transparent;
-            border-radius: 2px 0 0 2px;
-            box-sizing: border-box;
-            -moz-box-sizing: border-box;
-            height: 32px;
-            outline: none;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-        }
-
-        #pac-input {
-            background-color: #fff;
-            font-family: Roboto;
-            font-size: 15px;
-            font-weight: 300;
-            margin-left: 12px;
-            padding: 0 11px 0 13px;
-            text-overflow: ellipsis;
-            width: 300px;
-        }
-
-        #pac-input:focus {
-            border-color: #4d90fe;
-        }
-
-        .pac-container {
-            font-family: Roboto;
-            z-index: 9999;
-            position: fixed;
-            display: inline-block;
-            float: left;
-        }
-
-        #type-selector {
-            color: #fff;
-            background-color: #4d90fe;
-            padding: 5px 11px 0px 11px;
-        }
-
-        #type-selector label {
-            font-family: Roboto;
-            font-size: 13px;
-            font-weight: 300;
-        }
-
-    </style>
+    <script type="text/javascript" src="{% static "assets/js/plugins/loaders/blockui.min.js" %}"></script>
     <!-- /core JS files -->
+    <style>
+        .tr_selected {
+            background-color: dodgerblue;
+        }
+    </style>
 </head>
 
 <body>
@@ -108,7 +51,7 @@
                     <i class="caret"></i>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-right">
-                    <li><a href="http://192.168.200.123:3000"><i class="icon-switch2"></i> Cerrar Sesión</a>
+                    <li><a href="/"><i class="icon-switch2"></i> Cerrar Sesión</a>
                     </li>
                 </ul>
             </li>
@@ -205,6 +148,7 @@
     BASE_URL = protocol + '//' + host + '/';
     session = JSON.parse(localStorage.getItem('usuario'));
 
+
     function setSelect(id, json, select2 = false) {
         $('#' + id).find('option').remove();
         let html = '';
@@ -245,7 +189,7 @@
         if (json.html) {
             html = json.html;
         } else {
-            $.each(json, (key, val)=> {
+            $.each(json, (key, val) => {
                 html += '<tr>';
                 html += `<td>${key + 1}</td>`;
                 for (let i in params) {
@@ -266,7 +210,35 @@
         if (datatable) {
             ('#' + id).DataTable({datatable_params})
         }
+
+        $('table tbody tr td button').on('click', event => {
+            let selecteds = $('table tbody .tr_selected');
+            $.each(selecteds, (key, val) => {
+                $(val).removeClass('tr_selected');
+            });
+            $(event.target).parent().parent().addClass('tr_selected');
+        });
     }
+
+    function alert_confirm(callback, title = 'Está seguro de Guardar?', type = 'success') {
+        swal({
+            title: title,
+            text: '',
+            type: type,
+            showCancelButton: true,
+            confirmButtonColor: "#EF5350",
+            confirmButtonText: "Si!",
+            cancelButtonText: "No!",
+            closeOnConfirm: true,
+            closeOnCancel: true,
+            showLoaderOnConfirm: true
+        }, confirm => {
+            if (confirm) {
+                callback()
+            }
+        });
+    }
+
 
 </script>
 
@@ -304,6 +276,7 @@
     } else {
         $('#tipo_cargo').text('Jefe Zonal')
     }
+
 
 </script>
 </html>

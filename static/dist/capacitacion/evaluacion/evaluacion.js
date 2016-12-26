@@ -11,7 +11,7 @@ $(function () {
 var criterios = [];
 var aula_selected;
 var id_curso;
-$('#local').change(e=> {
+$('#local').change(e => {
     "use strict";
     let id_local = $('#local').val();
     getAmbientes(id_local);
@@ -146,6 +146,8 @@ function getPEA(id_localambiente) {
                 $(`input[name="${criterios[i].id_cursocriterio}"]`).trigger('keyup');
             }
 
+            $('#tabla_pea').dataTable();
+
         },
     })
 }
@@ -155,7 +157,7 @@ function findInObject(obj, search) {
     let nota = 0;
     console.log(obj);
     if (obj.length > 0) {
-        $.each(obj, (key, val)=> {
+        $.each(obj, (key, val) => {
             if (val['id_cursocriterio'] == search) {
                 nota = val['nota'];
             }
@@ -175,15 +177,17 @@ function calcularPromedio(input) {
         promedio = promedio + (parseInt(input_nota) * (parseInt(criterios[i].ponderacion) / 100));
     }
     $($(`input[name="nota_final"]`)[rowindex]).val(Math.round(promedio));
+    //$($(`input[name="nota_final"]`)[rowindex]).parent().text(Math.round(promedio));
+
 }
 
 function saveNotas() {
     "use strict";
     let data_send = [];
     let faltantes = 0;
-    $.each(criterios, (i, v)=> {
+    $.each(criterios, (i, v) => {
         let criterio_input = $(`input[name="${criterios[i].id_cursocriterio}"]`);
-        $.each(criterio_input, (k, v)=> {
+        $.each(criterio_input, (k, v) => {
             if ($(criterio_input[k]).val() != '') {
                 let json = {
                     nota: $(criterio_input[k]).val(),
