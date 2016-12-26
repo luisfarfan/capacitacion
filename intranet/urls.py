@@ -55,5 +55,7 @@ urlpatterns = [
     url('^generar_ambientes/$', generar_ambientes),
     url('^get_funcionarioinei/(?P<id_per>.+)/$', get_funcionarioinei),
     url('^update_peaaula/(?P<id_localambiente>.+)/(?P<id_instructor>.+)/$', update_peaaula),
+    url('^darBajaPea/$', darBajaPea),
+    url('^darAltaPea/$', darAltaPea),
 
 ]

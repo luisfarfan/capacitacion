@@ -7,7 +7,7 @@ $(function () {
 
 var turno;
 var rangofechas = [];
-var cant_columns_tablapea = 3;
+var peaaula = [];
 var aula_selected;
 
 $('#local').change(e=> {
@@ -124,7 +124,7 @@ function getPEA(id_localambiente) {
         url: `${BASEURL}/peaaulaasistencia/${id_localambiente}/`,
         type: 'GET',
         success: response => {
-            console.log(response);
+            peaaula = response;
             response[0].id_instructor != null ? $('#instructor').val(response[0].id_instructor) : $('#instructor').val(-1);
             let fecha_selected = $('#fechas').val();
             let json = {};
@@ -274,8 +274,88 @@ function saveAsistencia() {
 function darBaja() {
     "use strict";
     let id_pea = [];
-    let inputs_idea_pea = $('input[name="id_pea"]')
-    $.each(inputs_idea_pea, (key, val)=> {
-
+    let inputs_checked_idpea = $('input[name="check_id_pea"]')
+    $.each(inputs_checked_idpea, (key, val)=> {
+        if ($(val).is(':checked')) {
+            id_pea.push($(val).val());
+        }
     });
+    $.ajax({
+        url: `${BASEURL}/darBajaPea/`,
+        type: 'POST',
+        data: {'id_peas': id_pea},
+        success: response => {
+            console.log(response);
+        }
+    })
+    console.log(id_pea);
+}
+
+function darAlta() {
+    "use strict";
+    let id_pea = [];
+    let inputs_checked_idpea = $('input[name="check_id_pea_dar_alta"]')
+    $.each(inputs_checked_idpea, (key, val)=> {
+        if ($(val).is(':checked')) {
+            id_pea.push($(val).val());
+        }
+    });
+    $.ajax({
+        url: `${BASEURL}/darAltaPea/`,
+        type: 'POST',
+        data: {'id_peas': id_pea},
+        success: response => {
+            console.log(response);
+        }
+    });
+}
+
+function getContingencia() {
+    $.ajax({
+        url: `${BASEURL}/sobrantes_zona/`,
+        type: 'POST',
+        data: {
+            ubigeo: `${session.ccdd}${session.ccpp}${session.ccdi}`,
+            zona: `${session.zona}`,
+            id_curso: `${session.curso}`,
+            contingencia: 1
+        },
+        success: response => {
+            $('#modal_pea_dar_alta').modal('show');
+            let html = '';
+            $('#tabla_pea_dar_alta').find('tbody').empty();
+            $.each(response, (key, val)=> {
+                html += `<tr>`;
+                html += `<td>${val.dni}</td>`;
+                html += `<td>${val.ape_paterno}</td>`;
+                html += `<td>${val.ape_materno}</td>`;
+                html += `<td>${val.nombre}</td>`;
+                html += `<td><input type="checkbox" name="check_id_pea_dar_alta" value="${val.id_pea}"></td>`;
+                html += `</tr>`;
+            });
+            $('#tabla_pea_dar_alta').find('tbody').html(html);
+
+            $('#modal_pea_dar_alta').modal('show');
+        },
+        error: error => {
+            console.log('ERROR!!', error)
+        }
+    })
+}
+
+function setTablaDarBaja() {
+    $('#modal_pea_dar_baja').modal('show');
+    let html = '';
+    $('#tabla_pea_dar_baja').find('tbody').empty();
+    $.each(peaaula, (key, val)=> {
+        html += `<tr>`;
+        html += `<td>${val.id_pea.dni}</td>`;
+        html += `<td>${val.id_pea.ape_paterno}</td>`;
+        html += `<td>${val.id_pea.ape_materno}</td>`;
+        html += `<td>${val.id_pea.nombre}</td>`;
+        html += `<td><input type="checkbox" name="check_id_pea" value="${val.id_pea.id_pea}"></td>`;
+        html += `</tr>`;
+    });
+    $('#tabla_pea_dar_baja').find('tbody').html(html);
+    //$('#tabla_pea_dar_baja').dataTable();
 }

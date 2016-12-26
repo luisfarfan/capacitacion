@@ -16,8 +16,8 @@ import json
 
 def modulo_registro(request):
     template = loader.get_template('capacitacion/modulo_registro.html')
-    funcionarios = FuncionariosINEI.objects.using('consecucion').values('id_per', 'ape_paterno', 'ape_materno',
-                                                                        'nombre', 'dni')
+    funcionarios = FuncionariosINEI.objects.values('id_per', 'ape_paterno', 'ape_materno',
+                                                   'nombre', 'dni')
     context = {
         'titulo_padre': 'Capacitacion',
         'titulo_hijo': 'REGISTRO DE LOCAL',
@@ -96,7 +96,7 @@ class DistritosList(APIView):
 class ZonasList(APIView):
     def get(self, request, ubigeo):
         zonas = list(
-            Zona.objects.using('segmentacion').filter(UBIGEO=ubigeo).values('UBIGEO', 'ZONA', 'ETIQ_ZONA').annotate(
+            Zona.objects.filter(UBIGEO=ubigeo).values('UBIGEO', 'ZONA', 'ETIQ_ZONA').annotate(
                 dcount=Count('UBIGEO', 'ZONA')))
         response = JsonResponse(zonas, safe=False)
         return response
@@ -215,7 +215,7 @@ class PEA_AULAViewSet(generics.ListAPIView):
 
     def get_queryset(self):
         id_localambiente = self.kwargs['id_localambiente']
-        return PEA_AULA.objects.filter(id_localambiente=id_localambiente)
+        return PEA_AULA.objects.filter(id_localambiente=id_localambiente, id_pea__baja_estado=0)
 
 
 class PEA_AULAbyLocalAmbienteViewSet(generics.ListAPIView):
@@ -240,14 +240,14 @@ def sobrantes_zona(request):
         ubigeo = request.POST['ubigeo']
         zona = request.POST['zona']
         id_curso = request.POST['id_curso']
-        reserva = request.POST['reserva']
+        contingencia = request.POST['contingencia']
         sobrantes = PEA.objects.exclude(id_pea__in=PEA_AULA.objects.values('id_pea')).annotate(
             cargo=F('id_cargofuncional__nombre_funcionario')).filter(ubigeo=ubigeo,
                                                                      zona=zona,
                                                                      id_cargofuncional__cursofuncionario__id_curso_id=id_curso,
-                                                                     reserva=reserva).order_by(
+                                                                     contingencia=contingencia).order_by(
             'ape_paterno').values('dni', 'ape_paterno', 'ape_materno', 'nombre',
-                                  'cargo')
+                                  'cargo', 'id_pea')
         return JsonResponse(list(sobrantes), safe=False)
 
     return JsonResponse({'msg': False})
@@ -260,7 +260,7 @@ def getMeta(request):
         ubigeo = request.POST['ubigeo']
         zona = request.POST['zona']
         meta = PEA.objects.filter(id_cargofuncional__cursofuncionario__id_curso=id_curso, ubigeo=ubigeo,
-                                  zona=zona, reserva=0).count()
+                                  zona=zona, contingencia=0).count()
 
         capacidad_zona = LocalAmbiente.objects.filter(id_local__zona=zona, id_local__ubigeo=ubigeo,
                                                       id_local__id_curso=id_curso).aggregate(
@@ -293,17 +293,17 @@ def asignar(request):
                 print a.id_localambiente
                 disponibilidad = disponibilidad_aula(a.id_localambiente)
                 if disponibilidad > 0:
-                    if 'reserva' not in data:
+                    if 'contingencia' not in data:
                         print 'entro a normal'
                         pea_ubicar = PEA.objects.exclude(
                             id_pea__in=PEA_AULA.objects.values('id_pea')).filter(
-                            ubigeo=ubigeo, zona=zona, reserva=0, baja_estado=0,
+                            ubigeo=ubigeo, zona=zona, contingencia=0, baja_estado=0,
                             id_cargofuncional__in=Funcionario.objects.filter(id_curso=e.id_curso)).order_by(
                             'ape_paterno')[:a.capacidad]
                     else:
                         pea_ubicar = PEA.objects.exclude(
                             id_pea__in=PEA_AULA.objects.filter(id_pea__baja_estado=0).values('id_pea')).filter(
-                            pk__in=data['reserva'])[:disponibilidad]
+                            pk__in=data['contingencia'])[:disponibilidad]
                     for p in pea_ubicar:
                         pea = PEA.objects.get(pk=p.id_pea)
                         aula = LocalAmbiente.objects.get(pk=a.id_localambiente)
@@ -465,7 +465,7 @@ def generar_ambientes(request):
 
 @csrf_exempt
 def get_funcionarioinei(request, id_per):
-    funcionarios = list(FuncionariosINEI.objects.using('consecucion').filter(id_per=id_per).values())
+    funcionarios = list(FuncionariosINEI.objects.filter(id_per=id_per).values())
 
     return JsonResponse(funcionarios, safe=False)
 
@@ -473,6 +473,30 @@ def get_funcionarioinei(request, id_per):
 @csrf_exempt
 def update_peaaula(request, id_localambiente, id_instructor):
     PEA_AULA.objects.filter(id_localambiente=id_localambiente).update(id_instructor=id_instructor)
+
+    return JsonResponse({'msg': True}, safe=False)
+
+
+@csrf_exempt
+def darBajaPea(request):
+    id_pea = request.POST.getlist('id_peas[]')
+
+    for i in id_pea:
+        pea = PEA.objects.get(pk=i)
+        pea.baja_estado = 1
+        pea.save()
+
+    return JsonResponse({'msg': True}, safe=False)
+
+
+@csrf_exempt
+def darAltaPea(request):
+    id_pea = request.POST.getlist('id_peas[]')
+
+    for i in id_pea:
+        pea = PEA.objects.get(pk=i)
+        pea.contingencia = 0
+        pea.save()
 
     return JsonResponse({'msg': True}, safe=False)
 

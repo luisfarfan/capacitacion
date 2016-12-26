@@ -199,7 +199,7 @@ class PEA(models.Model):
     id_convocatoriacargo = models.CharField(max_length=4, blank=True, null=True, db_column='id_convocatoriacargo')
     zona = models.CharField(max_length=5, blank=True, null=True, db_column='zona')
     ubigeo = models.ForeignKey('Ubigeo', db_column='ubigeo')
-    reserva = models.IntegerField(blank=True, null=True)
+    contingencia = models.IntegerField(blank=True, null=True)
     baja_estado = models.IntegerField(null=True, blank=True)
 
     class Meta:
@@ -253,8 +253,8 @@ class FuncionariosINEI(models.Model):
     celular = models.CharField(max_length=100, blank=True, null=True)
 
     class Meta:
-        managed = False
-        db_table = 'v_personal_contratado_cpv'
+        managed = True
+        db_table = 'FUNCIONARIOS_INEI'
 
 
 class Instructor(models.Model):

@@ -58,11 +58,23 @@ function getAmbientes(id_local) {
 function getPEA(id_ambiente) {
     "use strict";
     $.ajax({
-        url: `${BASEURL}/rest/pea_aula/${id_ambiente}/`,
+        url: `${BASEURL}/peaaulaasistencia/${id_ambiente}/`,
         type: 'GET',
         success: response => {
-            console.log(response)
-            setTable('tabla_pea', response.pea, ['dni', 'ape_paterno', 'ape_materno', 'nombre', {'cargo': ['id_cargofuncional', 'nombre_funcionario']}]);
+            console.log(response);
+            let html = '';
+            $('#tabla_pea').find('tbody').empty();
+            $.each(response, (key, val)=> {
+                html += `<tr>`;
+                html += `<td>${parseInt(key) + 1}</td>`;
+                html += `<td>${val.id_pea.dni}</td>`;
+                html += `<td>${val.id_pea.ape_paterno}</td>`;
+                html += `<td>${val.id_pea.ape_materno}</td>`;
+                html += `<td>${val.id_pea.nombre}</td>`;
+                html += `<td>${val.id_pea.id_cargofuncional.nombre_funcionario}</td>`;
+                html += `</tr>`;
+            });
+            $('#tabla_pea').find('tbody').html(html);
         },
         error: error => {
             console.log('ERROR!!', error)
@@ -94,7 +106,7 @@ function doAsignacionReserva() {
     $.ajax({
         url: `${BASEURL}/asignacion/`,
         type: 'POST',
-        data: {ubigeo: ubigeo, zona: `${session.zona}`, reserva: 1, id_curso: session.curso},
+        data: {ubigeo: ubigeo, zona: `${session.zona}`, contingencia: 1, id_curso: session.curso},
         success: response => {
             $('#modal_pea_sobrante').unblock();
             getReserva();
@@ -115,7 +127,7 @@ function getSobrantes() {
     $.ajax({
         url: `${BASEURL}/sobrantes_zona/`,
         type: 'POST',
-        data: {ubigeo: ubigeo, zona: `${session.zona}`, id_curso: _id_curso, reserva: 0},
+        data: {ubigeo: ubigeo, zona: `${session.zona}`, id_curso: _id_curso, contingencia: 0},
         success: response => {
             $('#tabla_pea_sobrante').DataTable({
                 "data": response,
@@ -145,7 +157,7 @@ function getReserva() {
     $.ajax({
         url: `${BASEURL}/sobrantes_zona/`,
         type: 'POST',
-        data: {ubigeo: ubigeo, zona: `${session.zona}`, id_curso: _id_curso, reserva: 1},
+        data: {ubigeo: ubigeo, zona: `${session.zona}`, id_curso: _id_curso, contingencia: 1},
         success: response => {
             $('#tabla_pea_reserva').DataTable({
                 "data": response,
