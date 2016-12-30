@@ -282,42 +282,85 @@ def asignar(request):
         ubigeo = data['ubigeo']
         zona = data['zona']
         curso = data['id_curso']
-        if 'zona' in data:
-            locales_zona = Local.objects.filter(ubigeo=ubigeo, zona=zona, id_curso=curso)
+
+        if curso == '5':
+            return JsonResponse(distribucion_curso5(ubigeo, zona, curso), safe=False)
         else:
-            locales_zona = Local.objects.filter(ubigeo=ubigeo, id_curso=curso)
+            if 'zona' in data:
+                locales_zona = Local.objects.filter(ubigeo=ubigeo, zona=zona, id_curso=curso)
+            else:
+                locales_zona = Local.objects.filter(ubigeo=ubigeo, id_curso=curso)
 
-        for e in locales_zona:
-            aulas_by_local = LocalAmbiente.objects.filter(id_local=e.id_local).order_by('-capacidad')
-            for a in aulas_by_local:
-                print a.id_localambiente
-                disponibilidad = disponibilidad_aula(a.id_localambiente)
-                if disponibilidad > 0:
-                    if 'contingencia' not in data:
-                        print 'entro a normal'
-                        pea_ubicar = PEA.objects.exclude(
-                            id_pea__in=PEA_AULA.objects.values('id_pea')).filter(
-                            ubigeo=ubigeo, zona=zona, contingencia=0, baja_estado=0,
-                            id_cargofuncional__in=Funcionario.objects.filter(id_curso=e.id_curso)).order_by(
-                            'ape_paterno')[:a.capacidad]
-                    else:
-                        pea_ubicar = PEA.objects.exclude(
-                            id_pea__in=PEA_AULA.objects.filter(id_pea__baja_estado=0).values('id_pea')).filter(
-                            pk__in=data['contingencia'])[:disponibilidad]
-                    for p in pea_ubicar:
-                        pea = PEA.objects.get(pk=p.id_pea)
-                        aula = LocalAmbiente.objects.get(pk=a.id_localambiente)
-                        pea_aula = PEA_AULA(id_pea=pea, id_localambiente=aula)
-                        pea_aula.save()
+            for e in locales_zona:
+                aulas_by_local = LocalAmbiente.objects.filter(id_local=e.id_local).order_by('-capacidad')
+                for a in aulas_by_local:
+                    disponibilidad = disponibilidad_aula(a.id_localambiente)
+                    if disponibilidad > 0:
+                        if 'contingencia' not in data:
+                            pea_ubicar = PEA.objects.exclude(
+                                id_pea__in=PEA_AULA.objects.values('id_pea')).filter(
+                                ubigeo=ubigeo, zona=zona, contingencia=0, baja_estado=0,
+                                id_cargofuncional__in=Funcionario.objects.filter(id_curso=e.id_curso)).order_by(
+                                'ape_paterno')[:a.capacidad]
+                        else:
+                            pea_ubicar = PEA.objects.exclude(
+                                id_pea__in=PEA_AULA.objects.filter(id_pea__baja_estado=0).values('id_pea')).filter(
+                                pk__in=data['contingencia'])[:disponibilidad]
+                        for p in pea_ubicar:
+                            pea = PEA.objects.get(pk=p.id_pea)
+                            aula = LocalAmbiente.objects.get(pk=a.id_localambiente)
+                            pea_aula = PEA_AULA(id_pea=pea, id_localambiente=aula)
+                            pea_aula.save()
 
-        return JsonResponse({'msg': True})
+            return JsonResponse({'msg': True})
 
     return JsonResponse({'msg': False})
 
 
-def disponibilidad_aula(aula):
-    aula = LocalAmbiente.objects.get(pk=aula)
-    cantidad_asignada = PEA_AULA.objects.filter(id_localambiente=aula, id_pea__baja_estado=0).count()
+"""
+EMPADRONADOR URBANO : 901
+EMPADRONADOR RURAL : 284
+JEFE DE SECCION URBANO : 165
+JEFE DE SECCION RURAL : 3
+"""
+
+
+def distribucion_curso5(ubigeo, zona, curso):
+    locales = Local.objects.filter(ubigeo=ubigeo, zona=zona, id_curso=curso)
+    cargos = list(CursoFuncionario.objects.filter(id_curso=curso).values_list('id_funcionario', flat=True))
+    pea_distribuida = []
+    for i in cargos:
+        pea_cantidad = PEA.objects.filter(ubigeo=ubigeo, zona=zona, id_cargofuncional=i).count()
+        pea_dia1_ids = list(PEA.objects.filter(ubigeo=ubigeo, zona=zona, id_cargofuncional=i).values_list('id_pea',
+                                                                                                          flat=True)[
+                            :pea_cantidad / 2])
+        pea_distribuida.append(
+            {'id_cargofuncional': i,
+             'pea_dia1': list(
+                 PEA.objects.filter(ubigeo=ubigeo, zona=zona, id_cargofuncional=i).values_list('id_pea', flat=True)[
+                 :pea_cantidad / 2]),
+             'pea_dia2': list(PEA.objects.exclude(id_pea__in=pea_dia1_ids).filter(ubigeo=ubigeo, zona=zona,
+                                                                                  id_cargofuncional=i).values_list(
+                 'id_pea', flat=True))})
+
+
+    for i in locales:
+        for v in i.localambiente_set.all():
+            disponibilidad = disponibilidad_aula(v.id_localambiente, True, 1)
+            #if disponibilidad > 0:
+
+
+    return pea_distribuida
+
+
+def disponibilidad_aula(aula, curso5=False, dia=1):
+    if curso5:
+        aula = LocalAmbiente.objects.get(pk=aula)
+        cantidad_asignada = PEA_AULA.objects.filter(id_localambiente=aula, id_pea__baja_estado=0, pea_fecha=dia).count()
+    else:
+        aula = LocalAmbiente.objects.get(pk=aula)
+        cantidad_asignada = PEA_AULA.objects.filter(id_localambiente=aula, id_pea__baja_estado=0).count()
+
     if aula.capacidad == None:
         return 0
     return aula.capacidad - cantidad_asignada

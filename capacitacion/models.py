@@ -214,6 +214,7 @@ class PEA_AULA(models.Model):
     id_pea = models.ForeignKey('PEA', db_column='id_pea')
     id_localambiente = models.ForeignKey('LocalAmbiente', db_column='id_localambiente')
     id_instructor = models.ForeignKey('Instructor', blank=True, null=True)
+    pea_fecha = models.CharField(max_length=100, blank=True, null=True)
 
     class Meta:
         managed = True

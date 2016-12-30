@@ -5,11 +5,13 @@ from rest_framework import routers, serializers, viewsets
 class AmbienteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ambiente
+        fields = '__all__'
 
 
 class LocalSerializer(serializers.ModelSerializer):
     class Meta:
         model = Local
+        fields = '__all__'
 
 
 class LocalAulasSerializer(serializers.ModelSerializer):
@@ -17,36 +19,43 @@ class LocalAulasSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Local
+        fields = '__all__'
 
 
 class LocalAmbienteSerializer(serializers.ModelSerializer):
     class Meta:
         model = LocalAmbiente
+        fields = '__all__'
 
 
 class PEA_Serializer(serializers.ModelSerializer):
     class Meta:
         model = PEA
+        fields = '__all__'
 
 
 class CursoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Curso
+        fields = '__all__'
 
 
 class CriterioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Criterio
+        fields = '__all__'
 
 
 class CursoCriterioSerializer(serializers.ModelSerializer):
     class Meta:
         model = CursoCriterio
+        fields = '__all__'
 
 
 class TipoFuncionarioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Funcionario
+        fields = '__all__'
 
 
 class PEASerializer(serializers.ModelSerializer):
@@ -54,6 +63,7 @@ class PEASerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PEA
+        fields = '__all__'
 
 
 class PEA_BY_AULASerializer(serializers.ModelSerializer):
@@ -61,16 +71,19 @@ class PEA_BY_AULASerializer(serializers.ModelSerializer):
 
     class Meta:
         model = LocalAmbiente
+        fields = '__all__'
 
 
 class PEA_ASISTENCIASerializer(serializers.ModelSerializer):
     class Meta:
         model = PEA_ASISTENCIA
+        fields = '__all__'
 
 
 class PEA_CURSOCRITERIOSerializer(serializers.ModelSerializer):
     class Meta:
         model = PEA_CURSOCRITERIO
+        fields = '__all__'
 
 
 class PEA_AULASerializer(serializers.ModelSerializer):
@@ -79,3 +92,4 @@ class PEA_AULASerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PEA_AULA
+        fields = '__all__'
