@@ -12,6 +12,7 @@ import pandas as pd
 from django.db.models.functions import Concat
 from django.core.exceptions import ObjectDoesNotExist
 import json
+from random import sample
 
 
 def modulo_registro(request):
@@ -329,6 +330,7 @@ def distribucion_curso5(ubigeo, zona, curso):
     locales = Local.objects.filter(ubigeo=ubigeo, zona=zona, id_curso=curso)
     cargos = list(CursoFuncionario.objects.filter(id_curso=curso).values_list('id_funcionario', flat=True))
     pea_distribuida = []
+    pea_distribuida_junta = {'pea_dia1': [], 'pea_dia2': []}
     for i in cargos:
         pea_cantidad = PEA.objects.filter(ubigeo=ubigeo, zona=zona, id_cargofuncional=i).count()
         pea_dia1_ids = list(PEA.objects.filter(ubigeo=ubigeo, zona=zona, id_cargofuncional=i).values_list('id_pea',
@@ -343,14 +345,13 @@ def distribucion_curso5(ubigeo, zona, curso):
                                                                                   id_cargofuncional=i).values_list(
                  'id_pea', flat=True))})
 
-
-    for i in locales:
-        for v in i.localambiente_set.all():
-            disponibilidad = disponibilidad_aula(v.id_localambiente, True, 1)
-            #if disponibilidad > 0:
+    for d in pea_distribuida:
+        pea_distribuida_junta = {'pea_dia1': pea_distribuida_junta['pea_dia1'] + d['pea_dia1'],
+                                 'pea_dia2': pea_distribuida_junta['pea_dia2'] + d['pea_dia2']}
 
 
-    return pea_distribuida
+
+    return pea_distribuida_junta
 
 
 def disponibilidad_aula(aula, curso5=False, dia=1):
