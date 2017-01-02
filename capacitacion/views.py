@@ -330,36 +330,76 @@ def distribucion_curso5(ubigeo, zona, curso):
     locales = Local.objects.filter(ubigeo=ubigeo, zona=zona, id_curso=curso)
     cargos = list(CursoFuncionario.objects.filter(id_curso=curso).values_list('id_funcionario', flat=True))
     pea_distribuida = []
-    pea_distribuida_junta = {'pea_dia1': [], 'pea_dia2': []}
+    pea_distribuida_junta = {'pea_dia1': [], 'pea_dia2': [], 'pea_jefe_rural': []}
+    pea_ok = list(PEA_AULA.objects.values_list('id_pea', flat=True))
     for i in cargos:
-        pea_cantidad = PEA.objects.filter(ubigeo=ubigeo, zona=zona, id_cargofuncional=i).count()
-        pea_dia1_ids = list(PEA.objects.filter(ubigeo=ubigeo, zona=zona, id_cargofuncional=i).values_list('id_pea',
-                                                                                                          flat=True)[
-                            :pea_cantidad / 2])
+        pea_cantidad = PEA.objects.filter(ubigeo=ubigeo, zona=zona, id_cargofuncional=i, contingencia=0,
+                                          baja_estado=0).count()
+        pea_dia1_ids = list(
+            PEA.objects.exclude(id_pea__in=pea_ok).filter(ubigeo=ubigeo, zona=zona, id_cargofuncional=i,
+                                                          contingencia=0, baja_estado=0).values_list(
+                'id_pea', flat=True))[:pea_cantidad / 2]
         pea_distribuida.append(
             {'id_cargofuncional': i,
-             'pea_dia1': list(
-                 PEA.objects.filter(ubigeo=ubigeo, zona=zona, id_cargofuncional=i).values_list('id_pea', flat=True)[
-                 :pea_cantidad / 2]),
-             'pea_dia2': list(PEA.objects.exclude(id_pea__in=pea_dia1_ids).filter(ubigeo=ubigeo, zona=zona,
-                                                                                  id_cargofuncional=i).values_list(
+             'pea_dia1': pea_dia1_ids,
+             'pea_dia2': list(PEA.objects.exclude(id_pea__in=pea_dia1_ids).filter(
+                 ubigeo=ubigeo, zona=zona, id_cargofuncional=i, contingencia=0, baja_estado=0).values_list(
                  'id_pea', flat=True))})
 
     for d in pea_distribuida:
-        pea_distribuida_junta = {'pea_dia1': pea_distribuida_junta['pea_dia1'] + d['pea_dia1'],
-                                 'pea_dia2': pea_distribuida_junta['pea_dia2'] + d['pea_dia2']}
+        if d['id_cargofuncional'] != 3:
+            pea_distribuida_junta['pea_dia1'] = pea_distribuida_junta['pea_dia1'] + d['pea_dia1']
+            pea_distribuida_junta['pea_dia2'] = pea_distribuida_junta['pea_dia2'] + d['pea_dia2']
 
+        else:
+            pea_distribuida_junta['pea_dia1'] = pea_distribuida_junta['pea_dia1'] + d['pea_dia1'] + d['pea_dia2']
+            pea_distribuida_junta['pea_jefe_rural'] = d['pea_dia1'] + d['pea_dia2']
 
+    pea_a_distribuir = [{'pea': pea_distribuida_junta['pea_dia1'], 'dia': 1},
+                        {'pea': pea_distribuida_junta['pea_dia2'], 'dia': 2},
+                        {'pea': pea_distribuida_junta['pea_jefe_rural'], 'dia': 2, 'jefe_rural': 1}]
+
+    for k in pea_a_distribuir:
+        for i in locales:
+            for a in i.localambiente_set.all():
+                disponibilidad = disponibilidad_aula(a.id_localambiente, True, k['dia'])
+                if disponibilidad > 0:
+                    if 'jefe_rural' not in k:
+                        pea_ubicar = k['pea'][:disponibilidad]
+                        k['pea'] = list(set(k['pea']) - set(pea_ubicar))
+                        for u in pea_ubicar:
+                            if k['dia'] == 1:
+                                fecha = i.fecha_inicio
+                            else:
+                                fecha = i.fecha_fin
+                            pea = PEA_AULA(id_pea_id=u, id_localambiente_id=a.id_localambiente, pea_fecha=fecha)
+                            pea.save()
+                    else:
+                        if int(a.capacidad) == disponibilidad:
+                            pea_ubicar = k['pea'][:disponibilidad]
+                            k['pea'] = list(set(k['pea']) - set(pea_ubicar))
+                            for u in pea_ubicar:
+                                if k['dia'] == 1:
+                                    fecha = i.fecha_inicio
+                                else:
+                                    fecha = i.fecha_fin
+                                pea = PEA_AULA(id_pea_id=u, id_localambiente_id=a.id_localambiente, pea_fecha=fecha)
+                                pea.save()
 
     return pea_distribuida_junta
 
 
 def disponibilidad_aula(aula, curso5=False, dia=1):
-    if curso5:
-        aula = LocalAmbiente.objects.get(pk=aula)
-        cantidad_asignada = PEA_AULA.objects.filter(id_localambiente=aula, id_pea__baja_estado=0, pea_fecha=dia).count()
+    aula = LocalAmbiente.objects.get(pk=aula)
+    if dia == 1:
+        fecha = aula.id_local.fecha_inicio
     else:
-        aula = LocalAmbiente.objects.get(pk=aula)
+        fecha = aula.id_local.fecha_fin
+
+    if curso5:
+        cantidad_asignada = PEA_AULA.objects.filter(id_localambiente=aula, id_pea__baja_estado=0,
+                                                    pea_fecha=fecha).count()
+    else:
         cantidad_asignada = PEA_AULA.objects.filter(id_localambiente=aula, id_pea__baja_estado=0).count()
 
     if aula.capacidad == None:
