@@ -58,5 +58,6 @@ urlpatterns = [
     url('^update_peaaula/(?P<id_localambiente>.+)/(?P<id_instructor>.+)/$', update_peaaula),
     url('^darBajaPea/$', darBajaPea),
     url('^darAltaPea/$', darAltaPea),
+    url('^redistribuir_aula/(?P<id_localambiente>.+)/$', redistribuir_aula),
 
 ]

@@ -178,7 +178,53 @@
         $('#' + id).html(html);
         select2 ? $('#' + id).select2() : '';
     }
+    function setTable2(id, json, params, datatable = false, datatable_params = {}) {
+        let html = '';
+        $('#' + id).find('tbody').empty();
+        if (datatable) {
+            ('#' + id).DataTable({datatable_params})
+            ('#' + id).dataTable().fnDestroy();
+        }
+        if (json.html) {
+            html = json.html;
+        } else {
+            $.each(json, (key, val) => {
+                html += '<tr>';
+                html += `<td>${key + 1}</td>`;
+                for (let i in params) {
+                    if (params[i].pk) {
 
+                        html += `
+                            <td>
+								<ul class="icons-list">
+                                    <li class="text-primary-600"><a data-toggle="tooltip" data-placement="top" title="Mostar PEA por Aula"  onclick="getPEA(${val[params[i].pk]})"><i class="icon-pencil7"></i></a></li>
+                                    <li class="text-danger-600"><a data-toggle="tooltip" data-placement="top" title="Redistribuir PEA en esta aula" onclick="redistribuirAula(${val[params[i].pk]})" ><i class="icon-reload-alt"></i></a></li>
+								</ul>
+							</td>`;
+                    } else if (params[i]['cargo']) {
+                        html += `<td>${val.id_cargofuncional.nombre_funcionario}</td>`;
+                    } else {
+                        html += `<td>${val[params[i]] == null ? 0 : val[params[i]]}</td>`;
+                    }
+                }
+                html += '</tr>';
+            });
+        }
+
+        $('#' + id).find('tbody').html(html);
+
+        if (datatable) {
+            ('#' + id).DataTable({datatable_params})
+        }
+
+        $('table tbody tr td button').on('click', event => {
+            let selecteds = $('table tbody .tr_selected');
+            $.each(selecteds, (key, val) => {
+                $(val).removeClass('tr_selected');
+            });
+            $(event.target).parent().parent().addClass('tr_selected');
+        });
+    }
     function setTable(id, json, params, datatable = false, datatable_params = {}) {
         let html = '';
         $('#' + id).find('tbody').empty();

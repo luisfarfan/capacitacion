@@ -74,7 +74,7 @@ function getAmbientes(id_local) {
         type: 'GET',
         success: response => {
             id_curso = response.id_curso;
-            setTable('tabla_detalle_ambientes', response.ambientes, ['numero', 'capacidad', 'nombre_ambiente', {pk: 'id_localambiente'}]);
+            setTable2('tabla_detalle_ambientes', response.ambientes, ['numero', 'capacidad', 'nombre_ambiente', {pk: 'id_localambiente'}]);
         },
         error: error => {
             console.log('ERROR!!', error);
@@ -110,8 +110,7 @@ function getPEA(id_ambiente) {
     })
 }
 
-function doAsignacion() {
-    "use strict";
+function doAsignacion(show = false) {
     let ubigeo = `${session.ccdd}${session.ccpp}${session.ccdi}`;
     $.ajax({
         url: `${BASEURL}/asignacion/`,
@@ -120,7 +119,7 @@ function doAsignacion() {
         success: response => {
             console.log(response);
             $('#modal_pea_sobrante').unblock();
-            getSobrantes();
+            show ? getSobrantes() : '';
         },
         error: error => {
             console.log('ERROR!!', error)
@@ -224,3 +223,21 @@ $('#btn_do_asignar_pea').on('click', function () {
     $('#modal_pea_sobrante').modal('show');
     doAsignacion()
 });
+
+function redistribuirAula(id_localambiente) {
+    alert_confirm(()=> {
+        $.ajax({
+            url: `${BASEURL}/redistribuir_aula/${id_localambiente}`,
+            type: 'GET',
+            success: response => {
+                doAsignacion();
+                getPEA(id_localambiente);
+            },
+            error: error => {
+                console.log('ERROR!!', error)
+            }
+        });
+
+    }, 'Esta usted seguro de redistribuir la PEA de esta aula?')
+
+}

@@ -416,8 +416,11 @@ TURNO
 """
 
 
-def reasignar_aula(request, id_localambiente):
+@csrf_exempt
+def redistribuir_aula(request, id_localambiente):
     PEA_AULA.objects.filter(id_localambiente=id_localambiente).delete()
+
+    return JsonResponse({'msg': True}, safe=False)
 
 
 def getRangeDatesLocal(request, id_local):
