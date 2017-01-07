@@ -8,6 +8,8 @@ if (session.curso == '1') {
     $('#zona').parent().show();
 }
 
+var local_selected = [];
+
 $('#etapa').val(1);
 function resetForm(idform) {
     "use strict";
@@ -178,6 +180,7 @@ function getLocal(id_local) {
     $.ajax({
         url: `${BASE_URL}rest/local/${id_local}`,
         success: function (data) {
+            local_selected = data;
             $(`#etapa`).val(1);
             $.each(data, function (key, val) {
                 if (key == 'tipo_via' || key == 'turno_uso_local' || key == 'id_curso' || key == 'zona_ubicacion_local' || key == 'funcionario_nombre') {
@@ -186,22 +189,8 @@ function getLocal(id_local) {
                     $(`input[name=${key}]`).val(val)
                 }
             });
-            center = {
-                lat: $('#x').val() != '' ? parseFloat($('#x').val()) : -12.034467,
-                lng: $('#y').val() != '' ? parseFloat($('#y').val()) : -77.095752
-            };
-
-            var marker = new google.maps.Marker({
-                position: new google.maps.LatLng(center.lat, center.lng),
-                title: "Aqui!"
-            });
             $('#capacidad_total').text(0);
-            marker.setMap(map);
             $('#funcionario_nombre').trigger('change');
-// To add the marker to the map, call setMap();
-            marker.setMap(map);
-            $('#pac-input').val($('input[name="nombre_via"]').val());
-
             $('#registrar_aulas_modal').prop('disabled', false);
             $('#modal_localesbyubigeo').modal('hide');
 
@@ -506,10 +495,11 @@ function getLocalAmbientes() {
     $.getJSON(url, function (data) {
         let capacidad_total = 0;
         $('#tabla_aulas').find('tbody').empty();
+        let otros_label = `Otros(${local_selected.especifique_otros})`;
         if (data.ambientes.length > 0) {
             $.each(data.ambientes, function (key, val) {
                 capacidad_total = capacidad_total + parseInt(val.capacidad == null ? 0 : val.capacidad);
-                html += `<tr><td>${parseInt(key) + 1}</td><td>${val.nombre_ambiente}</td><td>${val.numero}</td>
+                html += `<tr><td>${parseInt(key) + 1}</td><td>${val.nombre_ambiente == 'Otros' ? otros_label : val.nombre_ambiente}</td><td>${val.numero}</td>
                 <td><input type="text" name="capacidad_ambiente" class="form-control" value="${val.capacidad == null ? '' : val.capacidad}"></td>
                 <td><input type="text" name="piso_ambiente" class="form-control" value="${val.n_piso == null ? '' : val.n_piso}"></td>
                 <td>
@@ -657,7 +647,7 @@ function saveLocalambiente(element, id_localambiente) {
 }
 
 function eliminarLocal(id_local) {
-var ubigeo = `${$('#departamentos').val()}${$('#provincias').val()}${$('#distritos').val()}`;
+    var ubigeo = `${$('#departamentos').val()}${$('#provincias').val()}${$('#distritos').val()}`;
     $.ajax({
         url: `${BASEURL}/rest/local/${id_local}`,
         type: 'DELETE',

@@ -195,6 +195,7 @@ function getPEA(id_localambiente) {
             setTable('tabla_pea', json);
             disabledTurnos(turno);
             $('#tabla_pea').DataTable();
+
         },
         error: error => {
             console.log('ERROR!!', error)
@@ -285,8 +286,7 @@ function fn_darBaja() {
         type: 'POST',
         data: {'id_peas': id_pea},
         success: response => {
-            getPEA(aula_selected)
-            setTablaDarBaja();
+            $('#modal_pea_dar_baja').modal('hide');
         }
     });
 }
@@ -294,7 +294,7 @@ function fn_darBaja() {
 function fn_darAlta() {
     "use strict";
     let id_pea = [];
-    let inputs_checked_idpea = $('input[name="check_id_pea_dar_alta"]')
+    let inputs_checked_idpea = $('input[name="check_id_pea_dar_alta"]');
     $.each(inputs_checked_idpea, (key, val) => {
         if ($(val).is(':checked')) {
             id_pea.push($(val).val());
@@ -305,7 +305,7 @@ function fn_darAlta() {
         type: 'POST',
         data: {'id_peas': id_pea},
         success: response => {
-            console.log(response);
+            $('#modal_pea_dar_alta').modal('hide');
         }
     });
 }
@@ -320,6 +320,9 @@ function darBaja() {
 }
 
 function getContingencia() {
+    if ($.fn.DataTable.isDataTable('#tabla_pea_dar_alta')) {
+        $('#tabla_pea_dar_alta').dataTable().fnDestroy();
+    }
     $.ajax({
         url: `${BASEURL}/sobrantes_zona/`,
         type: 'POST',
@@ -343,6 +346,7 @@ function getContingencia() {
                 html += `</tr>`;
             });
             $('#tabla_pea_dar_alta').find('tbody').html(html);
+            $('#tabla_pea_dar_alta').dataTable();
 
             $('#modal_pea_dar_alta').modal('show');
         },
@@ -353,6 +357,10 @@ function getContingencia() {
 }
 
 function setTablaDarBaja() {
+    getPEA(aula_selected);
+    if ($.fn.DataTable.isDataTable('#tabla_pea_dar_baja')) {
+        $('#tabla_pea_dar_baja').dataTable().fnDestroy();
+    }
     if (peaaula.length) {
         $('#modal_pea_dar_baja').modal('show');
         let html = '';
@@ -367,9 +375,8 @@ function setTablaDarBaja() {
             html += `</tr>`;
         });
         $('#tabla_pea_dar_baja').find('tbody').html(html);
+        $('#tabla_pea_dar_baja').dataTable();
     } else {
         alert('Debe seleccionar un aula');
     }
-
-    //$('#tabla_pea_dar_baja').dataTable();
 }
