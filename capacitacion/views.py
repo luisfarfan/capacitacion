@@ -416,6 +416,10 @@ TURNO
 """
 
 
+def reasignar_aula(request, id_localambiente):
+    PEA_AULA.objects.filter(id_localambiente=id_localambiente).delete()
+
+
 def getRangeDatesLocal(request, id_local):
     format_fechas = []
     local = Local.objects.filter(pk=id_local).values('fecha_inicio', 'fecha_fin', 'turno_uso_local')
