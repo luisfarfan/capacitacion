@@ -646,20 +646,24 @@ function saveLocalambiente(element, id_localambiente) {
     })
 }
 
+
 function eliminarLocal(id_local) {
-    var ubigeo = `${$('#departamentos').val()}${$('#provincias').val()}${$('#distritos').val()}`;
-    $.ajax({
-        url: `${BASEURL}/rest/local/${id_local}`,
-        type: 'DELETE',
-        success: response => {
-            validarMetaPea();
-            getLocalesbyUbigeo();
-        },
-        error: error => {
-            console.log('ERROR!!', error)
-        }
-    })
+    alert_confirm(function () {
+        var ubigeo = `${$('#departamentos').val()}${$('#provincias').val()}${$('#distritos').val()}`;
+        $.ajax({
+            url: `${BASEURL}/rest/local/${id_local}`,
+            type: 'DELETE',
+            success: response => {
+                validarMetaPea();
+                getLocalesbyUbigeo();
+            },
+            error: error => {
+                console.log('ERROR!!', error)
+            }
+        })
+    });
 }
+
 
 // $('input[name="fecha_fin"]').on('change', function (e) {
 //     $('input[name="fecha_fin"]').valid();

@@ -26,6 +26,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['172.16.2.205']
 
+DEPLOY = 'INEI'
 # Application definition
 
 INSTALLED_APPS = [
@@ -76,59 +77,61 @@ WSGI_APPLICATION = 'intranet.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
+
+if DEPLOY == 'INEI':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'sql_server.pyodbc',
+            'NAME': 'CPV_CAPACITACION2',
+            'USER': 'us_capacitacion_web',
+            'PASSWORD': 'cap5wegU$re',
+            'HOST': '172.18.1.41',
+            'OPTIONS': {
+                'driver': 'SQL Server',
+            },
+        },
+        'segmentacion': {
+            'ENGINE': 'sql_server.pyodbc',
+            'NAME': 'CPV_SEGMENTACION',
+            'USER': 'us_segmentacion_web',
+            'PASSWORD': 'u$s3g*mentaWeB',
+            'HOST': '172.18.1.41',
+            'OPTIONS': {
+                'driver': 'SQL Server',
+            },
+        },
+        'consecucion': {
+            'ENGINE': 'sql_server.pyodbc',
+            'NAME': 'INEI_BDRRHH_CONSECUCION',
+            'USER': 'rvila',
+            'PASSWORD': 'inei1202',
+            'HOST': '192.168.200.250',
+            'OPTIONS': {
+                'driver': 'SQL Server',
+                'unicode_results': True,
+            },
+        },
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'sql_server.pyodbc',
+            'NAME': 'CPV_CAPACITACION',
+            'USER': 'sa',
+            'PASSWORD': 'luis123',
+            'HOST': 'localhost',
+            'OPTIONS': {
+                'driver': 'SQL Server',
+            },
+        },
+    }
 """
 'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     },
 """
-DATABASES = {
-    'default': {
-        'ENGINE': 'sql_server.pyodbc',
-        'NAME': 'CPV_CAPACITACION2',
-        'USER': 'us_capacitacion_web',
-        'PASSWORD': 'cap5wegU$re',
-        'HOST': '172.18.1.41',
-        'OPTIONS': {
-            'driver': 'SQL Server',
-        },
-    },
-    'segmentacion': {
-        'ENGINE': 'sql_server.pyodbc',
-        'NAME': 'CPV_SEGMENTACION',
-        'USER': 'us_segmentacion_web',
-        'PASSWORD': 'u$s3g*mentaWeB',
-        'HOST': '172.18.1.41',
-        'OPTIONS': {
-            'driver': 'SQL Server',
-        },
-    },
-    'consecucion': {
-        'ENGINE': 'sql_server.pyodbc',
-        'NAME': 'INEI_BDRRHH_CONSECUCION',
-        'USER': 'rvila',
-        'PASSWORD': 'inei1202',
-        'HOST': '192.168.200.250',
-        'OPTIONS': {
-            'driver': 'SQL Server',
-            'unicode_results': True,
-        },
-    },
-}
-"""
-DATABASES = {
-    'default': {
-        'ENGINE': 'sql_server.pyodbc',
-        'NAME': 'CPV_CAPACITACION',
-        'USER': 'sa',
-        'PASSWORD': 'luis123',
-        'HOST': 'localhost',
-        'OPTIONS': {
-            'driver': 'SQL Server',
-        },
-    },
-}
-"""
+
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
 
