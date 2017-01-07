@@ -156,9 +156,15 @@ function getLocalesbyUbigeo() {
         success: function (data) {
             var html = '';
             $.each(data, function (key, val) {
-                html += `<tr><td>${val.nombre_local}</td><td>${val.nombre_via}</td><td>${val.referencia}</td><td>${val.zona}</td>
-                    <td><button onclick="getLocal(${val.id_local})" type="button"class="btn btn-info btn-float btn-rounded btn-loading" data-loading-text="<i class='icon-spinner4 spinner'></i>">
-                    <i class="icon-spinner4"></i></button></button></td></tr>`;
+                html += `<tr>
+                            <td>${val.nombre_local}</td><td>${val.nombre_via}</td><td>${val.referencia}</td><td>${val.zona}</td>
+                            <td>
+								<ul class="icons-list">
+                                    <li class="text-primary-600"><a onclick="getLocal(${val.id_local})" href="#"><i class="icon-pencil7"></i></a></li>
+                                    <li class="text-danger-600"><a onclick="eliminarLocal(${val.id_local})" href="#"><i class="icon-trash"></i></a></li>
+								</ul>
+							</td>
+                          </tr>`;
             });
 
             $('#table_localesubigeo').find('tbody').html(html);
@@ -650,6 +656,20 @@ function saveLocalambiente(element, id_localambiente) {
     })
 }
 
+function eliminarLocal(id_local) {
+var ubigeo = `${$('#departamentos').val()}${$('#provincias').val()}${$('#distritos').val()}`;
+    $.ajax({
+        url: `${BASEURL}/rest/local/${id_local}`,
+        type: 'DELETE',
+        success: response => {
+            validarMetaPea();
+            getLocalesbyUbigeo();
+        },
+        error: error => {
+            console.log('ERROR!!', error)
+        }
+    })
+}
 
 // $('input[name="fecha_fin"]').on('change', function (e) {
 //     $('input[name="fecha_fin"]').valid();

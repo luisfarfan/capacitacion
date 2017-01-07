@@ -69,7 +69,7 @@ class Funcionario(models.Model):
     id_funcionario = models.AutoField(primary_key=True, db_column='id_funcionario')
     id_cargofuncional = models.CharField(max_length=3, blank=True, null=True)
     nombre_funcionario = models.CharField(max_length=100, blank=True, null=True)
-    id_curso = models.ForeignKey('Curso', db_column='id_curso')
+    id_curso = models.ForeignKey('Curso', db_column='id_curso',on_delete=models.CASCADE)
 
     class Meta:
         managed = True
@@ -87,7 +87,7 @@ class Ambiente(models.Model):
 
 class LocalAmbiente(models.Model):
     id_localambiente = models.AutoField(primary_key=True, db_column='id_localambiente')
-    id_local = models.ForeignKey('Local')
+    id_local = models.ForeignKey('Local',on_delete=models.CASCADE)
     id_ambiente = models.ForeignKey('Ambiente')
     numero = models.IntegerField(blank=True, null=True)
     n_piso = models.IntegerField(blank=True, null=True)
@@ -177,8 +177,8 @@ class Criterio(models.Model):
 
 class CursoCriterio(models.Model):
     id_cursocriterio = models.AutoField(primary_key=True, db_column='id_cursocriterio')
-    id_curso = models.ForeignKey('Curso', db_column='id_curso')
-    id_criterio = models.ForeignKey('Criterio', db_column='id_criterio')
+    id_curso = models.ForeignKey('Curso', db_column='id_curso',on_delete=models.CASCADE)
+    id_criterio = models.ForeignKey('Criterio', db_column='id_criterio',on_delete=models.CASCADE)
     # descripcion_criterio = models.CharField(max_length=100, blank=True, null=True)
     ponderacion = models.IntegerField()
 
@@ -211,9 +211,9 @@ class PEA(models.Model):
 
 class PEA_AULA(models.Model):
     id_peaaula = models.AutoField(primary_key=True, db_column='id_peaaula')
-    id_pea = models.ForeignKey('PEA', db_column='id_pea')
-    id_localambiente = models.ForeignKey('LocalAmbiente', db_column='id_localambiente')
-    id_instructor = models.ForeignKey('Instructor', blank=True, null=True)
+    id_pea = models.ForeignKey('PEA', db_column='id_pea',on_delete=models.CASCADE)
+    id_localambiente = models.ForeignKey('LocalAmbiente', db_column='id_localambiente',on_delete=models.CASCADE)
+    id_instructor = models.ForeignKey('Instructor', blank=True, null=True,on_delete=models.CASCADE)
     pea_fecha = models.CharField(max_length=100, blank=True, null=True)
 
     class Meta:
@@ -223,7 +223,7 @@ class PEA_AULA(models.Model):
 
 class PEA_ASISTENCIA(models.Model):
     id_asistencia = models.AutoField(primary_key=True)
-    id_peaaula = models.ForeignKey('PEA_AULA', related_name='peaaulas')
+    id_peaaula = models.ForeignKey('PEA_AULA', related_name='peaaulas',on_delete=models.CASCADE)
     fecha = models.CharField(max_length=20, blank=True, null=True)
     turno_manana = models.IntegerField(blank=True, null=True)
     turno_tarde = models.IntegerField(blank=True, null=True)
