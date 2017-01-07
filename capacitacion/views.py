@@ -11,6 +11,7 @@ from datetime import datetime
 import pandas as pd
 from django.db.models.functions import Concat
 from django.core.exceptions import ObjectDoesNotExist
+
 import json
 from random import sample
 
@@ -437,6 +438,18 @@ def getPeaAsistencia(request):
                                          'id_pea__pea_aula__pea_asistencia__turno_tarde')
 
     return JsonResponse(list(pea), safe=False)
+
+
+class PEA_AULACurso5ViewSet(generics.ListAPIView):
+    serializer_class = PEA_AULASerializer
+
+    def get_queryset(self):
+        id_localambiente = self.request.POST['id_localambiente']
+        fecha = self.request.POST['fecha']
+        return PEA_AULA.objects.filter(id_localambiente=id_localambiente, pea_fecha=fecha)
+
+    def post(self, request, *args, **kwargs):
+        return super(PEA_AULACurso5ViewSet, self).get(request, *args, **kwargs)
 
 
 @csrf_exempt

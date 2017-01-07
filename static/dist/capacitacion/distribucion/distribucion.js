@@ -11,17 +11,28 @@ $(function () {
 
 //VARIABLES COMUNES
 var id_curso;
+var rangofechas = [];
+var id_localambiente;
+var id_ambiente = undefined;
 //
 
 $('#local').change(e => {
     "use strict";
     getAmbientes($('#local').val());
+    getRangoFechas($('#local').val());
     $('#tabla_pea').find('tbody').empty();
 });
 
 $('#ambiente').change(e => {
     "use strict";
-    getPEA($('#ambiente').val());
+    id_ambiente = $('#ambiente').val();
+    getPEA(id_localambiente);
+});
+
+$('#fechas').change(e => {
+    if (id_localambiente !== undefined) {
+        getPEA(id_localambiente)
+    }
 });
 
 function getLocales() {
@@ -38,6 +49,22 @@ function getLocales() {
             console.log('ERROR!!', error)
         }
     })
+}
+
+function getRangoFechas(id_local) {
+    "use strict";
+    $.ajax({
+        url: `${BASEURL}/getRangeDatesLocal/${id_local}/`,
+        type: 'GET',
+        success: response => {
+            setSelect_v2('fechas', response.fechas);
+            rangofechas = response.fechas;
+            $('#fechas').val(rangofechas[0]);
+        },
+        error: error => {
+            console.log(error);
+        }
+    });
 }
 
 function getAmbientes(id_local) {
@@ -57,14 +84,15 @@ function getAmbientes(id_local) {
 
 function getPEA(id_ambiente) {
     "use strict";
+    id_localambiente = id_ambiente;
     $.ajax({
-        url: `${BASEURL}/peaaulaasistencia/${id_ambiente}/`,
-        type: 'GET',
+        url: `${BASEURL}/getPeaCurso5/`,
+        type: 'POST',
+        data: {'id_localambiente': id_ambiente, fecha: $('#fechas').val()},
         success: response => {
-            console.log(response);
             let html = '';
             $('#tabla_pea').find('tbody').empty();
-            $.each(response, (key, val)=> {
+            $.each(response, (key, val) => {
                 html += `<tr>`;
                 html += `<td>${parseInt(key) + 1}</td>`;
                 html += `<td>${val.id_pea.dni}</td>`;

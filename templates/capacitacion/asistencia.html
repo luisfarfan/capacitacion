@@ -1,5 +1,8 @@
 {% extends 'base/base.html' %}
 {% load staticfiles %}
+{% block css %}
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.2.4/css/buttons.dataTables.min.css">
+{% endblock %}
 {% block content %}
     <div class="panel panel-primary panel-bordered">
         <div class="panel-heading">
@@ -17,7 +20,7 @@
         </div>
         <div class="panel-body">
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-5">
                     <div class="form-group">
                         <label>Local</label>
                         <select id="local" class="select form-control">
@@ -25,56 +28,22 @@
                         </select>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <button onclick="setTablaDarBaja()" class="btn btn-primary">Dar Baja</button>
-                </div>
-                <div class="col-md-6">
-                    <button onclick="getContingencia()" class="btn btn-primary">Contingencia (Dar Alta)</button>
-                </div>
-
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-5">
-        <div class="panel panel-primary panel-bordered">
-            <div class="panel-heading">
-                <h5 class="panel-title">Detalle Ambientes por Local</h5>
-                <div class="heading-elements">
-                    <ul class="icons-list">
-                        <li>
-                            <a data-action="collapse"></a>
-                        </li>
-                        <li>
-                            <a data-action="close"></a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            <div class="panel-body">
-                <div class="row">
-                    <div class="table-responsive">
-                        <table id="tabla_detalle_ambientes" class="table table-bordered">
-                            <thead>
-                            <tr>
-                                <th>N°</th>
-                                <th>Número Ambiente</th>
-                                <th>Capacidad</th>
-                                <th>Ambiente</th>
-                                <th></th>
-                            </tr>
-                            </thead>
-                            <tbody>
-
-                            </tbody>
-                        </table>
+                <div class="col-md-5">
+                    <div class="form-group">
+                        <label>Aulas</label>
+                        <select id="aulas" class="select form-control">
+                            <option value="">Seleccione</option>
+                        </select>
                     </div>
-
+                </div>
+                <div class="col-md-2">
+                    <button id="btn_getpea" class="btn btn-primary">Mostrar PEA</button>
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-md-7">
+
+    <div class="col-md-12">
         <div class="panel panel-primary panel-bordered">
             <div class="panel-heading">
                 <h5 class="panel-title">PEA por Aula</h5>
@@ -91,33 +60,13 @@
             </div>
             <div class="panel-body">
                 <div class="row">
-                    <form action="" class="form-horizontal">
-                        <fieldset class="content-group">
-                            <div class="form-group">
-                                <label class="control-label col-lg-2">Fechas: </label>
-                                <div class="col-lg-7">
-                                    <select id="fechas" class="select form-control">
+                    <div class="pull-left">
+                        <button onclick="saveNotas()" class="btn btn-primary">Guardar</button>
+                    </div>
+                    <div class="pull-right">
+                        <a href="#" download="" id="btn_exportar_evaluacion" class="btn btn-primary">Exportar</a>
+                    </div>
 
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="control-label col-lg-2">Instructor: </label>
-                                <div class="col-lg-7">
-                                    <select id="instructor" class="select form-control">
-                                        <option value="-1">Seleccione</option>
-                                        {% for instructor in instructores %}
-                                            <option value="{{ instructor.id_instructor }}">{{ instructor.dni }}
-                                                - {{ instructor.nombre_completo }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                            </div>
-                        </fieldset>
-                    </form>
-                </div>
-                <div class="row">
-                    <button onclick="saveAsistencia()" class="btn btn-primary">Guardar</button>
                 </div>
                 <div class="row">
                     <div class="table-responsive">
@@ -133,93 +82,11 @@
             </div>
         </div>
     </div>
+    <div id="clone" style="display: none">
 
-    <div id="modal_pea_dar_baja" class="modal fade">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header bg-primary">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h6 class="modal-title">Dar Baja</h6>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-6 col-md-offset-3">
-                            <button data-toggle="modal" onclick="darBaja()" id="btn_do_asignar_pea"
-                                    class="btn btn-primary">Realizar
-                                Dar de Baja
-                            </button>
-
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="table table-responsive">
-                            <table id="tabla_pea_dar_baja" class="table table-responsive table-bordered">
-                                <thead>
-                                <tr>
-                                    <th>DNI</th>
-                                    <th>Apellido Paterno</th>
-                                    <th>Apellido Materno</th>
-                                    <th>Nombre</th>
-                                    <th></th>
-                                </tr>
-                                </thead>
-                                <tbody>
-
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                </div>
-                <div class="modal-footer">
-
-                </div>
-            </div>
-        </div>
-    </div>
-    <div id="modal_pea_dar_alta" class="modal fade">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header bg-primary">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h6 class="modal-title">Dar Alta</h6>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-6 col-md-offset-3">
-                            <button data-toggle="modal" onclick="darAlta()" id="btn_dar_alta" class="btn btn-primary">
-                                Realizar
-                                Dar de Alta
-                            </button>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="table table-responsive">
-                            <table id="tabla_pea_dar_alta" class="table table-responsive table-bordered">
-                                <thead>
-                                <tr>
-                                    <th>DNI</th>
-                                    <th>Apellido Paterno</th>
-                                    <th>Apellido Materno</th>
-                                    <th>Nombre</th>
-                                    <th></th>
-                                </tr>
-                                </thead>
-                                <tbody>
-
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                </div>
-                <div class="modal-footer">
-
-                </div>
-            </div>
-        </div>
     </div>
 {% endblock %}
+
 
 
 {% block js %}
@@ -227,6 +94,7 @@
     <script type="text/javascript" src="{% static "assets/js/plugins/loaders/blockui.min.js" %}"></script>
     <script type="text/javascript" src="{% static "assets/js/plugins/forms/selects/select2.min.js" %}"></script>
     <script type="text/javascript" src="{% static "assets/js/plugins/notifications/sweet_alert.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "assets/js/plugins/jquery.battatech.excelexport.js" %}"></script>
     <script type="text/javascript" src="{% static "assets/js/core/app.js" %}"></script>
-    <script type="text/javascript" src="{% static "dist/capacitacion/asistencia/asistencia.js" %}"></script>
+    <script type="text/javascript" src="{% static "dist/capacitacion/evaluacion/evaluacion.js" %}"></script>
 {% endblock %}
