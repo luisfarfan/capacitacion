@@ -2,7 +2,7 @@
  * Created by LFarfan on 21/11/2016.
  */
 //BASE_URL = `http://localhost:8000/`;
-if (session.curso == '1') {
+if (session.curso == '902') {
     $('#zona').parent().hide();
 } else {
     $('#zona').parent().show();

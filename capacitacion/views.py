@@ -134,8 +134,8 @@ class TbLocalByZonaViewSet(generics.ListAPIView):
 
 def TbLocalAmbienteByLocalViewSet(request, id_local):
     query = LocalAmbiente.objects.filter(id_local=id_local).order_by('-capacidad').annotate(
-        nombre_ambiente=F('id_ambiente__nombre_ambiente')).values(
-        'id_localambiente', 'numero', 'capacidad', 'nombre_ambiente', 'n_piso').order_by('id_ambiente')
+        nombre_ambiente=F('id_ambiente__nombre_ambiente'), cant_pea=Count('pea')).values(
+        'id_localambiente', 'numero', 'capacidad', 'nombre_ambiente', 'n_piso', 'cant_pea').order_by('id_ambiente')
     local = Local.objects.get(pk=id_local)
     return JsonResponse(
         {'ambientes': list(query), 'ubigeo': local.ubigeo_id, 'zona': local.zona, 'id_curso': local.id_curso_id},

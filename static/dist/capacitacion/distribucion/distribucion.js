@@ -29,11 +29,16 @@ $('#ambiente').change(e => {
     getPEA(id_localambiente);
 });
 
-$('#fechas').change(e => {
-    if (id_localambiente !== undefined) {
-        getPEA(id_localambiente)
-    }
-});
+if (session.curso == '5') {
+    $('#fechas').change(e => {
+        if (id_localambiente !== undefined) {
+            getPEA(id_localambiente)
+        }
+    });
+} else {
+    $('#div_fechas').hide();
+}
+
 
 function getLocales() {
     let ubigeo = `${session.ccdd}${session.ccpp}${session.ccdi}`;
@@ -74,7 +79,7 @@ function getAmbientes(id_local) {
         type: 'GET',
         success: response => {
             id_curso = response.id_curso;
-            setTable2('tabla_detalle_ambientes', response.ambientes, ['numero', 'capacidad', 'nombre_ambiente', {pk: 'id_localambiente'}]);
+            setTable2('tabla_detalle_ambientes', response.ambientes, ['numero', 'capacidad', 'cant_pea', 'nombre_ambiente', {pk: 'id_localambiente'}]);
         },
         error: error => {
             console.log('ERROR!!', error);
@@ -85,29 +90,42 @@ function getAmbientes(id_local) {
 function getPEA(id_ambiente) {
     "use strict";
     id_localambiente = id_ambiente;
-    $.ajax({
-        url: `${BASEURL}/getPeaCurso5/`,
-        type: 'POST',
-        data: {'id_localambiente': id_ambiente, fecha: $('#fechas').val()},
-        success: response => {
-            let html = '';
-            $('#tabla_pea').find('tbody').empty();
-            $.each(response, (key, val) => {
-                html += `<tr>`;
-                html += `<td>${parseInt(key) + 1}</td>`;
-                html += `<td>${val.id_pea.dni}</td>`;
-                html += `<td>${val.id_pea.ape_paterno}</td>`;
-                html += `<td>${val.id_pea.ape_materno}</td>`;
-                html += `<td>${val.id_pea.nombre}</td>`;
-                html += `<td>${val.id_pea.id_cargofuncional.nombre_funcionario}</td>`;
-                html += `</tr>`;
-            });
-            $('#tabla_pea').find('tbody').html(html);
-        },
-        error: error => {
-            console.log('ERROR!!', error)
+    let ajax_options = {};
+    if (session.curso == '5') {
+        ajax_options = {
+            url: `${BASEURL}/getPeaCurso5/`,
+            type: 'POST',
+            data: {'id_localambiente': id_ambiente, fecha: $('#fechas').val()},
+            success: '',
+            error: ''
         }
-    })
+    } else {
+        ajax_options = {
+            url: `${BASEURL}/peaaulabylocalambiente/${id_ambiente}`,
+            type: 'GET',
+            success: '',
+            error: ''
+        }
+    }
+    ajax_options['success'] = (response => {
+        let html = '';
+        $('#tabla_pea').find('tbody').empty();
+        $.each(response, (key, val) => {
+            html += `<tr>`;
+            html += `<td>${parseInt(key) + 1}</td>`;
+            html += `<td>${val.id_pea.dni}</td>`;
+            html += `<td>${val.id_pea.ape_paterno}</td>`;
+            html += `<td>${val.id_pea.ape_materno}</td>`;
+            html += `<td>${val.id_pea.nombre}</td>`;
+            html += `<td>${val.id_pea.id_cargofuncional.nombre_funcionario}</td>`;
+            html += `</tr>`;
+        });
+        $('#tabla_pea').find('tbody').html(html);
+    });
+    ajax_options['error'] = (error => {
+        console.log('ERROR!!', error)
+    });
+    $.ajax(ajax_options);
 }
 
 function doAsignacion(show = false) {
@@ -120,6 +138,7 @@ function doAsignacion(show = false) {
             console.log(response);
             $('#modal_pea_sobrante').unblock();
             show ? getSobrantes() : '';
+            $('#local').trigger('change');
         },
         error: error => {
             console.log('ERROR!!', error)

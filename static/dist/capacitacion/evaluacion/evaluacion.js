@@ -11,6 +11,11 @@ $(function () {
 var criterios = [];
 var aula_selected;
 var id_curso;
+
+var columns = [];
+var position_nota_final = 0;
+
+
 $('#local').change(e => {
     "use strict";
     let id_local = $('#local').val();
@@ -69,8 +74,20 @@ function getCriterios() {
     })
 }
 
+function setColumnsDataTablePea() {
+    columns = [];
+    columns = [null, null, null]
+    $.each(criterios, (key, val)=> {
+        columns.push({"orderDataType": "dom-text-numeric"})
+    });
+    columns.push({"orderDataType": "dom-text-numeric"})
+    columns.push(null)
+    position_nota_final = columns.length - 2;
+}
+
 function getPEA(id_localambiente) {
     "use strict";
+    setColumnsDataTablePea();
     aula_selected = id_localambiente;
     if ($.fn.DataTable.isDataTable('#tabla_pea')) {
         $('#tabla_pea').dataTable().fnDestroy();
@@ -149,16 +166,8 @@ function getPEA(id_localambiente) {
 
             $('#tabla_pea').DataTable({
                 "bPaginate": false,
-                "columns": [
-                    null,
-                    null,
-                    null,
-                    {"orderDataType": "dom-text-numeric"},
-                    {"orderDataType": "dom-text-numeric"},
-                    {"orderDataType": "dom-text-numeric"},
-                    null,
-                ],
-                "order": [[5, "desc"]]
+                "columns": columns,
+                "order": [[position_nota_final, "desc"]]
             });
         },
     })
@@ -269,6 +278,9 @@ $("#btn_exportar_evaluacion").on('click', function () {
     $('#clone').find('input[type="number"]').map((key, val) => {
         "use strict";
         $(val).parent().text($(val).val());
+    });
+    $('#clone').find('input[name="aptos"]').map((key, value)=> {
+        $(value).remove()
     });
     var uri = $("#clone").battatech_excelexport({
         containerid: "clone",

@@ -57,7 +57,13 @@
             </div>
             <div class="panel-body">
                 <div class="row">
-                    <button onclick="saveNotas()" class="btn btn-primary">Guardar</button>
+                    <div class="pull-left">
+                        <button onclick="saveNotas()" class="btn btn-primary">Guardar</button>
+                    </div>
+                    <div class="pull-right">
+                        <a href="#" download="" id="btn_exportar_evaluacion" class="btn btn-primary">Exportar</a>
+                    </div>
+
                 </div>
                 <div class="row">
                     <div class="table-responsive">
@@ -73,6 +79,9 @@
             </div>
         </div>
     </div>
+    <div id="clone" style="display: none">
+
+    </div>
 {% endblock %}
 
 
@@ -82,6 +91,7 @@
     <script type="text/javascript" src="{% static "assets/js/plugins/loaders/blockui.min.js" %}"></script>
     <script type="text/javascript" src="{% static "assets/js/plugins/forms/selects/select2.min.js" %}"></script>
     <script type="text/javascript" src="{% static "assets/js/plugins/notifications/sweet_alert.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "assets/js/plugins/jquery.battatech.excelexport.js" %}"></script>
     <script type="text/javascript" src="{% static "assets/js/core/app.js" %}"></script>
     <script type="text/javascript" src="{% static "dist/capacitacion/evaluacion/evaluacion.js" %}"></script>
 {% endblock %}
