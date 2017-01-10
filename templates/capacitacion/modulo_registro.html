@@ -604,15 +604,6 @@
         </div>
     </div>
 
-    <div id="modal" class="modal fade" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <input id="pac-input" class="controls" type="text" placeholder="Search Box">
-                <div id="map-canvas"></div>
-            </div>
-        </div>
-
-    </div>
     <!-- /.modal -->
 {% endblock %}
 
@@ -634,93 +625,8 @@
         moment.locale('es');
     </script>
     <script>
-        // This example adds a search box to a map, using the Google Place Autocomplete
-        // feature. People can enter geographical searches. The search box will return a
-        // pick list containing a mix of places and predicted search terms.
-        function initAutocomplete() {
-            center = {
-                lat: $('#x').val() != '' ? $('#x').val() : -12.034467,
-                lng: $('#y').val() != '' ? $('#y').val() : -77.095752
-            };
-            map = new google.maps.Map(document.getElementById('map-canvas'), {
-                center: center,
-                zoom: 13,
-                mapTypeId: google.maps.MapTypeId.ROADMAP
-            });
+        $('#modulo_registro').addClass('active');
 
-            // Create the search box and link it to the UI element.
-            var input = document.getElementById('pac-input');
-            var searchBox = new google.maps.places.SearchBox(input);
-            map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
-            // Bias the SearchBox results towards current map's viewport.
-            map.addListener('bounds_changed', function () {
-                searchBox.setBounds(map.getBounds());
-            });
-            google.maps.event.addListener(map, "dblclick", function (e) {
-                $('input[name="nombre_via"]').val($('#pac-input').val());
-                $('#modal').modal('hide');
-                $('#x').val(e.latLng.lat());
-                $('#y').val(e.latLng.lng());
-            });
-
-            var markers = [];
-            // [START region_getplaces]
-            // Listen for the event fired when the user selects a prediction and retrieve
-            // more details for that place.
-            searchBox.addListener('places_changed', function () {
-                var places = searchBox.getPlaces();
-
-                if (places.length == 0) {
-                    return;
-                }
-
-                // Clear out the old markers.
-                markers.forEach(function (marker) {
-                    marker.setMap(null);
-                });
-                markers = [];
-
-                // For each place, get the icon, name and location.
-                var bounds = new google.maps.LatLngBounds();
-                places.forEach(function (place) {
-                    var icon = {
-                        url: place.icon,
-                        size: new google.maps.Size(71, 71),
-                        origin: new google.maps.Point(0, 0),
-                        anchor: new google.maps.Point(17, 34),
-                        scaledSize: new google.maps.Size(25, 25)
-                    };
-
-                    // Create a marker for each place.
-                    markers.push(new google.maps.Marker({
-                        map: map,
-                        icon: icon,
-                        title: place.name,
-                        position: place.geometry.location
-                    }));
-
-                    if (place.geometry.viewport) {
-                        // Only geocodes have viewport.
-                        bounds.union(place.geometry.viewport);
-                    } else {
-                        bounds.extend(place.geometry.location);
-                    }
-                });
-                map.fitBounds(bounds);
-            });
-            // [END region_getplaces]
-        }
-
-    </script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAZ0rTBOS6SVXATgEUkZmNS7E5mIKBGXMI&libraries=places&callback=initAutocomplete"
-            async defer></script>
-    <script>
-        $('#abrir_mapa').on('click', function () {
-            $('#modal').modal({}).on('shown.bs.modal', function () {
-                google.maps.event.trigger(map, "resize");
-                map.setCenter(center);
-            });
-        })
     </script>
 
 {% endblock %}

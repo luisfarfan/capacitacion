@@ -237,7 +237,7 @@ class PEA_CURSOCRITERIO(models.Model):
     id_pea_cursocriterio = models.AutoField(primary_key=True, db_column='id_pea_cursocriterio')
     id_peaaula = models.ForeignKey('PEA_AULA', related_name='pea_cursocriterios')
     id_cursocriterio = models.ForeignKey('CursoCriterio')
-    nota = models.IntegerField()
+    nota = models.FloatField()
 
     class Meta:
         managed = True

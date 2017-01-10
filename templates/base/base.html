@@ -98,7 +98,7 @@
                                     </li>
                                     <li id="distribucion"><a href="{% url 'distribucion' %}">Modulo Distribucion de
                                         PEA</a></li>
-                                    <li id="asistencia" class="active"><a href="{% url 'asistencia' %}">Modulo de
+                                    <li id="asistencia"><a href="{% url 'asistencia' %}">Modulo de
                                         Asistencia</a></li>
                                     <li id="notas"><a href="{% url 'evaluacion' %}">Modulo de Registro de Notas y
                                         Resultado</a>
@@ -185,20 +185,20 @@
             ('#' + id).DataTable({datatable_params})
             ('#' + id).dataTable().fnDestroy();
         }
-if (json.html) {
+        if (json.html) {
             html = json.html;
         } else {
             $.each(json, (key, val) => {
                 html += '<tr>';
                 html += `<td>${key + 1}</td>`;
-                for (let i in params) {
+                $.each(params, (i, a) => {
                     if (params[i].pk) {
-                        html += `<td><ul class="icons-list"><li class="text-primary-600"><a data-toggle="tooltip" data-placement="top" title="Mostar PEA por Aula"  onclick="getPEA(${val[params[i].pk]})"><i class="icon-pencil7"></i></a></li>`;
+                        html += `<td><ul class="icons-list"><li class="text-primary-600"><a data-popup="tooltip" title="Mostrar PEA por Aula"  onclick="getPEA(${val[params[i].pk]})"><i class="icon-pencil7"></i></a></li>`;
                         if (session.curso == '5') {
 
                         } else {
                             if (parseInt(val[params[1]]) < parseInt(val[params[2]])) {
-                                html += `<li class="text-danger-600"><a data-toggle="tooltip" data-placement="top" title="Redistribuir PEA en esta aula" onclick="redistribuirAula(${val[params[i].pk]})" ><i class="icon-reload-alt"></i></a></li>`;
+                                html += `<li class="text-danger-600"><a data-popup="tooltip" title="Redistribuir PEA" onclick="redistribuirAula(${val[params[i].pk]})" ><i class="icon-reload-alt"></i></a></li>`;
                             }
                         }
                         html += `</ul></td>`;
@@ -207,7 +207,7 @@ if (json.html) {
                     } else {
                         html += `<td>${val[params[i]] == null ? 0 : val[params[i]]}</td>`;
                     }
-                }
+                });
                 html += '</tr>';
             });
         }
@@ -225,6 +225,10 @@ if (json.html) {
             });
             $(event.target).parent().parent().addClass('tr_selected');
         });
+
+        $('[data-popup]').tooltip({
+            template: '<div class="tooltip"><div class="bg-slate-800"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div></div>'
+        });
     }
     function setTable(id, json, params, datatable = false, datatable_params = {}) {
         let html = '';
@@ -236,10 +240,10 @@ if (json.html) {
         if (json.html) {
             html = json.html;
         } else {
-        $.each(json, (key, val) => {
+            $.each(json, (key, val) => {
                 html += '<tr>';
                 html += `<td>${key + 1}</td>`;
-                $.each(params, (i, a)=> {
+                $.each(params, (i, a) => {
                     if (params[i].pk) {
                         html += `<td><button onclick="getPEA(${val[params[i].pk]})" type="button">PEA</button></td>`;
                     } else if (params[i]['cargo']) {
@@ -285,6 +289,19 @@ if (json.html) {
                 callback()
             }
         });
+    }
+
+    function findInObject2(obj, search, key_object) {
+        "use strict";
+        let res = {};
+        if (obj.length > 0) {
+            $.each(obj, (key, val) => {
+                if (val[key_object] == search) {
+                    res = val;
+                }
+            });
+        }
+        return res;
     }
 
 
@@ -356,6 +373,12 @@ if (json.html) {
             return a.indexOf(i) < 0;
         });
     };
+
+    $(function () {
+        $('[data-popup]').tooltip({
+            template: '<div class="tooltip"><div class="bg-teal"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div></div>'
+        });
+    })
 
 
 </script>

@@ -178,14 +178,6 @@
                 </div>
                 <div class="modal-body">
                     <div class="row">
-                        <div class="col-md-6 col-md-offset-3">
-                            <button data-toggle="modal" id="btn_do_asignar_pea" class="btn btn-primary">Realizar
-                                Asignacion
-                                Automática
-                            </button>
-                        </div>
-                    </div>
-                    <div class="row">
                         <div class="table table-responsive">
                             <table id="tabla_pea_reserva" class="table table-responsive table-bordered">
                                 <thead>
@@ -221,4 +213,7 @@
     <script type="text/javascript" src="{% static "assets/js/plugins/forms/selects/select2.min.js" %}"></script>
     <script type="text/javascript" src="{% static "assets/js/core/app.js" %}"></script>
     <script type="text/javascript" src="{% static "dist/capacitacion/distribucion/distribucion.js" %}"></script>
+    <script>
+    $('#distribucion').addClass('active');
+    </script>
 {% endblock %}

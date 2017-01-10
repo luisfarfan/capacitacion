@@ -6,6 +6,7 @@ $(function () {
 });
 
 var turno;
+var local_selected = [];
 var rangofechas = [];
 var peaaula = [];
 var aula_selected;
@@ -125,7 +126,7 @@ function getPEA(id_localambiente) {
         type: 'GET',
         success: response => {
             peaaula = response;
-            response[0].id_instructor != null ? $('#instructor').val(response[0].id_instructor) : $('#instructor').val(-1);
+            response[0].id_instructor != null ? $('#instructor').val(response[0].id_instructor).trigger("change") : $('#instructor').val(-1).trigger("change");
             let fecha_selected = $('#fechas').val();
             let json = {};
             let html = '';
@@ -251,7 +252,7 @@ function saveAsistencia() {
                 url: `${BASEURL}/update_peaaula/${aula_selected}/${$('#instructor').val()}/`,
                 type: 'GET',
                 success: function (response) {
-                    console.log(response);
+                    getPEA(aula_selected);
                 },
                 error: function (error) {
 
@@ -379,4 +380,113 @@ function setTablaDarBaja() {
     } else {
         alert('Debe seleccionar un aula');
     }
+}
+
+
+function reporte_pea_asistencia() {
+    "use strict";
+    let html = `<tr><th rowspan="2">N°</th><th rowspan="2">APELLIDOS</th><th rowspan="2">NOMBRES</th><th rowspan="2">CARGO</th>`;
+    let td_mt = `<tr>`;
+    $.each(rangofechas, (i, v) => {
+        html += `<th colspan="2">${v.substring(0, 5)}</th>`;
+        td_mt += `<th>M</th><th>T</th>`;
+    });
+    html += `</tr>`;
+    td_mt += `</tr>`;
+    html = html + td_mt;
+
+    $('#tabla_reporte_pea_asistencia').find('thead').html(html);
+    set_reporte_pea_asistencia();
+    $('#modal_reporte_pea_exportar').modal('show');
+
+}
+
+function set_reporte_pea_asistencia() {
+    "use strict";
+    let html = '';
+    let fechas_persona = [];
+    let obj_fecha = {};
+    peaaula.map((key, val) => {
+        html += `<tr>`;
+        html += `<td>${val + 1}</td>`;
+        html += `<td>${key.id_pea.ape_paterno} ${key.id_pea.ape_materno}</td>`;
+        html += `<td>${key.id_pea.nombre}</td>`;
+        html += `<td>${key.id_pea.id_cargofuncional.nombre_funcionario}</td>`;
+        fechas_persona = [];
+        key.peaaulas.map(f => {
+            fechas_persona.push(f.fecha);
+        });
+        console.log(fechas_persona);
+        rangofechas.map(fecha => {
+            if ($.inArray(fecha, fechas_persona) >= 0) {
+                obj_fecha = findInObject2(key.peaaulas, fecha, 'fecha');
+                switch (obj_fecha.turno_manana) {
+                    case 0:
+                        html += `<td>P</td>`;
+                        break;
+                    case 1:
+                        html += `<td>T</td>`;
+                        break;
+                    case 2:
+                        html += `<td style="background-color: red">F</td>`;
+                        break;
+                    default:
+                        html += `<td></td>`;
+                }
+                switch (obj_fecha.turno_tarde) {
+                    case 0:
+                        html += `<td>P</td>`;
+                        break;
+                    case 1:
+                        html += `<td>T</td>`;
+                        break;
+                    case 2:
+                        html += `<td style="background-color: red">F</td>`;
+                        break;
+                    default:
+                        html += `<td></td>`;
+                }
+            } else {
+                html += `<td></td><td></td>`;
+            }
+        });
+        html += `</tr>`;
+    });
+    $('#tabla_reporte_pea_asistencia').find('tbody').html(html);
+}
+
+
+function reporte_pea_asistencia_blanco() {
+    "use strict";
+    let html = `<tr><th rowspan="2">N°</th><th rowspan="2">APELLIDOS</th><th rowspan="2">NOMBRES</th><th rowspan="2">CARGO</th>`;
+    let td_mt = `<tr>`;
+    $.each(rangofechas, (i, v) => {
+        html += `<th colspan="2">${v.substring(0, 5)}</th>`;
+        td_mt += `<th>M</th><th>T</th>`;
+    });
+    html += `</tr>`;
+    td_mt += `</tr>`;
+    html = html + td_mt;
+
+    $('#tabla_reporte_pea_asistencia').find('thead').html(html);
+    set_reporte_pea_asistencia_blanco();
+    $('#modal_reporte_pea_exportar').modal('show');
+
+}
+
+function set_reporte_pea_asistencia_blanco() {
+    "use strict";
+    let html = '';
+    peaaula.map((key, val) => {
+        html += `<tr>`;
+        html += `<td>${val + 1}</td>`;
+        html += `<td>${key.id_pea.ape_paterno} ${key.id_pea.ape_materno}</td>`;
+        html += `<td>${key.id_pea.nombre}</td>`;
+        html += `<td>${key.id_pea.id_cargofuncional.nombre_funcionario}</td>`;
+        rangofechas.map(fecha => {
+            html += `<td></td><td></td>`;
+        });
+        html += `</tr>`;
+    });
+    $('#tabla_reporte_pea_asistencia').find('tbody').html(html);
 }

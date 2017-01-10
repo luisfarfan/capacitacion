@@ -89,7 +89,7 @@ $('#buscarlocal').click(function () {
     getLocalesbyUbigeo();
 });
 
-$('#cursos').change(()=> {
+$('#cursos').change(() => {
     "use strict";
     getMetaPea();
 });
@@ -583,7 +583,7 @@ function eliminarAmbiente(id_localambiente) {
             cancelButtonText: "No, Cancelar!",
             closeOnConfirm: true,
             closeOnCancel: true,
-        }, (isConfirm)=> {
+        }, (isConfirm) => {
             window.onkeydown = null;
             window.onfocus = null;
             if (isConfirm) {
@@ -605,7 +605,7 @@ $('#funcionario_nombre').change(e => {
     "use strict";
     let id_per = $('#funcionario_nombre').val();
     id_per = id_per.trim();
-    $.getJSON(`${BASEURL}/get_funcionarioinei/${id_per}/`, response=> {
+    $.getJSON(`${BASEURL}/get_funcionarioinei/${id_per}/`, response => {
         $('input[name="funcionario_email"]').val(response[0].correo);
         $('input[name="funcionario_cargo"]').val(response[0].cargo);
         $('input[name="funcionario_celular"]').val(response[0].celular);
@@ -661,7 +661,7 @@ function eliminarLocal(id_local) {
                 console.log('ERROR!!', error)
             }
         })
-    });
+    }, 'Esta seguro de eliminar el Local?');
 }
 
 

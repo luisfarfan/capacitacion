@@ -77,7 +77,7 @@ function getCriterios() {
 function setColumnsDataTablePea() {
     columns = [];
     columns = [null, null, null]
-    $.each(criterios, (key, val)=> {
+    $.each(criterios, (key, val) => {
         columns.push({"orderDataType": "dom-text-numeric"})
     });
     columns.push({"orderDataType": "dom-text-numeric"})
@@ -187,6 +187,7 @@ function findInObject(obj, search) {
     return nota_res;
 }
 
+
 function calcularPromedio(input) {
     "use strict";
     let rowindex = $(input).parent().parent()[0];
@@ -279,7 +280,7 @@ $("#btn_exportar_evaluacion").on('click', function () {
         "use strict";
         $(val).parent().text($(val).val());
     });
-    $('#clone').find('input[name="aptos"]').map((key, value)=> {
+    $('#clone').find('input[name="aptos"]').map((key, value) => {
         $(value).remove()
     });
     var uri = $("#clone").battatech_excelexport({

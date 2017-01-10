@@ -117,6 +117,10 @@
                 </div>
                 <div class="row">
                     <button onclick="saveAsistencia()" class="btn btn-primary">Guardar</button>
+                    <button onclick="reporte_pea_asistencia()" class="btn btn-primary">Ver Listado Reporte</button>
+                    <button onclick="reporte_pea_asistencia_blanco()" class="btn btn-primary">Ver Listado Reporte En
+                        Blanco
+                    </button>
                 </div>
                 <div class="row">
                     <div class="table-responsive">
@@ -218,6 +222,34 @@
             </div>
         </div>
     </div>
+    <div id="modal_reporte_pea_exportar" class="modal fade">
+        <div class="modal-dialog modal-full">
+            <div class="modal-content">
+                <div class="modal-header bg-primary">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h6 class="modal-title">Reporte PEA Asistencia</h6>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="table table-responsive">
+                            <table id="tabla_reporte_pea_asistencia" class="table table-bordered">
+                                <thead>
+
+                                </thead>
+                                <tbody>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
 
@@ -228,4 +260,8 @@
     <script type="text/javascript" src="{% static "assets/js/plugins/notifications/sweet_alert.min.js" %}"></script>
     <script type="text/javascript" src="{% static "assets/js/core/app.js" %}"></script>
     <script type="text/javascript" src="{% static "dist/capacitacion/asistencia/asistencia.js" %}"></script>
+    <script>
+        $('#asistencia').addClass('active');
+        $('#instructor').select2();
+    </script>
 {% endblock %}
