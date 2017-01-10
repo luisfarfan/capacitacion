@@ -490,3 +490,13 @@ function set_reporte_pea_asistencia_blanco() {
     });
     $('#tabla_reporte_pea_asistencia').find('tbody').html(html);
 }
+
+$("#btn_exportar_evaluacion").on('click', function () {
+    var uri = $("#div_listado_reporte").battatech_excelexport({
+        containerid: "div_listado_reporte",
+        datatype: 'table',
+        returnUri: true
+    });
+
+    $(this).attr('download', 'listado_asistencia.xls').attr('href', uri).attr('target', '_blank');
+});

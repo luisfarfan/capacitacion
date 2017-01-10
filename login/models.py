@@ -13,3 +13,5 @@ class User(models.Model):
     ccdi = models.CharField(max_length=2)
     zona = models.CharField(max_length=5)
     curso = models.IntegerField(null=True, blank=True)
+    descripcion_rol = models.CharField(max_length=100, null=True, blank=True)
+    rol = models.IntegerField(null=True, blank=True)

@@ -380,6 +380,13 @@
         });
     })
 
+    if (session.rol == 1) {
+        $('#asistencia').hide();
+        $('#notas').hide();
+    } else if (session.rol == 2) {
+        $('#modulo_registro').hide();
+        $('#distribucion').hide();
+    }
 
 </script>
 </html>
