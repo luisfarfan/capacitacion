@@ -135,12 +135,14 @@ function getPEA(id_localambiente) {
                             <th>Nombre Completo</th>
                             <th>Cargo</th>`;
             $.each(response, (key, val) => {
-                html += '<tr>';
+                html += `<tr ${val.id_pea.baja_estado == 1 ? 'style="background-color: #f1a6a6"' : "" }>`;
                 html += `<td>${key + 1}</td>`;
                 html += `<td>${val.id_pea.ape_paterno} ${val.id_pea.ape_materno} ${val.id_pea.nombre}</td><td>${val.id_pea.id_cargofuncional.nombre_funcionario}</td>`;
 
-
-                html += `<td><div name="m${fecha_selected}" class="form-group">
+                if (val.id_pea.baja_estado == 1) {
+                    html += `<td></td><td></td>`;
+                } else {
+                    html += `<td><div name="m${fecha_selected}" class="form-group">
                                         <input type="hidden" id="id_peaaula" name="id_peaaula${val.id_peaaula}" value="${val.id_peaaula}">
 										<div class="checkbox checkbox-right">
 											<label>
@@ -148,7 +150,6 @@ function getPEA(id_localambiente) {
 												Puntual
 											</label>
 										</div>
-
 										<div class="checkbox checkbox-right">
 											<label>
 												<input type="radio" name="turno_manana${key}${fecha_selected}" ${setCheckedTurnoManana(val.peaaulas, fecha_selected, "1")} value="1">
@@ -162,7 +163,7 @@ function getPEA(id_localambiente) {
 											</label>
 										</div>
 									</div></td>`;
-                html += `<td><div name="${fecha_selected}" class="form-group">
+                    html += `<td><div name="${fecha_selected}" class="form-group">
                                         <input type="hidden" id="id_peaaula" name="id_peaaula${val.id_peaaula}" value="${val.id_peaaula}">
 										<div class="checkbox checkbox-right">
 											<label>
@@ -184,6 +185,8 @@ function getPEA(id_localambiente) {
 											</label>
 										</div>
 									</div></td>`;
+                }
+
 
                 html += '</tr>';
             });
@@ -288,6 +291,7 @@ function fn_darBaja() {
         data: {'id_peas': id_pea},
         success: response => {
             $('#modal_pea_dar_baja').modal('hide');
+            setTablaDarBaja();
         }
     });
 }
@@ -307,6 +311,7 @@ function fn_darAlta() {
         data: {'id_peas': id_pea},
         success: response => {
             $('#modal_pea_dar_alta').modal('hide');
+            doAsignacion();
         }
     });
 }
@@ -500,3 +505,23 @@ $("#btn_exportar_evaluacion").on('click', function () {
 
     $(this).attr('download', 'listado_asistencia.xls').attr('href', uri).attr('target', '_blank');
 });
+
+function doAsignacion(show = false) {
+    let ubigeo = `${session.ccdd}${session.ccpp}${session.ccdi}`;
+    $.ajax({
+        url: `${BASEURL}/asignacion/`,
+        type: 'POST',
+        data: {ubigeo: ubigeo, zona: `${session.zona}`, id_curso: session.curso},
+        success: response => {
+            console.log(response);
+            $('#modal_pea_sobrante').unblock();
+            show ? getSobrantes() : '';
+            $('#local').trigger('change');
+            getPEA(aula_selected);
+        },
+        error: error => {
+            console.log('ERROR!!', error)
+            $('#modal_pea_sobrante').unblock();
+        }
+    })
+}

@@ -197,7 +197,7 @@
                         if (session.curso == '5') {
 
                         } else {
-                            if (parseInt(val[params[1]]) < parseInt(val[params[2]])) {
+                            if (parseInt(val[params[2]]) < parseInt(val[params[3]])) {
                                 html += `<li class="text-danger-600"><a data-popup="tooltip" title="Redistribuir PEA" onclick="redistribuirAula(${val[params[i].pk]})" ><i class="icon-reload-alt"></i></a></li>`;
                             }
                         }
@@ -378,7 +378,7 @@
         $('[data-popup]').tooltip({
             template: '<div class="tooltip"><div class="bg-teal"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div></div>'
         });
-    })
+    });
 
     if (session.rol == 1) {
         $('#asistencia').hide();

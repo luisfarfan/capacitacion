@@ -9,6 +9,7 @@ if (session.curso == '902') {
 }
 
 var local_selected = [];
+var fecha_hoy = moment().format('DD/MM/YYYY');
 
 $('#etapa').val(1);
 function resetForm(idform) {
@@ -47,6 +48,8 @@ $(function () {
     });
 
     $('input[name="fecha_inicio"]').daterangepicker({
+        "minDate": fecha_hoy,
+        "maxDate": "31/10/2017",
         singleDatePicker: true,
         autoUpdateInput: false,
         locale: {
@@ -57,6 +60,8 @@ $(function () {
     });
 
     $('input[name="fecha_fin"]').daterangepicker({
+        "minDate": fecha_hoy,
+        "maxDate": "31/10/2017",
         singleDatePicker: true,
         autoUpdateInput: false,
         locale: {
@@ -162,8 +167,8 @@ function getLocalesbyUbigeo() {
                             <td>${val.nombre_local}</td><td>${val.nombre_via}</td><td>${val.referencia}</td><td>${val.zona}</td>
                             <td>
 								<ul class="icons-list">
-                                    <li class="text-primary-600"><a onclick="getLocal(${val.id_local})" href="#"><i class="icon-pencil7"></i></a></li>
-                                    <li class="text-danger-600"><a onclick="eliminarLocal(${val.id_local})" href="#"><i class="icon-trash"></i></a></li>
+                                    <li class="text-primary-600"><a data-popup="tooltip" title="Mostrar" onclick="getLocal(${val.id_local})" href="#"><i class="icon-pencil7"></i></a></li>
+                                    <li class="text-danger-600"><a data-popup="tooltip" title="Eliminar" onclick="eliminarLocal(${val.id_local})" href="#"><i class="icon-trash"></i></a></li>
 								</ul>
 							</td>
                           </tr>`;
@@ -171,6 +176,9 @@ function getLocalesbyUbigeo() {
 
             $('#table_localesubigeo').find('tbody').html(html);
             $('#table_localesubigeo').DataTable();
+            $('[data-popup]').tooltip({
+                template: '<div class="tooltip"><div class="bg-slate-800"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div></div>'
+            });
         }
     });
 }

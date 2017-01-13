@@ -217,7 +217,7 @@ class PEA_AULAViewSet(generics.ListAPIView):
 
     def get_queryset(self):
         id_localambiente = self.kwargs['id_localambiente']
-        return PEA_AULA.objects.filter(id_localambiente=id_localambiente, id_pea__baja_estado=0)
+        return PEA_AULA.objects.filter(id_localambiente=id_localambiente)
 
 
 class PEA_AULAbyLocalAmbienteViewSet(generics.ListAPIView):

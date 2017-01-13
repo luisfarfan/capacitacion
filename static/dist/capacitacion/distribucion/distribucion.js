@@ -79,7 +79,7 @@ function getAmbientes(id_local) {
         type: 'GET',
         success: response => {
             id_curso = response.id_curso;
-            setTable2('tabla_detalle_ambientes', response.ambientes, ['numero', 'capacidad', 'cant_pea', 'nombre_ambiente', {pk: 'id_localambiente'}]);
+            setTable2('tabla_detalle_ambientes', response.ambientes, ['nombre_ambiente', 'numero', 'capacidad', 'cant_pea', {pk: 'id_localambiente'}]);
         },
         error: error => {
             console.log('ERROR!!', error);
@@ -135,7 +135,6 @@ function doAsignacion(show = false) {
         type: 'POST',
         data: {ubigeo: ubigeo, zona: `${session.zona}`, id_curso: session.curso},
         success: response => {
-            console.log(response);
             $('#modal_pea_sobrante').unblock();
             show ? getSobrantes() : '';
             $('#local').trigger('change');
@@ -244,7 +243,7 @@ $('#btn_do_asignar_pea').on('click', function () {
 });
 
 function redistribuirAula(id_localambiente) {
-    alert_confirm(()=> {
+    alert_confirm(() => {
         $.ajax({
             url: `${BASEURL}/redistribuir_aula/${id_localambiente}`,
             type: 'GET',
