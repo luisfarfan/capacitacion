@@ -103,6 +103,17 @@
                                     <li id="notas"><a href="{% url 'evaluacion' %}">Modulo de Registro de Notas y
                                         Resultado</a>
                                     </li>
+                                    <li id="reportes">
+                                        <a href="#"><i class="icon-droplet2"></i> <span>Modulo de Reportes</span></a>
+                                        <ul>
+                                            <li><a href="{% url 'reporte:directorio_locales' %}">Directorio de
+                                                Locales</a>
+                                            </li>
+                                            <li><a href="{% url 'reporte:numero_aulas_coberturadas_por_curso' %}">Numero
+                                                de Aulas Coberturadas por Curso</a>
+                                            </li>
+                                        </ul>
+                                    </li>
                                 </ul>
                             </li>
                             <!-- /main -->
@@ -224,6 +235,13 @@
                 $(val).removeClass('tr_selected');
             });
             $(event.target).parent().parent().addClass('tr_selected');
+        });
+        $('table tbody tr td ul li a').on('click', event => {
+            let selecteds = $('table tbody .tr_selected');
+            $.each(selecteds, (key, val) => {
+                $(val).removeClass('tr_selected');
+            });
+            $(event.target).parent().parent().parent().parent().parent().addClass('tr_selected');
         });
 
         $('[data-popup]').tooltip({
@@ -373,6 +391,24 @@
             return a.indexOf(i) < 0;
         });
     };
+    if (!Array.prototype.filter) {
+        Array.prototype.filter = function (fun /*, thisp*/) {
+            var len = this.length >>> 0;
+            if (typeof fun != "function")
+                throw new TypeError();
+
+            var res = [];
+            var thisp = arguments[1];
+            for (var i = 0; i < len; i++) {
+                if (i in this) {
+                    var val = this[i]; // in case fun mutates this
+                    if (fun.call(thisp, val, i, this))
+                        res.push(val);
+                }
+            }
+            return res;
+        };
+    }
 
     $(function () {
         $('[data-popup]').tooltip({
@@ -386,6 +422,65 @@
     } else if (session.rol == 2) {
         $('#modulo_registro').hide();
         $('#distribucion').hide();
+    }
+    if (session.curso == 4 || session.curso == 6) {
+        $('#notas').hide();
+    }
+
+    function getDepartamentos() {
+        let array_departamentos = [{id: '', text: 'Seleccione'}];
+        $.getJSON(`${BASE_URL}departamentos`, function (data) {
+            $.each(data, function (key, val) {
+                array_departamentos.push({id: val.ccdd, text: val.departamento})
+            });
+            $('#departamentos').select2({data: array_departamentos});
+            $('#departamentos').val(session.ccdd).trigger('change');
+        });
+    }
+    function getProvincias() {
+        let array_provincias = [{id: '', text: 'Seleccione'}];
+        var ccdd = $('#departamentos').val();
+        $.getJSON(`${BASE_URL}provincias/${ccdd}`, function (data) {
+            $.each(data, function (key, val) {
+                array_provincias.push({id: val.ccpp, text: val.provincia})
+            });
+            $('#provincias').select2({data: array_provincias});
+            $('#provincias').val(session.ccpp).trigger('change');
+        });
+    }
+
+    function getDistritos() {
+        let array_distritos = [{id: '', text: 'Seleccione'}];
+        var ccdd = $('#departamentos').val();
+        var ccpp = $('#provincias').val();
+        if (ccpp != 'Seleccione' & ccpp != undefined) {
+            $.getJSON(`${BASE_URL}distritos/${ccdd}/${ccpp}`, function (data) {
+                $.each(data, function (key, val) {
+                    array_distritos.push({id: val.ccdi, text: val.distrito})
+                });
+                $('#distritos').select2({data: array_distritos});
+                $('#distritos').val(session.ccdi).trigger('change');
+            });
+        }
+
+    }
+
+    function getZonas() {
+        "use strict";
+        let array_zonas = [{id: '', text: 'Seleccione'}];
+        var ccdd = $('#departamentos').val();
+        var ccpp = $('#provincias').val();
+        var ccdi = $('#distritos').val();
+        $.getJSON(`${BASE_URL}zonas/${ccdd}${ccpp}${ccdi}/`, function (data) {
+            $.each(data, function (key, val) {
+                array_zonas.push({id: val.ZONA, text: val.ZONA})
+            });
+            $('#zona').select2({data: array_zonas});
+            $('#zona_ubicacion_local').select2({data: array_zonas});
+            if (session.curso != '1') {
+                $('#zona').val(session.zona).trigger('change');
+            }
+        });
     }
 
 </script>

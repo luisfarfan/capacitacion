@@ -55,12 +55,15 @@
                         <table id="tabla_detalle_ambientes" class="table table-bordered">
                             <thead>
                             <tr>
-                                <th>N°</th>
+                                <th>
+                                    <center>Aula de Capacitación</center>
+                                    <center>N°</center>
+                                </th>
                                 <th>Ambiente</th>
                                 <th>Número Ambiente</th>
                                 <th>Capacidad</th>
                                 <th>Cantidad PEA <br>distribuida</th>
-                                <th></th>
+                                <th>Pea por Aula</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -214,6 +217,6 @@
     <script type="text/javascript" src="{% static "assets/js/core/app.js" %}"></script>
     <script type="text/javascript" src="{% static "dist/capacitacion/distribucion/distribucion.js" %}"></script>
     <script>
-    $('#distribucion').addClass('active');
+        $('#distribucion').addClass('active');
     </script>
 {% endblock %}

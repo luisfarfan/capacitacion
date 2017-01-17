@@ -14,13 +14,18 @@ var id_curso;
 var rangofechas = [];
 var id_localambiente;
 var id_ambiente = undefined;
+var locales = [];
+var local_selected = {};
 //
 
 $('#local').change(e => {
     "use strict";
-    getAmbientes($('#local').val());
     getRangoFechas($('#local').val());
     $('#tabla_pea').find('tbody').empty();
+    local_selected = findInObject2(locales, $('#local').val(), 'id_local');
+    console.log(local_selected);
+    console.log(rangofechas);
+    setTimeout(getAmbientes($('#local').val(), 0), 1000);
 });
 
 $('#ambiente').change(e => {
@@ -29,7 +34,12 @@ $('#ambiente').change(e => {
     getPEA(id_localambiente);
 });
 
-if (session.curso == '5') {
+$('#fechas').change(() => {
+    "use strict";
+    getAmbientes($('#local').val(), $.inArray($('#fechas').val(), rangofechas));
+});
+
+if (session.curso == '4') {
     $('#fechas').change(e => {
         if (id_localambiente !== undefined) {
             getPEA(id_localambiente)
@@ -48,6 +58,7 @@ function getLocales() {
         url: url,
         type: 'GET',
         success: response => {
+            locales = response;
             setSelect_v2('local', response, ['id_local', 'nombre_local'])
         },
         error: error => {
@@ -72,10 +83,11 @@ function getRangoFechas(id_local) {
     });
 }
 
-function getAmbientes(id_local) {
-    "use strict";
+function getAmbientes(id_local, fecha = null) {
+    //"use strict";
+    let url = session.curso == 4 ? `${BASEURL}/localambiente/${id_local}/${fecha}` : `${BASEURL}/localambiente/${id_local}/`;
     $.ajax({
-        url: `${BASEURL}/localambiente/${id_local}/`,
+        url: url,
         type: 'GET',
         success: response => {
             id_curso = response.id_curso;
@@ -91,7 +103,7 @@ function getPEA(id_ambiente) {
     "use strict";
     id_localambiente = id_ambiente;
     let ajax_options = {};
-    if (session.curso == '5') {
+    if (session.curso == '4') {
         ajax_options = {
             url: `${BASEURL}/getPeaCurso5/`,
             type: 'POST',
@@ -135,6 +147,7 @@ function doAsignacion(show = false) {
         type: 'POST',
         data: {ubigeo: ubigeo, zona: `${session.zona}`, id_curso: session.curso},
         success: response => {
+            console.log(response);
             $('#modal_pea_sobrante').unblock();
             show ? getSobrantes() : '';
             $('#local').trigger('change');

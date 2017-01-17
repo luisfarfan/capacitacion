@@ -21,10 +21,11 @@ class Ubigeo(models.Model):
 class Zona(models.Model):
     ID = models.IntegerField(primary_key=True)
     UBIGEO = models.CharField(max_length=6)
+    CODCCPP = models.CharField(max_length=4)
     ZONA = models.CharField(max_length=5)
     LLAVE_CCPP = models.CharField(max_length=10)
     LLAVE_ZONA = models.CharField(max_length=15)
-    ETIQ_ZONA = models.CharField(max_length=6)
+    ETIQ_ZONA = models.CharField(max_length=5)
 
     class Meta:
         managed = False
@@ -49,6 +50,7 @@ class Curso(models.Model):
     funcionarios = models.ManyToManyField('Funcionario', through='CursoFuncionario')
     criterios = models.ManyToManyField('Criterio', through='CursoCriterio')
     nota_minima = models.IntegerField(blank=True, null=True)
+    metas = models.ManyToManyField('Ubigeo', through='UbigeoCursoMeta')
 
     class Meta:
         managed = True
@@ -66,10 +68,10 @@ class CursoFuncionario(models.Model):
 
 
 class Funcionario(models.Model):
-    id_funcionario = models.AutoField(primary_key=True, db_column='id_funcionario')
+    id_funcionario = models.IntegerField(primary_key=True, db_column='id_funcionario')
     id_cargofuncional = models.CharField(max_length=3, blank=True, null=True)
     nombre_funcionario = models.CharField(max_length=100, blank=True, null=True)
-    id_curso = models.ForeignKey('Curso', db_column='id_curso',on_delete=models.CASCADE)
+    id_curso = models.ForeignKey('Curso', db_column='id_curso', on_delete=models.CASCADE)
 
     class Meta:
         managed = True
@@ -87,7 +89,7 @@ class Ambiente(models.Model):
 
 class LocalAmbiente(models.Model):
     id_localambiente = models.AutoField(primary_key=True, db_column='id_localambiente')
-    id_local = models.ForeignKey('Local',on_delete=models.CASCADE)
+    id_local = models.ForeignKey('Local', on_delete=models.CASCADE)
     id_ambiente = models.ForeignKey('Ambiente')
     numero = models.IntegerField(blank=True, null=True)
     n_piso = models.IntegerField(blank=True, null=True)
@@ -107,6 +109,7 @@ class LocalAmbiente(models.Model):
 
 class Local(models.Model):
     id_local = models.AutoField(primary_key=True, db_column='id_local')
+    marcolocal = models.ForeignKey('MarcoLocal', null=True, blank=True)
     ambientes = models.ManyToManyField(Ambiente, through='LocalAmbiente')
     ubigeo = models.ForeignKey(Ubigeo)
     zona = models.CharField(max_length=5, blank=True, null=True)
@@ -161,6 +164,20 @@ class Local(models.Model):
         db_table = 'LOCAL'
 
 
+class MarcoLocal(models.Model):
+    nombre_local = models.CharField(max_length=300, blank=True, null=True)
+    direccion = models.CharField(max_length=300, blank=True, null=True)
+    responsable_nombre = models.CharField(max_length=300, blank=True, null=True)
+    responsable_telefono = models.CharField(max_length=300, blank=True, null=True)
+    zona = models.CharField(max_length=5, blank=True, null=True)
+    mz_direccion = models.CharField(max_length=300, blank=True, null=True)
+    ubigeo = models.ForeignKey(Ubigeo, null=True)
+
+    class Meta:
+        managed = True
+        db_table = 'MARCO_LOCAL'
+
+
 class Criterio(models.Model):
     id_criterio = models.AutoField(primary_key=True, db_column='id_criterio')
     nombre_criterio = models.CharField(max_length=100, blank=True, null=True)
@@ -173,8 +190,8 @@ class Criterio(models.Model):
 
 class CursoCriterio(models.Model):
     id_cursocriterio = models.AutoField(primary_key=True, db_column='id_cursocriterio')
-    id_curso = models.ForeignKey('Curso', db_column='id_curso',on_delete=models.CASCADE)
-    id_criterio = models.ForeignKey('Criterio', db_column='id_criterio',on_delete=models.CASCADE)
+    id_curso = models.ForeignKey('Curso', db_column='id_curso', on_delete=models.CASCADE)
+    id_criterio = models.ForeignKey('Criterio', db_column='id_criterio', on_delete=models.CASCADE)
     # descripcion_criterio = models.CharField(max_length=100, blank=True, null=True)
     ponderacion = models.IntegerField()
 
@@ -207,9 +224,9 @@ class PEA(models.Model):
 
 class PEA_AULA(models.Model):
     id_peaaula = models.AutoField(primary_key=True, db_column='id_peaaula')
-    id_pea = models.ForeignKey('PEA', db_column='id_pea',on_delete=models.CASCADE)
-    id_localambiente = models.ForeignKey('LocalAmbiente', db_column='id_localambiente',on_delete=models.CASCADE)
-    id_instructor = models.ForeignKey('Instructor', blank=True, null=True,on_delete=models.CASCADE)
+    id_pea = models.ForeignKey('PEA', db_column='id_pea', on_delete=models.CASCADE)
+    id_localambiente = models.ForeignKey('LocalAmbiente', db_column='id_localambiente', on_delete=models.CASCADE)
+    id_instructor = models.ForeignKey('Instructor', blank=True, null=True, on_delete=models.CASCADE)
     pea_fecha = models.CharField(max_length=100, blank=True, null=True)
 
     class Meta:
@@ -219,7 +236,7 @@ class PEA_AULA(models.Model):
 
 class PEA_ASISTENCIA(models.Model):
     id_asistencia = models.AutoField(primary_key=True)
-    id_peaaula = models.ForeignKey('PEA_AULA', related_name='peaaulas',on_delete=models.CASCADE)
+    id_peaaula = models.ForeignKey('PEA_AULA', related_name='peaaulas', on_delete=models.CASCADE)
     fecha = models.CharField(max_length=20, blank=True, null=True)
     turno_manana = models.IntegerField(blank=True, null=True)
     turno_tarde = models.IntegerField(blank=True, null=True)
@@ -264,3 +281,14 @@ class Instructor(models.Model):
     class Meta:
         managed = True
         db_table = 'INSTRUCTOR'
+
+
+class UbigeoCursoMeta(models.Model):
+    ubigeo = models.ForeignKey('Ubigeo')
+    curso = models.ForeignKey('Curso')
+    cantidad = models.IntegerField()
+    dia = models.CharField(max_length=100, null=True, blank=True)
+
+    class Meta:
+        managed = True
+        db_table = 'UBIGEO_CURSO_META'

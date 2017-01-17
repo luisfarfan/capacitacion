@@ -11,7 +11,9 @@ $(function () {
 var criterios = [];
 var aula_selected;
 var id_curso;
-
+var local = [];
+var local_selected = {};
+var rangofechas = [];
 var columns = [];
 var position_nota_final = 0;
 
@@ -20,6 +22,7 @@ $('#local').change(e => {
     "use strict";
     let id_local = $('#local').val();
     getAmbientes(id_local);
+    getRangoFechas(id_local);
 });
 
 $('#btn_getpea').click(event => {
@@ -36,6 +39,7 @@ function getLocales() {
         url: url,
         type: 'GET',
         success: response => {
+            local = response;
             setSelect_v2('local', response, ['id_local', 'nombre_local'])
         },
         error: error => {
@@ -51,13 +55,29 @@ function getAmbientes(id_local) {
         success: response => {
             id_curso = response.id_curso;
             getCriterios();
-            setSelect_v2('aulas', response.ambientes, ['id_localambiente', ['numero', 'nombre_ambiente']]);
+            setSelect_v2('aulas', response.ambientes, ['id_localambiente', ['nombre_ambiente', 'numero']]);
             //setTable('tabla_detalle_ambientes', response.ambientes, ['numero', 'capacidad', 'nombre_ambiente', {pk: 'id_localambiente'}]);
         },
         error: error => {
             console.log('ERROR!!', error);
         }
     })
+}
+
+function getRangoFechas(id_local) {
+    "use strict";
+    $.ajax({
+        url: `${BASEURL}/getRangeDatesLocal/${id_local}/`,
+        type: 'GET',
+        success: response => {
+            setSelect_v2('fechas', response.fechas);
+            rangofechas = response.fechas;
+            $('#fechas').val(rangofechas[0]);
+        },
+        error: error => {
+            console.log(error);
+        }
+    });
 }
 
 function getCriterios() {

@@ -6,11 +6,13 @@ $(function () {
 });
 
 var turno;
-var local_selected = [];
+var local = [];
+var local_selected = {};
 var rangofechas = [];
 var peaaula = [];
 var aula_selected;
-
+var ambientes = [];
+var ambiente_selected = [];
 $('#local').change(e => {
     "use strict";
     let id_local = $('#local').val();
@@ -70,6 +72,7 @@ function getLocales() {
         url: url,
         type: 'GET',
         success: response => {
+            local = response;
             setSelect_v2('local', response, ['id_local', 'nombre_local'])
         },
         error: error => {
@@ -83,13 +86,13 @@ function getAmbientes(id_local) {
         url: `${BASEURL}/localambiente/${id_local}/`,
         type: 'GET',
         success: response => {
-            console.log(response);
+            ambientes = response;
             setTable('tabla_detalle_ambientes', response.ambientes, ['numero', 'capacidad', 'nombre_ambiente', {pk: 'id_localambiente'}]);
         },
         error: error => {
             console.log('ERROR!!', error);
         }
-    })
+    });
 }
 
 function setCheckedTurnoManana(obj, fecha, val) {
@@ -118,6 +121,7 @@ function setCheckedTurnoTarde(obj, fecha, val) {
 function getPEA(id_localambiente) {
     "use strict";
     aula_selected = id_localambiente;
+    ambiente_selected = findInObject2(ambientes.ambientes, id_localambiente, 'id_localambiente');
     if ($.fn.DataTable.isDataTable('#tabla_pea')) {
         $('#tabla_pea').dataTable().fnDestroy();
     }
@@ -126,7 +130,10 @@ function getPEA(id_localambiente) {
         type: 'GET',
         success: response => {
             peaaula = response;
-            response[0].id_instructor != null ? $('#instructor').val(response[0].id_instructor).trigger("change") : $('#instructor').val(-1).trigger("change");
+            if (response[0]['id_instructor'] !== undefined) {
+                response[0].id_instructor != null ? $('#instructor').val(response[0].id_instructor).trigger("change") : $('#instructor').val(-1).trigger("change");
+            }
+
             let fecha_selected = $('#fechas').val();
             let json = {};
             let html = '';
@@ -134,7 +141,16 @@ function getPEA(id_localambiente) {
                             <th>N°</th>
                             <th>Nombre Completo</th>
                             <th>Cargo</th>`;
-            $.each(response, (key, val) => {
+            let pea_por_fecha = [];
+            if (session.curso == 4) {
+                pea_por_fecha = peaaula.filter(function (e) {
+                    return e.pea_fecha == $('#fechas').val();
+                });
+            } else {
+                pea_por_fecha = peaaula;
+            }
+
+            $.each(pea_por_fecha, (key, val) => {
                 html += `<tr ${val.id_pea.baja_estado == 1 ? 'style="background-color: #f1a6a6"' : "" }>`;
                 html += `<td>${key + 1}</td>`;
                 html += `<td>${val.id_pea.ape_paterno} ${val.id_pea.ape_materno} ${val.id_pea.nombre}</td><td>${val.id_pea.id_cargofuncional.nombre_funcionario}</td>`;
@@ -186,13 +202,9 @@ function getPEA(id_localambiente) {
 										</div>
 									</div></td>`;
                 }
-
-
                 html += '</tr>';
             });
-
             thead += `<th>MAÑANA</th><th>TARDE</th>`;
-
             thead += `</tr>`;
             json.html = html;
             $('#tabla_pea').find('thead').html(thead);
@@ -368,7 +380,6 @@ function setTablaDarBaja() {
         $('#tabla_pea_dar_baja').dataTable().fnDestroy();
     }
     if (peaaula.length) {
-        $('#modal_pea_dar_baja').modal('show');
         let html = '';
         $('#tabla_pea_dar_baja').find('tbody').empty();
         $.each(peaaula, (key, val) => {
@@ -411,7 +422,16 @@ function set_reporte_pea_asistencia() {
     let html = '';
     let fechas_persona = [];
     let obj_fecha = {};
-    peaaula.map((key, val) => {
+
+    let pea_por_fecha = [];
+    if (session.curso == 4) {
+        pea_por_fecha = peaaula.filter(function (e) {
+            return e.pea_fecha == $('#fechas').val();
+        });
+    } else {
+        pea_por_fecha = peaaula;
+    }
+    pea_por_fecha.map((key, val) => {
         html += `<tr>`;
         html += `<td>${val + 1}</td>`;
         html += `<td>${key.id_pea.ape_paterno} ${key.id_pea.ape_materno}</td>`;
@@ -421,43 +441,53 @@ function set_reporte_pea_asistencia() {
         key.peaaulas.map(f => {
             fechas_persona.push(f.fecha);
         });
-        console.log(fechas_persona);
-        rangofechas.map(fecha => {
-            if ($.inArray(fecha, fechas_persona) >= 0) {
-                obj_fecha = findInObject2(key.peaaulas, fecha, 'fecha');
-                switch (obj_fecha.turno_manana) {
-                    case 0:
-                        html += `<td>P</td>`;
-                        break;
-                    case 1:
-                        html += `<td>T</td>`;
-                        break;
-                    case 2:
-                        html += `<td style="background-color: red">F</td>`;
-                        break;
-                    default:
-                        html += `<td></td>`;
+        if (key.id_pea.baja_estado == 1) {
+            html += `<td colspan=${(rangofechas.length) * 2}><span>DADO DE BAJA</span></td>`;
+        } else {
+            rangofechas.map(fecha => {
+                if ($.inArray(fecha, fechas_persona) >= 0) {
+                    obj_fecha = findInObject2(key.peaaulas, fecha, 'fecha');
+                    switch (obj_fecha.turno_manana) {
+                        case 0:
+                            html += `<td>P</td>`;
+                            break;
+                        case 1:
+                            html += `<td>T</td>`;
+                            break;
+                        case 2:
+                            html += `<td style="background-color: red">F</td>`;
+                            break;
+                        default:
+                            html += `<td></td>`;
+                    }
+                    switch (obj_fecha.turno_tarde) {
+                        case 0:
+                            html += `<td>P</td>`;
+                            break;
+                        case 1:
+                            html += `<td>T</td>`;
+                            break;
+                        case 2:
+                            html += `<td style="background-color: red">F</td>`;
+                            break;
+                        default:
+                            html += `<td></td>`;
+                    }
+                    if (obj_fecha.baja_estado == 1) {
+                        html += `<td>B</td>`;
+                    }
+                } else {
+                    html += `<td></td><td></td>`;
                 }
-                switch (obj_fecha.turno_tarde) {
-                    case 0:
-                        html += `<td>P</td>`;
-                        break;
-                    case 1:
-                        html += `<td>T</td>`;
-                        break;
-                    case 2:
-                        html += `<td style="background-color: red">F</td>`;
-                        break;
-                    default:
-                        html += `<td></td>`;
-                }
-            } else {
-                html += `<td></td><td></td>`;
-            }
-        });
+            });
+        }
         html += `</tr>`;
     });
     $('#tabla_reporte_pea_asistencia').find('tbody').html(html);
+
+    $('#descripcion_curso_aula').text(`${session.descripcion_curso}`);
+    let grupo_curso4 = session.curso == 4 ? `GRUPO ${$.inArray($('#fechas').val(), rangofechas) + 1}` : '';
+    $('#descripcion_aula').text(`CONTROL DE ASISTENCIA DIARIA - AULA ${ambiente_selected.numero} ${grupo_curso4}`);
 }
 
 
@@ -476,13 +506,20 @@ function reporte_pea_asistencia_blanco() {
     $('#tabla_reporte_pea_asistencia').find('thead').html(html);
     set_reporte_pea_asistencia_blanco();
     $('#modal_reporte_pea_exportar').modal('show');
-
 }
 
 function set_reporte_pea_asistencia_blanco() {
     "use strict";
     let html = '';
-    peaaula.map((key, val) => {
+    let pea_por_fecha = [];
+    if (session.curso == 4) {
+        pea_por_fecha = peaaula.filter(function (e) {
+            return e.pea_fecha == $('#fechas').val();
+        });
+    } else {
+        pea_por_fecha = peaaula;
+    }
+    pea_por_fecha.map((key, val) => {
         html += `<tr>`;
         html += `<td>${val + 1}</td>`;
         html += `<td>${key.id_pea.ape_paterno} ${key.id_pea.ape_materno}</td>`;
@@ -520,7 +557,7 @@ function doAsignacion(show = false) {
             getPEA(aula_selected);
         },
         error: error => {
-            console.log('ERROR!!', error)
+            console.log('ERROR!!', error);
             $('#modal_pea_sobrante').unblock();
         }
     })

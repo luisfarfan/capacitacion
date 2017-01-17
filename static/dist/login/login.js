@@ -12,13 +12,16 @@ $('#iniciar_sesion').click(event => {
 
 function do_login() {
     "use strict";
+    let session_response;
     $.ajax({
         url: '/do_login/',
         type: 'POST',
         data: {usuario: $('#usuario').val(), clave: $('#clave').val()},
         success: function (response) {
             if (response.length > 0) {
-                localStorage.setItem('usuario', JSON.stringify(response[0]));
+                session_response = response[0];
+                session_response[0]['descripcion_curso'] = response[1];
+                localStorage.setItem('usuario', JSON.stringify(session_response[0]));
                 window.location.replace(`${BASEURL}/modulo_registro`);
             } else {
                 alert('ERROR!')

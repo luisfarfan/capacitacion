@@ -10,6 +10,8 @@ if (session.curso == '902') {
 
 var local_selected = [];
 var fecha_hoy = moment().format('DD/MM/YYYY');
+var local_marco = [];
+var local_marco_selected = {};
 
 $('#etapa').val(1);
 function resetForm(idform) {
@@ -51,7 +53,6 @@ $(function () {
         "minDate": fecha_hoy,
         "maxDate": "31/10/2017",
         singleDatePicker: true,
-        autoUpdateInput: false,
         locale: {
             format: 'DD/MM/YYYY'
         }
@@ -63,7 +64,6 @@ $(function () {
         "minDate": fecha_hoy,
         "maxDate": "31/10/2017",
         singleDatePicker: true,
-        autoUpdateInput: false,
         locale: {
             format: 'DD/MM/YYYY'
         }
@@ -94,65 +94,15 @@ $('#buscarlocal').click(function () {
     getLocalesbyUbigeo();
 });
 
+$('#buscarlocalmarco').click(function () {
+    getLocalesbyMarco();
+});
+
+
 $('#cursos').change(() => {
     "use strict";
     getMetaPea();
 });
-
-function getDepartamentos() {
-    let array_departamentos = [{id: '', text: 'Seleccione'}];
-    $.getJSON(`${BASE_URL}departamentos`, function (data) {
-        $.each(data, function (key, val) {
-            array_departamentos.push({id: val.ccdd, text: val.departamento})
-        });
-        $('#departamentos').select2({data: array_departamentos});
-        $('#departamentos').val(session.ccdd).trigger('change');
-    });
-}
-function getProvincias() {
-    let array_provincias = [{id: '', text: 'Seleccione'}];
-    var ccdd = $('#departamentos').val();
-    $.getJSON(`${BASE_URL}provincias/${ccdd}`, function (data) {
-        $.each(data, function (key, val) {
-            array_provincias.push({id: val.ccpp, text: val.provincia})
-        });
-        console.log(array_provincias);
-        $('#provincias').select2({data: array_provincias});
-        $('#provincias').val(session.ccpp).trigger('change');
-    });
-}
-
-function getDistritos() {
-    let array_distritos = [{id: '', text: 'Seleccione'}];
-    var ccdd = $('#departamentos').val();
-    var ccpp = $('#provincias').val();
-    $.getJSON(`${BASE_URL}distritos/${ccdd}/${ccpp}`, function (data) {
-        $.each(data, function (key, val) {
-            array_distritos.push({id: val.ccdi, text: val.distrito})
-        });
-        $('#distritos').select2({data: array_distritos});
-        $('#distritos').val(session.ccdi).trigger('change');
-    });
-}
-
-function getZonas() {
-    "use strict";
-    let array_zonas = [{id: '', text: 'Seleccione'}];
-    var ccdd = $('#departamentos').val();
-    var ccpp = $('#provincias').val();
-    var ccdi = $('#distritos').val();
-    $.getJSON(`${BASE_URL}zonas/${ccdd}${ccpp}${ccdi}/`, function (data) {
-        $.each(data, function (key, val) {
-            array_zonas.push({id: val.ZONA, text: val.ZONA})
-        });
-        $('#zona').select2({data: array_zonas});
-        $('#zona_ubicacion_local').select2({data: array_zonas});
-        if (session.curso != '1') {
-            $('#zona').val(session.zona).trigger('change');
-        }
-    });
-}
-
 
 function getLocalesbyUbigeo() {
     var ubigeo = `${$('#departamentos').val()}${$('#provincias').val()}${$('#distritos').val()}`;
@@ -183,6 +133,33 @@ function getLocalesbyUbigeo() {
     });
 }
 
+function getLocalesbyMarco() {
+    var ubigeo = `${$('#departamentos').val()}${$('#provincias').val()}${$('#distritos').val()}`;
+    let url = `${BASE_URL}localmarco/${ubigeo}/${session.zona}/`;
+    $.ajax({
+        url: url,
+        success: function (data) {
+            local_marco = data;
+            var html = '';
+            $.each(data, function (key, val) {
+                html += `<tr>
+                            <td>${val.nombre_local}</td><td>${val.zona}</td>
+                            <td>
+								<ul class="icons-list">
+                                    <li class="text-primary-600"><a data-popup="tooltip" title="Mostrar" onclick="setMarco(${val.id})" href="#"><i class="icon-pencil7"></i></a></li>
+								</ul>
+							</td>
+                          </tr>`;
+            });
+            $('#table_localesmarco').find('tbody').html(html);
+            $('#table_localesmarco').DataTable();
+            $('[data-popup]').tooltip({
+                template: '<div class="tooltip"><div class="bg-slate-800"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div></div>'
+            });
+        }
+    });
+}
+
 function getLocal(id_local) {
     $('#id_local').val(id_local);
     $.ajax({
@@ -206,6 +183,20 @@ function getLocal(id_local) {
         }
     });
 }
+
+function setMarco(id_local) {
+    local_selected = findInObject2(local_marco, id_local, 'id');
+    $(`#etapa`).val(1);
+    $.each(local_selected, function (key, val) {
+        if (key == 'tipo_via' || key == 'turno_uso_local' || key == 'id_curso' || key == 'zona_ubicacion_local' || key == 'funcionario_nombre') {
+            $(`select[name=${key}]`).val(val).trigger('change')
+        } else {
+            $(`input[name=${key}]`).val(val)
+        }
+    });
+    $('#modal_localesmarco').modal('hide');
+
+}
 function getCursos(id_etapa) {
     $('#cursos').find('option').remove();
     let array_cursos = [{id: '', text: 'Seleccione'}];
@@ -227,7 +218,7 @@ jQuery.validator.addMethod("validateFechaInicio", function (value, element) {
 
     var f = Date.parse(fin);
     var i = Date.parse(inicio);
-    return f > i
+    return f >= i
 }, jQuery.validator.format("Fecha de Inicio tiene que ser menor que la Fecha Fin"));
 
 jQuery.validator.addMethod("esMenor", function (value, element) {
@@ -280,7 +271,7 @@ jQuery.validator.addMethod("validateFechaFin", function (value, element) {
 
     console.log(f, i);
     console.log(f < i);
-    return f < i
+    return f <= i
 }, jQuery.validator.format("Fecha de Fin tiene que ser mayor que la Fecha Inicio"));
 
 var validator = $(".form-validate-jquery").validate({
@@ -555,12 +546,13 @@ function getMetaPea() {
         type: 'POST',
         data: {ubigeo: ubigeo, zona: session.zona, id_curso: id_curso},
         success: response => {
+            console.log(response);
             $('#cant_meta').val(response.cant);
             $('#cant_reclutada').val(1500);
             if (session.curso == '1') {
-                $('#capacidad_ambiente').val(response.cantidad_distrito)
+                $('#capacidad_ambiente').val(response.total_ambientes_distrito)
             } else {
-                $('#capacidad_ambiente').val(response.cantidad_zona)
+                $('#capacidad_ambiente').val(response.total_ambientes_zona)
             }
             validarMetaPea();
         },

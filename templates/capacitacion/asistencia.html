@@ -26,7 +26,10 @@
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <button onclick="setTablaDarBaja()" class="btn btn-primary">Dar Baja</button>
+                    <button data-toggle="modal" data-target="#modal_pea_dar_baja" onclick="setTablaDarBaja()"
+                            class="btn btn-primary">Dar
+                        Baja
+                    </button>
                 </div>
                 <div class="col-md-6">
                     <button onclick="getContingencia()" class="btn btn-primary">Contingencia (Dar Alta)</button>
@@ -57,11 +60,14 @@
                         <table id="tabla_detalle_ambientes" class="table table-bordered">
                             <thead>
                             <tr>
-                                <th>N°</th>
+                                <th>
+                                    <center>Aula de Capacitación</center>
+                                    <center>N°</center>
+                                </th>
                                 <th>Número Ambiente</th>
                                 <th>Capacidad</th>
                                 <th>Ambiente</th>
-                                <th></th>
+                                <th>Pea Por Aula</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -234,12 +240,10 @@
                 </div>
                 <div class="modal-body">
                     <div class="row">
-                        <h1 class="text-center">LISTA DE ASISTENCIA POR AULA</h1>
                         <h4 class="text-center">DIRECCIÓN NACIONAL DE CENSOS ENCUESTAS</h4>
                         <h4 class="text-center">CENSOS NACIONALES 2017: XII DE POBLACIÓN Y VII DE VIVIENDA</h4>
-                        <h4 class="text-center">ACTUALIZACIÓN CARTOGRÁFICA Y REGISTRO DE VIVIENDAS Y
-                            ESTABLECIMIENTOS</h4>
-                        <h4 id="title_aula" class="text-center"></h4>
+                        <h4 id="descripcion_curso_aula" class="text-center"></h4>
+                        <h4 id="descripcion_aula" class="text-center"></h4>
                     </div>
                     <div class="row">
                         <div class="table table-responsive">
@@ -265,7 +269,6 @@
 
 
 {% block js %}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.2/jspdf.debug.js"></script>
     <script type="text/javascript" src="{% static "assets/js/plugins/tables/datatables/datatables.min.js" %}"></script>
     <script type="text/javascript" src="{% static "assets/js/plugins/loaders/blockui.min.js" %}"></script>
     <script type="text/javascript" src="{% static "assets/js/plugins/forms/selects/select2.min.js" %}"></script>

@@ -14,6 +14,12 @@ class LocalSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class MarcoLocalSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MarcoLocal
+        fields = '__all__'
+
+
 class LocalAulasSerializer(serializers.ModelSerializer):
     ambientes = AmbienteSerializer(many=True, read_only=True)
 

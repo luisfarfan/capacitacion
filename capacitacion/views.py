@@ -98,7 +98,7 @@ class DistritosList(APIView):
 class ZonasList(APIView):
     def get(self, request, ubigeo):
         zonas = list(
-            Zona.objects.filter(UBIGEO=ubigeo).values('UBIGEO', 'ZONA', 'ETIQ_ZONA').annotate(
+            Zona.objects.using('segmentacion').filter(UBIGEO=ubigeo).values('UBIGEO', 'ZONA', 'ETIQ_ZONA').annotate(
                 dcount=Count('UBIGEO', 'ZONA')))
         response = JsonResponse(zonas, safe=False)
         return response
@@ -111,6 +111,15 @@ class TbLocalByUbigeoViewSet(generics.ListAPIView):
         ubigeo = self.kwargs['ubigeo']
         id_curso = self.kwargs['id_curso']
         return Local.objects.filter(ubigeo=ubigeo, id_curso=id_curso)
+
+
+class TbLocalByMarcoViewSet(generics.ListAPIView):
+    serializer_class = MarcoLocalSerializer
+
+    def get_queryset(self):
+        ubigeo = self.kwargs['ubigeo']
+        zona = self.kwargs['zona']
+        return MarcoLocal.objects.filter(ubigeo=ubigeo, zona=zona)
 
 
 class TbLocalByZonaViewSet(generics.ListAPIView):
@@ -132,13 +141,30 @@ class TbLocalByZonaViewSet(generics.ListAPIView):
 #         return Local.objects.filter(ubigeo=ubigeo, zona=zona)
 
 
-def TbLocalAmbienteByLocalViewSet(request, id_local):
-    query = LocalAmbiente.objects.filter(id_local=id_local).order_by('-capacidad').annotate(
-        nombre_ambiente=F('id_ambiente__nombre_ambiente'), cant_pea=Count('pea')).values(
-        'id_localambiente', 'numero', 'capacidad', 'nombre_ambiente', 'n_piso', 'cant_pea').order_by('id_ambiente')
+def TbLocalAmbienteByLocalViewSet(request, id_local, fecha=None):
     local = Local.objects.get(pk=id_local)
+    if fecha is not None:
+        if fecha == 0:
+            query_response = LocalAmbiente.objects.order_by('-capacidad').filter(id_local=id_local,
+                                                                                 pea_aula__pea_fecha=local.fecha_inicio).annotate(
+                nombre_ambiente=F('id_ambiente__nombre_ambiente'), cant_pea=Count('pea')).values(
+                'id_localambiente', 'numero', 'capacidad', 'nombre_ambiente', 'n_piso', 'cant_pea').order_by(
+                'id_ambiente')
+        else:
+            query_response = LocalAmbiente.objects.order_by('-capacidad').filter(id_local=id_local,
+                                                                                 pea_aula__pea_fecha=local.fecha_fin).annotate(
+                nombre_ambiente=F('id_ambiente__nombre_ambiente'), cant_pea=Count('pea')).values(
+                'id_localambiente', 'numero', 'capacidad', 'nombre_ambiente', 'n_piso', 'cant_pea').order_by(
+                'id_ambiente')
+    else:
+        query_response = LocalAmbiente.objects.order_by('-capacidad').filter(id_local=id_local).annotate(
+            nombre_ambiente=F('id_ambiente__nombre_ambiente'), cant_pea=Count('pea')).values(
+            'id_localambiente', 'numero', 'capacidad', 'nombre_ambiente', 'n_piso', 'cant_pea').order_by(
+            'id_ambiente')
+
     return JsonResponse(
-        {'ambientes': list(query), 'ubigeo': local.ubigeo_id, 'zona': local.zona, 'id_curso': local.id_curso_id},
+        {'ambientes': list(query_response), 'ubigeo': local.ubigeo_id, 'zona': local.zona,
+         'id_curso': local.id_curso_id},
         safe=False)
 
 
@@ -270,9 +296,27 @@ def getMeta(request):
         capacidad_distrito = LocalAmbiente.objects.filter(id_local__ubigeo=ubigeo,
                                                           id_local__id_curso=id_curso).aggregate(
             cantidad_distrito=Sum('capacidad'))
+        total_ambientes_distrito_query = Local.objects.filter(id_curso=id_curso, ubigeo=ubigeo, zona=zona).values(
+            'cantidad_usar_auditorios', 'cantidad_usar_aulas', 'cantidad_usar_computo', 'cantidad_usar_oficina',
+            'cantidad_usar_otros', 'cantidad_usar_sala')
+
+        total_ambientes_zona_query = Local.objects.filter(id_curso=id_curso, ubigeo=ubigeo, zona=zona).values(
+            'cantidad_usar_auditorios', 'cantidad_usar_aulas', 'cantidad_usar_computo', 'cantidad_usar_oficina',
+            'cantidad_usar_otros', 'cantidad_usar_sala')
+        total_ambientes_zona = 0
+        total_ambientes_distrito = 0
+        for i in total_ambientes_zona_query:
+            for v in i:
+                total_ambientes_zona = total_ambientes_zona + int(i[v])
+
+        for i in total_ambientes_distrito_query:
+            for v in i:
+                total_ambientes_distrito = total_ambientes_distrito + int(i[v])
 
         return JsonResponse({'cant': meta, 'cantidad_zona': capacidad_zona['cantidad_zona'],
-                             'cantidad_distrito': capacidad_distrito['cantidad_distrito']}, safe=False)
+                             'cantidad_distrito': capacidad_distrito['cantidad_distrito'],
+                             'total_ambientes_zona': total_ambientes_zona,
+                             'total_ambientes_distrito': total_ambientes_distrito}, safe=False)
 
     return JsonResponse({'msg': False})
 
@@ -285,8 +329,8 @@ def asignar(request):
         zona = data['zona']
         curso = data['id_curso']
 
-        if curso == '5':
-            return JsonResponse(distribucion_curso5(ubigeo, zona, curso), safe=False)
+        if curso == '4':
+            return JsonResponse(distribucion_curso4(ubigeo, zona, curso), safe=False)
         else:
             if 'zona' in data:
                 locales_zona = Local.objects.filter(ubigeo=ubigeo, zona=zona, id_curso=curso)
@@ -325,6 +369,39 @@ EMPADRONADOR RURAL : 284
 JEFE DE SECCION URBANO : 165
 JEFE DE SECCION RURAL : 3
 """
+
+
+def distribucion_curso4(ubigeo, zona, curso):
+    locales = Local.objects.filter(ubigeo=ubigeo, zona=zona, id_curso=curso)
+    cargos = list(CursoFuncionario.objects.filter(id_curso=curso).values_list('id_funcionario', flat=True))
+    pea = PEA.objects.exclude(id_pea__in=PEA_AULA.objects.values('id_pea')).filter(ubigeo=ubigeo, zona=zona,
+                                                                                   id_cargofuncional__in=cargos,
+                                                                                   contingencia=0,
+                                                                                   baja_estado=0).values_list('id_pea',
+                                                                                                              flat=True)
+    pea_grupo1 = pea[0:pea.count() / 2]
+    pea_grupo2 = pea[pea.count() / 2:pea.count()]
+    pea_distribuida = [{'pea': list(pea_grupo1), 'dia': 1}, {'pea': list(pea_grupo2), 'dia': 2}]
+
+    for p in pea_distribuida:
+        for l in locales:
+            for a in l.localambiente_set.all():
+                disponibilidad = disponibilidad_aula(a.id_localambiente, True, p['dia'])
+                if disponibilidad > 0:
+                    pea_ubicar = p['pea'][:disponibilidad]
+                    p['pea'] = list(set(p['pea']) - set(pea_ubicar))
+                    print pea_distribuida
+                    for pu in pea_ubicar:
+                        if p['dia'] == 1:
+                            ubicada = PEA_AULA(id_pea_id=pu, id_localambiente_id=a.id_localambiente,
+                                               pea_fecha=l.fecha_inicio)
+                            ubicada.save()
+                        else:
+                            ubicada = PEA_AULA(id_pea_id=pu, id_localambiente_id=a.id_localambiente,
+                                               pea_fecha=l.fecha_fin)
+                            ubicada.save()
+
+    return pea_distribuida
 
 
 def distribucion_curso5(ubigeo, zona, curso):
