@@ -112,7 +112,7 @@ if DEPLOY == 'INEI':
             },
         },
     }
-else:
+elif DEPLOY == 'CASA':
     DATABASES = {
         'default': {
             'ENGINE': 'sql_server.pyodbc',
@@ -122,6 +122,42 @@ else:
             'HOST': 'localhost',
             'OPTIONS': {
                 'driver': 'SQL Server',
+            },
+        },
+    }
+elif DEPLOY == 'PRODUCTION':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'sql_server.pyodbc',
+            'NAME': 'CPV_CAPACITACION2',
+            'USER': 'us_capacitacion_web',
+            'PASSWORD': 'cap5wegU$re',
+            'HOST': '172.18.1.41',
+            'OPTIONS': {
+                'driver': 'ODBC Driver 11 for SQL Server',
+                'unicode_results': True
+            },
+        },
+        'segmentacion': {
+            'ENGINE': 'sql_server.pyodbc',
+            'NAME': 'CPV_SEGMENTACION',
+            'USER': 'us_segmentacion_web',
+            'PASSWORD': 'u$s3g*mentaWeB',
+            'HOST': '172.18.1.41',
+            'OPTIONS': {
+                'driver': 'ODBC Driver 11 for SQL Server',
+                'unicode_results': True
+            },
+        },
+        'consecucion': {
+            'ENGINE': 'sql_server.pyodbc',
+            'NAME': 'INEI_BDRRHH_CONSECUCION',
+            'USER': 'rvila',
+            'PASSWORD': 'inei1202',
+            'HOST': '192.168.200.250',
+            'OPTIONS': {
+                'driver': 'ODBC Driver 11 for SQL Server',
+                'unicode_results': True
             },
         },
     }

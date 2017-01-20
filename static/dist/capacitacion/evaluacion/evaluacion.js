@@ -16,6 +16,7 @@ var local_selected = {};
 var rangofechas = [];
 var columns = [];
 var position_nota_final = 0;
+var peaaula = [];
 
 
 $('#local').change(e => {

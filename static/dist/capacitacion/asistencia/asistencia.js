@@ -545,12 +545,17 @@ $("#btn_exportar_evaluacion").on('click', function () {
 
 function doAsignacion(show = false) {
     let ubigeo = `${session.ccdd}${session.ccpp}${session.ccdi}`;
+    let data = session.curso == 4 ? {
+            ubigeo: ubigeo,
+            zona: `${session.zona}`,
+            id_curso: session.curso,
+            alta: 1
+        } : {ubigeo: ubigeo, zona: `${session.zona}`, id_curso: session.curso};
     $.ajax({
         url: `${BASEURL}/asignacion/`,
         type: 'POST',
-        data: {ubigeo: ubigeo, zona: `${session.zona}`, id_curso: session.curso},
+        data: data,
         success: response => {
-            console.log(response);
             $('#modal_pea_sobrante').unblock();
             show ? getSobrantes() : '';
             $('#local').trigger('change');

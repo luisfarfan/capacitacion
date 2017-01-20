@@ -492,6 +492,7 @@ function getLocalAmbientes() {
     $('#tabla_aulas').dataTable().fnDestroy();
 
     $.getJSON(url, function (data) {
+        console.log(data);
         let capacidad_total = 0;
         $('#tabla_aulas').find('tbody').empty();
         let otros_label = `Otros(${local_selected.especifique_otros})`;
