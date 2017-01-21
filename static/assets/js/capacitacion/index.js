@@ -2,8 +2,9 @@
  * Created by LFarfan on 21/11/2016.
  */
 //BASE_URL = `http://localhost:8000/`;
-if (session.curso == '902') {
-    $('#zona').parent().hide();
+if (session.curso == '1') {
+    $('#zona').parent().remove();
+    $('#zona_ubicacion_local').parent().remove()
 } else {
     $('#zona').parent().show();
 }

@@ -483,5 +483,16 @@
         });
     }
 
+    function Imprimir(data) {
+        var mywindow = window.open('', 'my div', 'height=1000,width=1200');
+        mywindow.document.write('<html><head><title></title>');
+        mywindow.document.write('<style type="text/css">.test { color:red; } </style></head><body>');
+        mywindow.document.write(data);
+        mywindow.document.write('</body></html>');
+        mywindow.document.close();
+        mywindow.print();
+    }
+
+
 </script>
 </html>

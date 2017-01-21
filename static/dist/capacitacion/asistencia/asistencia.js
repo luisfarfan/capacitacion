@@ -403,6 +403,9 @@ function reporte_pea_asistencia() {
     "use strict";
     let html = `<tr><th rowspan="2">N°</th><th rowspan="2">APELLIDOS</th><th rowspan="2">NOMBRES</th><th rowspan="2">CARGO</th>`;
     let td_mt = `<tr>`;
+    if (session.curso == 4) {
+        rangofechas = [$('#fechas').val()]
+    }
     $.each(rangofechas, (i, v) => {
         html += `<th colspan="2">${v.substring(0, 5)}</th>`;
         td_mt += `<th>M</th><th>T</th>`;
@@ -441,6 +444,9 @@ function set_reporte_pea_asistencia() {
         key.peaaulas.map(f => {
             fechas_persona.push(f.fecha);
         });
+        if (session.curso == 4) {
+            rangofechas = [$('#fechas').val()]
+        }
         if (key.id_pea.baja_estado == 1) {
             html += `<td colspan=${(rangofechas.length) * 2}><span>DADO DE BAJA</span></td>`;
         } else {
@@ -534,13 +540,14 @@ function set_reporte_pea_asistencia_blanco() {
 }
 
 $("#btn_exportar_evaluacion").on('click', function () {
-    var uri = $("#div_listado_reporte").battatech_excelexport({
-        containerid: "div_listado_reporte",
-        datatype: 'table',
-        returnUri: true
-    });
-
-    $(this).attr('download', 'listado_asistencia.xls').attr('href', uri).attr('target', '_blank');
+    // var uri = $("#div_listado_reporte").battatech_excelexport({
+    //     containerid: "div_listado_reporte",
+    //     datatype: 'table',
+    //     returnUri: true
+    // });
+    //
+    // $(this).attr('download', 'listado_asistencia.xls').attr('href', uri).attr('target', '_blank');
+    Imprimir($('#tabla_reporte_pea_asistencia').parent().html());
 });
 
 function doAsignacion(show = false) {

@@ -220,7 +220,14 @@ function calcularPromedio(input) {
         promedio = promedio + (parseInt(input_nota) * (parseInt(criterios[i].ponderacion) / 100));
     })
     //$($(`input[name="nota_final"]`)[rowindex]).val(Math.round(promedio * 100) / 100);
-    $(`input[name="nota_final"]`)[rowindex].value = Math.round(promedio * 100) / 100;
+    promedio = Math.round(promedio * 1000) / 1000;
+    $(`input[name="nota_final"]`)[rowindex].value = Math.round(promedio * 1000) / 1000;
+    if (promedio >= 11) {
+        $('input[name="aptos"]')[rowindex].checked = true
+    }else{
+        $('input[name="aptos"]')[rowindex].checked = false
+    }
+
     //$($(`input[name="nota_final"]`)[rowindex]).parent().text(Math.round(promedio));
 }
 

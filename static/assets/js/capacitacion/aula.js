@@ -15,7 +15,6 @@ function setLocalAmbienteForm(id_localambiente) {
         });
         $('#modal_registroaula').modal('show');
         $('#id_ambiente').val(data.id_ambiente).trigger('change');
-
     });
 }
 
