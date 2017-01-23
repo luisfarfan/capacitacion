@@ -292,3 +292,13 @@ class UbigeoCursoMeta(models.Model):
     class Meta:
         managed = True
         db_table = 'UBIGEO_CURSO_META'
+
+
+class PeaNotaFinal(models.Model):
+    id_pea = models.ForeignKey(PEA)
+    id_curso = models.ForeignKey(Curso)
+    nota_final = models.FloatField()
+
+    class Meta:
+        managed = True
+        db_table = 'PEA_NOTA_FINAL'

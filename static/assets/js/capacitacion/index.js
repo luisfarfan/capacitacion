@@ -2,7 +2,7 @@
  * Created by LFarfan on 21/11/2016.
  */
 //BASE_URL = `http://localhost:8000/`;
-if (session.curso == '1') {
+if (session.rol == '3') {
     $('#zona').parent().remove();
     $('#zona_ubicacion_local').parent().remove()
 } else {
@@ -107,7 +107,7 @@ $('#cursos').change(() => {
 
 function getLocalesbyUbigeo() {
     var ubigeo = `${$('#departamentos').val()}${$('#provincias').val()}${$('#distritos').val()}`;
-    let url = session.curso == '1' ? `${BASE_URL}localubigeo/${ubigeo}/${session.curso}/` : `${BASE_URL}localzona/${ubigeo}/${session.zona}/${session.curso}/`;
+    let url = session.rol == '3' ? `${BASE_URL}localubigeo/${ubigeo}/${session.curso}/` : `${BASE_URL}localzona/${ubigeo}/${session.zona}/${session.curso}/`;
     $.ajax({
         async: false,
         url: url,
@@ -136,7 +136,8 @@ function getLocalesbyUbigeo() {
 
 function getLocalesbyMarco() {
     var ubigeo = `${$('#departamentos').val()}${$('#provincias').val()}${$('#distritos').val()}`;
-    let url = `${BASE_URL}localmarco/${ubigeo}/${session.zona}/`;
+    //let url = `${BASE_URL}localmarco/${ubigeo}/${session.zona}/`;
+    let url = `${BASE_URL}localmarco/${ubigeo}/`;
     $.ajax({
         url: url,
         success: function (data) {
@@ -512,7 +513,7 @@ function getLocalAmbientes() {
             $('#capacidad_total').text(capacidad_total);
             $('#tabla_aulas').find('tbody').html(html);
             $('#tabla_aulas').DataTable({
-                "pageLength": 5,
+                "pageLength": 10,
                 "lengthMenu": [[5, 10, 30, -1], [5, 10, 30, "All"]]
             });
             validarMetaPea();

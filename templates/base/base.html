@@ -106,11 +106,45 @@
                                     <li id="reportes">
                                         <a href="#"><i class="icon-droplet2"></i> <span>Modulo de Reportes</span></a>
                                         <ul>
-                                            <li><a href="{% url 'reporte:directorio_locales' %}">Directorio de
-                                                Locales</a>
+                                            <li><a href="{% url 'reporte:directorio_locales' %}">DIRECTORIO DE LOCALES A
+                                                UTILIZAR POR CURSO DE CAPACITACIÓN, SEGÚN DEPARTAMENTO, PROVINCIA Y
+                                                DISTRITO</a>
                                             </li>
-                                            <li><a href="{% url 'reporte:numero_aulas_coberturadas_por_curso' %}">Numero
-                                                de Aulas Coberturadas por Curso</a>
+                                            <li><a href="{% url 'reporte:numero_aulas_coberturadas_por_curso' %}">NÚMERO
+                                                DE AULAS COBERTURADAS POR CURSO DE CAPACITACIÓN, SEGÚN DEPARTAMENTO,
+                                                PROVINCIA Y DISTRITO</a>
+                                            </li>
+                                            <li><a href="{% url 'reporte:numero_aulas_coberturadas_por_curso' %}">RELACIÓN
+                                                DE POSTULANTES QUE ASISTIERON AL CURSO DE CAPACITACIÓN, POR DEPARTAMENTO
+                                                Y PROVINCIA</a>
+                                            </li>
+                                            <li><a href="{% url 'reporte:numero_aulas_coberturadas_por_curso' %}">PERSONAL
+                                                QUE SE DIO DE BAJA, POR CURSO DE CAPACITACIÓN, SEGÚN DEPARTAMENTO,
+                                                PROVINCIA, DISTRITO Y ZONA</a>
+                                            </li>
+                                            <li><a href="{% url 'reporte:numero_aulas_coberturadas_por_curso' %}">PERSONAL
+                                                QUE SE DIO DE ALTA, POR CURSO DE CAPACITACIÓN, SEGÚN DEPARTAMENTO,
+                                                PROVINCIA, DISTRITO Y ZONA</a>
+                                            </li>
+                                            <li><a href="{% url 'reporte:numero_aulas_coberturadas_por_curso' %}">RELACIÓN
+                                                DE EMPADRONADORES SELECCIONADOS (APROBADO), EN EL CURSO DE CAPACITACIÓN,
+                                                SEGÚN DEPARTAMENTO, PROVINCIA Y DISTRITO</a>
+                                            </li>
+                                            <li><a href="{% url 'reporte:numero_aulas_coberturadas_por_curso' %}">RELACIÓN
+                                                DE LOS JEFES DISTRITALES SELECCIONADOS (APROBADO), EN EL CURSO DE
+                                                CAPACITACIÓN, SEGÚN DEPARTAMENTO Y PROVINCIA</a>
+                                            </li>
+                                            <li><a href="{% url 'reporte:numero_aulas_coberturadas_por_curso' %}">RELACIÓN
+                                                DE LOS JEFES DE ZONA SELECCIONADOS (APROBADO), EN EL CURSO DE
+                                                CAPACITACIÓN, SEGÚN DEPARTAMENTO, PROVINCIA Y DISTRITO</a>
+                                            </li>
+                                            <li><a href="{% url 'reporte:numero_aulas_coberturadas_por_curso' %}">RELACIÓN
+                                                DE LOS JEFES DE SECCIÓN SELECCIONADOS (APROBADO), EN EL CURSO DE
+                                                CAPACITACIÓN, SEGÚN DEPARTAMENTO, PROVINCIA Y DISTRITO</a>
+                                            </li>
+                                            <li><a href="{% url 'reporte:numero_aulas_coberturadas_por_curso' %}">NÚMERO
+                                                DE EMPADRONADORES CAPACITADOS POR ZONA, SEGÚN DEPARTAMENTO, PROVINCIA Y
+                                                DISTRITO</a>
                                             </li>
                                         </ul>
                                     </li>
@@ -482,6 +516,33 @@
             }
         });
     }
+    function getLocales2() {
+        let array_zonas = [];
+        var ccdd = $('#departamentos').val();
+        var ccpp = $('#provincias').val();
+        var ccdi = $('#distritos').val();
+        var zona = $('#zona').val();
+        var curso = $('#cursos').val();
+        let url = `${BASE_URL}localzona/${ccdd}${ccpp}${ccdi}/${zona}/${curso}/`;
+        "use strict";
+        $.getJSON(url, function (data) {
+            $.each(data, function (key, val) {
+                array_zonas.push({id: val.id_local, text: val.nombre_local})
+            });
+            $('#locales').select2({data: array_zonas});
+        });
+    }
+    function getCursos2(id_etapa = 1) {
+        $('#cursos').find('option').remove();
+        let array_cursos = [{id: '', text: 'Seleccione'}];
+        $.getJSON(`${BASE_URL}cursobyetapa/${id_etapa}`, function (data) {
+            $.each(data, function (key, val) {
+                array_cursos.push({id: val.id_curso, text: val.nombre_curso})
+            });
+            setSelect('cursos', array_cursos);
+        });
+    }
+
 
     function Imprimir(data) {
         var mywindow = window.open('', 'my div', 'height=1000,width=1200');

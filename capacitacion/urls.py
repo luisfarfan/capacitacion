@@ -12,4 +12,6 @@ router.register(r'cursos', CursoViewSet)
 router.register(r'pea_aula', PEA_BY_AULAViewSet)
 router.register(r'pea_asistencia', PEA_ASISTENCIAViewSet)
 router.register(r'pea', PEAViewSet)
+router.register(r'pea', PeaNotaFinalViewSet)
+
 # router.register(r'pea_cursocriterio', PEA_CURSOCRITERIOViewSet)

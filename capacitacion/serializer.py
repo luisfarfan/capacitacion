@@ -99,3 +99,9 @@ class PEA_AULASerializer(serializers.ModelSerializer):
     class Meta:
         model = PEA_AULA
         fields = '__all__'
+
+
+class PeaNotaFinalSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PeaNotaFinal
+        fields = '__all__'

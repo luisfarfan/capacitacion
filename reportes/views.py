@@ -1,5 +1,5 @@
 from capacitacion.models import *
-from django.db.models import Count, Value
+from django.db.models import Count, Value, F
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.template import loader
@@ -51,18 +51,42 @@ def TotalPostulantesSeleccionados(request):
         dcount=Count('id_pea'))
 
 
-def TotalPostulantesQueAsistieron(request):
-    query = PEA.objects.values('id_cargofuncional__id_curso', 'id_cargofuncional__id_curso__nombre_curso').annotate(
-        dcount=Count('id_pea'))
+# Reporte 4
+def PersonalQueSeDioDeBajaPorCurso(request, ccdd, ccpp, ccdi, zona):
+    curso = Curso.objects.all().filter(id_etapa=1)
+    response = []
+    ubigeo = ccdd + ccpp + ccdi
+    for c in curso:
+        curso_funcionario = CursoFuncionario.objects.filter(id_curso=c.id_curso).values_list('id_funcionario',
+                                                                                             flat=True)
+        pea_baja_curso = PEA.objects.filter(baja_estado=1, id_cargofuncional__in=curso_funcionario, ubigeo=ubigeo,
+                                            zona=zona).count()
+        response.append(
+            {'id_curso': c.id_curso, 'nombre_curso': c.nombre_curso, 'cantidad_pea_baja': pea_baja_curso})
+
+    return JsonResponse(response, safe=False)
 
 
-def directorio_locales(request):
-    template = loader.get_template('capacitacion/modulo_registro.html')
-    funcionarios = FuncionariosINEI.objects.values('id_per', 'ape_paterno', 'ape_materno',
-                                                   'nombre', 'dni')
-    context = {
-        'titulo_padre': 'Capacitacion',
-        'titulo_hijo': 'REGISTRO DE LOCAL',
-        'funcionarios': funcionarios,
-    }
-    return HttpResponse(template.render(context, request))
+# Reporte 5
+def PersonalQueSeDioDeAltaPorCurso(request, ubigeo, zona):
+    curso = Curso.objects.all()
+    response = []
+    for c in curso:
+        curso_funcionario = CursoFuncionario.objects.filter(id_curso=c.id_curso).values_list('id_funcionario',
+                                                                                             flat=True)
+        pea_baja_curso = PEA.objects.filter(alta_estado=1, id_cargofuncional__in=curso_funcionario, ubigeo=ubigeo,
+                                            zona=zona).count()
+        response.append(
+            {'id_curso': c.id_curso, 'nombre_curso': c.nombre_curso, 'cantidad_pea_alta': pea_baja_curso})
+
+    return JsonResponse(response, safe=False)
+
+
+# Reporte 6,7,8,9
+def AprobadosPorCargo(request, ubigeo, cargo):
+    query = PeaNotaFinal.objects.filter(id_pea__ubigeo=ubigeo, id_pea__id_cargofuncional=cargo).annotate(
+        departamento=F('id_pea__ubigeo__departamento'), provincia=F('id_pea__ubigeo__provincia'),
+        distrito=F('id_pea__ubigeo__distrito'), cargo=F('id_pea__id_cargofuncional__nombre_funcionario')).values(
+        'departamento', 'provincia', 'distrito', 'id_pea__ape_paterno',
+        'id_pea__ape_materno', 'id_pea__nombre', 'cargo', 'nota_final')
+    return JsonResponse(list(query), safe=False)

@@ -98,7 +98,7 @@ class DistritosList(APIView):
 class ZonasList(APIView):
     def get(self, request, ubigeo):
         zonas = list(
-            Zona.objects.using('segmentacion').filter(UBIGEO=ubigeo).values('UBIGEO', 'ZONA', 'ETIQ_ZONA').annotate(
+            Zona.objects.filter(UBIGEO=ubigeo).values('UBIGEO', 'ZONA', 'ETIQ_ZONA').annotate(
                 dcount=Count('UBIGEO', 'ZONA')))
         response = JsonResponse(zonas, safe=False)
         return response
@@ -118,8 +118,8 @@ class TbLocalByMarcoViewSet(generics.ListAPIView):
 
     def get_queryset(self):
         ubigeo = self.kwargs['ubigeo']
-        zona = self.kwargs['zona']
-        return MarcoLocal.objects.filter(ubigeo=ubigeo, zona=zona)
+        # zona = self.kwargs['zona']
+        return MarcoLocal.objects.filter(ubigeo=ubigeo)
 
 
 class TbLocalByZonaViewSet(generics.ListAPIView):
@@ -223,6 +223,11 @@ class CursobyEtapaViewSet(generics.ListAPIView):
 class CriteriosViewSet(viewsets.ModelViewSet):
     queryset = Criterio.objects.all()
     serializer_class = CriterioSerializer
+
+
+class PeaNotaFinalViewSet(viewsets.ModelViewSet):
+    queryset = PeaNotaFinal.objects.all()
+    serializer_class = PeaNotaFinalSerializer
 
 
 class CursoCriteriosViewSet(viewsets.ModelViewSet):
@@ -726,6 +731,30 @@ def darAltaPea(request):
         pea.save()
 
     return JsonResponse({'msg': True}, safe=False)
+
+
+@csrf_exempt
+def save_nota_final(request):
+    if request.method == "POST" and request.is_ajax():
+        data = json.loads(request.body)
+
+        for i in data:
+            try:
+                pea = PeaNotaFinal.objects.get(id_pea=PEA.objects.get(pk=i['id_pea']),
+                                               id_curso=Curso.objects.get(pk=i['id_curso']))
+            except ObjectDoesNotExist:
+                pea = None
+
+            if pea is None:
+                pea_nota_final = PeaNotaFinal(nota_final=i['nota_final'],
+                                              id_pea=PEA.objects.get(pk=i['id_pea']),
+                                              id_curso=Curso.objects.get(pk=i['id_curso']))
+                pea_nota_final.save()
+            else:
+                pea.nota_final = i['nota_final']
+                pea.save()
+
+    return JsonResponse({'msg': True})
 
 
 class obj(object):

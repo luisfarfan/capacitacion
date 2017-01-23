@@ -34,7 +34,7 @@ $('#btn_getpea').click(event => {
 
 function getLocales() {
     let ubigeo = `${session.ccdd}${session.ccpp}${session.ccdi}`;
-    let url = session.curso == '1' ? `${BASE_URL}localubigeo/${ubigeo}/${session.curso}/` : `${BASE_URL}localzona/${ubigeo}/${session.zona}/${session.curso}/`;
+    let url = session.rol == '3' ? `${BASE_URL}localubigeo/${ubigeo}/${session.curso}/` : `${BASE_URL}localzona/${ubigeo}/${session.zona}/${session.curso}/`;
     "use strict";
     $.ajax({
         url: url,
@@ -224,7 +224,7 @@ function calcularPromedio(input) {
     $(`input[name="nota_final"]`)[rowindex].value = Math.round(promedio * 1000) / 1000;
     if (promedio >= 11) {
         $('input[name="aptos"]')[rowindex].checked = true
-    }else{
+    } else {
         $('input[name="aptos"]')[rowindex].checked = false
     }
 
@@ -284,6 +284,15 @@ function saveNotas() {
                         title: "Guardado con éxito!",
                         confirmButtonColor: "#2196F3"
                     });
+                    $.ajax({
+                        url: `${BASEURL}/save_nota_final/`,
+                        type: 'POST',
+                        data: JSON.stringify(getPeaNotaFinal()),
+                        success: function (response) {
+
+                        }
+                    });
+
                 }
             });
 
@@ -320,3 +329,14 @@ $("#btn_exportar_evaluacion").on('click', function () {
     $(this).attr('download', 'reporte_evaluacion.xls').attr('href', uri).attr('target', '_blank');
 });
 
+function getPeaNotaFinal() {
+    let data_nota_final = []
+    $('input[name="nota_final"]').map((key, value)=> {
+        data_nota_final.push({
+            id_pea: $(value).parent().parent().find('input[name="aptos"]').val(),
+            nota_final: value.value,
+            id_curso: session.curso
+        })
+    })
+    return data_nota_final
+}
