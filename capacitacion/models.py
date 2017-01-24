@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 from django.db import models
+from login.models import User
 
 
 # Create your models here.
@@ -110,10 +111,11 @@ class LocalAmbiente(models.Model):
 class Local(models.Model):
     id_local = models.AutoField(primary_key=True, db_column='id_local')
     marcolocal = models.ForeignKey('MarcoLocal', null=True, blank=True)
+    usuario_local = models.ForeignKey('UsuarioLocal',null=True)
     ambientes = models.ManyToManyField(Ambiente, through='LocalAmbiente')
     ubigeo = models.ForeignKey(Ubigeo)
     zona = models.CharField(max_length=5, blank=True, null=True)
-    id_curso = models.ForeignKey('Curso')
+    id_curso = models.ForeignKey('Curso', null=True)
     nombre_local = models.CharField(max_length=300, blank=True, null=True)
     zona_ubicacion_local = models.CharField(max_length=5, blank=True, null=True)
     tipo_via = models.CharField(max_length=300, blank=True, null=True)
@@ -302,3 +304,68 @@ class PeaNotaFinal(models.Model):
     class Meta:
         managed = True
         db_table = 'PEA_NOTA_FINAL'
+
+
+class DirectorioLocal(models.Model):
+    id_local = models.AutoField(primary_key=True, db_column='id_local')
+    ubigeo = models.ForeignKey(Ubigeo)
+    zona = models.CharField(max_length=5, blank=True, null=True)
+    id_curso = models.ForeignKey('Curso', null=True)
+    nombre_local = models.CharField(max_length=300, blank=True, null=True)
+    zona_ubicacion_local = models.CharField(max_length=5, blank=True, null=True)
+    tipo_via = models.CharField(max_length=300, blank=True, null=True)
+    nombre_via = models.CharField(max_length=300, blank=True, null=True)
+    referencia = models.CharField(max_length=300, blank=True, null=True)
+    n_direccion = models.CharField(max_length=300, blank=True, null=True)
+    km_direccion = models.CharField(max_length=300, blank=True, null=True)
+    mz_direccion = models.CharField(max_length=300, blank=True, null=True)
+    lote_direccion = models.CharField(max_length=300, blank=True, null=True)
+    piso_direccion = models.CharField(max_length=300, blank=True, null=True)
+    telefono_local_fijo = models.CharField(max_length=10, blank=True, null=True)
+    telefono_local_celular = models.CharField(max_length=10, blank=True, null=True)
+    fecha_inicio = models.CharField(max_length=100, blank=True, null=True)
+    fecha_fin = models.CharField(max_length=100, blank=True, null=True)
+    turno_uso_local = models.CharField(max_length=100, blank=True, null=True)
+    capacidad_local_total = models.IntegerField(blank=True, null=True)
+    capacidad_local_usar = models.IntegerField(blank=True, null=True)
+    funcionario_nombre = models.CharField(max_length=100, blank=True, null=True)
+    funcionario_email = models.CharField(max_length=100, blank=True, null=True)
+    funcionario_cargo = models.CharField(max_length=100, blank=True, null=True)
+    funcionario_celular = models.CharField(max_length=100, blank=True, null=True)
+    responsable_nombre = models.CharField(max_length=100, blank=True, null=True)
+    responsable_email = models.CharField(max_length=100, blank=True, null=True)
+    responsable_telefono = models.CharField(max_length=100, blank=True, null=True)
+    responsable_celular = models.CharField(max_length=100, blank=True, null=True)
+    cantidad_total_aulas = models.IntegerField(blank=True, null=True)
+    cantidad_disponible_aulas = models.IntegerField(blank=True, null=True)
+    cantidad_usar_aulas = models.IntegerField(blank=True, null=True)
+    cantidad_total_auditorios = models.IntegerField(blank=True, null=True)
+    cantidad_disponible_auditorios = models.IntegerField(blank=True, null=True)
+    cantidad_usar_auditorios = models.IntegerField(blank=True, null=True)
+    cantidad_total_sala = models.IntegerField(blank=True, null=True)
+    cantidad_disponible_sala = models.IntegerField(blank=True, null=True)
+    cantidad_usar_sala = models.IntegerField(blank=True, null=True)
+    cantidad_total_oficina = models.IntegerField(blank=True, null=True)
+    cantidad_disponible_oficina = models.IntegerField(blank=True, null=True)
+    cantidad_usar_oficina = models.IntegerField(blank=True, null=True)
+    cantidad_total_otros = models.IntegerField(blank=True, null=True)
+    cantidad_disponible_otros = models.IntegerField(blank=True, null=True)
+    cantidad_usar_otros = models.IntegerField(blank=True, null=True)
+    especifique_otros = models.CharField(max_length=100, blank=True, null=True)
+    cantidad_total_computo = models.IntegerField(blank=True, null=True)
+    cantidad_disponible_computo = models.IntegerField(blank=True, null=True)
+    cantidad_usar_computo = models.IntegerField(blank=True, null=True)
+    usuarios = models.ManyToManyField(User, through='UsuarioLocal')
+
+    class Meta:
+        managed = True
+        db_table = 'DIRECTORIO_LOCAL'
+
+
+class UsuarioLocal(models.Model):
+    id_directoriolocal = models.ForeignKey('DirectorioLocal')
+    id_usuario = models.ForeignKey(User)
+
+    class Meta:
+        managed = True
+        db_table = 'USUARIO_LOCALES'

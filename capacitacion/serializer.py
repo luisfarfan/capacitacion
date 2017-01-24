@@ -1,5 +1,6 @@
 from .models import *
 from rest_framework import routers, serializers, viewsets
+from login.models import User
 
 
 class AmbienteSerializer(serializers.ModelSerializer):
@@ -17,6 +18,26 @@ class LocalSerializer(serializers.ModelSerializer):
 class MarcoLocalSerializer(serializers.ModelSerializer):
     class Meta:
         model = MarcoLocal
+        fields = '__all__'
+
+
+class UsuarioLocalSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UsuarioLocal
+        fields = '__all__'
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = '__all__'
+
+
+class DirectorioLocalSerializer(serializers.ModelSerializer):
+    usuarios = UserSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = DirectorioLocal
         fields = '__all__'
 
 

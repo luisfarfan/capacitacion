@@ -68,9 +68,10 @@ def PersonalQueSeDioDeBajaPorCurso(request, ccdd, ccpp, ccdi, zona):
 
 
 # Reporte 5
-def PersonalQueSeDioDeAltaPorCurso(request, ubigeo, zona):
+def PersonalQueSeDioDeAltaPorCurso(request, ccdd, ccpp, ccdi, zona):
     curso = Curso.objects.all()
     response = []
+    ubigeo = ccdd + ccpp + ccdi
     for c in curso:
         curso_funcionario = CursoFuncionario.objects.filter(id_curso=c.id_curso).values_list('id_funcionario',
                                                                                              flat=True)
@@ -88,5 +89,5 @@ def AprobadosPorCargo(request, ubigeo, cargo):
         departamento=F('id_pea__ubigeo__departamento'), provincia=F('id_pea__ubigeo__provincia'),
         distrito=F('id_pea__ubigeo__distrito'), cargo=F('id_pea__id_cargofuncional__nombre_funcionario')).values(
         'departamento', 'provincia', 'distrito', 'id_pea__ape_paterno',
-        'id_pea__ape_materno', 'id_pea__nombre', 'cargo', 'nota_final')
+        'id_pea__ape_materno', 'id_pea__nombre', 'cargo', 'nota_final','id_pea__dni')
     return JsonResponse(list(query), safe=False)

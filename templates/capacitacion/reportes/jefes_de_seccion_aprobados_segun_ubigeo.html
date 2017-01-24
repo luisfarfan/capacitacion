@@ -1,0 +1,122 @@
+{% extends 'base/base.html' %}
+{% load staticfiles %}
+{% block content %}
+    <div class="panel panel-primary panel-bordered">
+        <div class="panel-heading">
+            <h5 class="panel-title">FILTRO: UBICACIÓN GEOGRÁFICA</h5>
+            <div class="heading-elements">
+                <ul class="icons-list">
+                    <li>
+                        <a data-action="collapse"></a>
+                    </li>
+                    <li>
+                        <a data-action="close"></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="text-right">
+                    <button type="button" class="btn btn-primary btn-sm" onclick="getReporte()" id="buscarlocal"
+                            class="btn btn-primary">
+                        Buscar Local <i
+                            class="icon-arrow-right14 position-right"></i></button>
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label class="text-bold">Departamento</label>
+                        <select id="departamentos" class="select">
+                            <option value="">Seleccione</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label class="text-bold">Provincia</label>
+                        <select id="provincias" class="select">
+                            <option value="">Seleccione</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label class="text-bold">Distrito</label>
+                        <select id="distritos" class="select">
+                            <option value="">Seleccione</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label class="text-bold">Zona</label>
+                        <select id="zona" class="select">
+                            <option value="0">Seleccione</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <div class="panel panel-primary panel-bordered">
+            <div class="panel-heading">
+                <h5 class="panel-title">Directorio de Locales por Numero de Ambientes a Utilizar, Segun Departamento,
+                    Provincia y Distrito</h5>
+                <div class="heading-elements">
+                    <ul class="icons-list">
+                        <li>
+                            <a data-action="collapse"></a>
+                        </li>
+                        <li>
+                            <a data-action="close"></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="table-responsive">
+                        <table id="tabla_reporte" class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th>Departamento</th>
+                                <th>Provincia</th>
+                                <th>Distrito</th>
+                                <th>Apellidos y Nombres</th>
+                                <th>DNI</th>
+                                <th>Cargo</th>
+                                <th>Nota Promedio Final</th>
+                                <th>Seleccionado</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block js %}
+    <script type="text/javascript" src="{% static "assets/js/plugins/tables/datatables/datatables.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "assets/js/plugins/loaders/blockui.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "assets/js/plugins/notifications/sweet_alert.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "assets/js/plugins/forms/selects/select2.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "assets/js/core/app.js" %}"></script>
+    <script type="text/javascript" src="{% static "dist/capacitacion/reportes/aprobados_segun_ubigeo.js" %}"></script>
+    <script>
+        $('#reportes').addClass('active');
+        $('.select').select2();
+
+        CARGO = [3, 165]
+    </script>
+{% endblock %}

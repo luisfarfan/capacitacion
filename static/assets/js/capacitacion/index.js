@@ -13,6 +13,7 @@ var local_selected = [];
 var fecha_hoy = moment().format('DD/MM/YYYY');
 var local_marco = [];
 var local_marco_selected = {};
+var is_directorio = true;
 
 $('#etapa').val(1);
 function resetForm(idform) {
@@ -107,7 +108,7 @@ $('#cursos').change(() => {
 
 function getLocalesbyUbigeo() {
     var ubigeo = `${$('#departamentos').val()}${$('#provincias').val()}${$('#distritos').val()}`;
-    let url = session.rol == '3' ? `${BASE_URL}localubigeo/${ubigeo}/${session.curso}/` : `${BASE_URL}localzona/${ubigeo}/${session.zona}/${session.curso}/`;
+    let url = session.rol == '3' ? `${BASE_URL}localubigeo/${ubigeo}/${session.curso}/` : `${BASE_URL}localzona/${session.id}/`;
     $.ajax({
         async: false,
         url: url,
@@ -118,7 +119,7 @@ function getLocalesbyUbigeo() {
                             <td>${val.nombre_local}</td><td>${val.nombre_via}</td><td>${val.referencia}</td><td>${val.zona}</td>
                             <td>
 								<ul class="icons-list">
-                                    <li class="text-primary-600"><a data-popup="tooltip" title="Mostrar" onclick="getLocal(${val.id_local})" href="#"><i class="icon-pencil7"></i></a></li>
+                                    <li class="text-primary-600"><a data-popup="tooltip" title="Mostrar" onclick="getLocal(${val.id_local},false)" href="#"><i class="icon-pencil7"></i></a></li>
                                     <li class="text-danger-600"><a data-popup="tooltip" title="Eliminar" onclick="eliminarLocal(${val.id_local})" href="#"><i class="icon-trash"></i></a></li>
 								</ul>
 							</td>
@@ -137,18 +138,25 @@ function getLocalesbyUbigeo() {
 function getLocalesbyMarco() {
     var ubigeo = `${$('#departamentos').val()}${$('#provincias').val()}${$('#distritos').val()}`;
     //let url = `${BASE_URL}localmarco/${ubigeo}/${session.zona}/`;
-    let url = `${BASE_URL}localmarco/${ubigeo}/`;
+    let url = `${BASE_URL}directoriolocal/${ubigeo}/`;
     $.ajax({
         url: url,
         success: function (data) {
             local_marco = data;
             var html = '';
             $.each(data, function (key, val) {
+                let atributo = '';
+                if ('id' in findInObject2(val.usuarios, session.id, 'id')) {
+                    atributo = 'checked disabled';
+                } else {
+                    atributo = '';
+                }
                 html += `<tr>
                             <td>${val.nombre_local}</td><td>${val.zona}</td>
                             <td>
 								<ul class="icons-list">
-                                    <li class="text-primary-600"><a data-popup="tooltip" title="Mostrar" onclick="setMarco(${val.id})" href="#"><i class="icon-pencil7"></i></a></li>
+                                    <li class="text-primary-600"><a data-popup="tooltip" title="Mostrar" onclick="setMarco(${val.id_local},true)" href="#"><i class="icon-pencil7"></i></a></li>
+                                    <li class="text-primary-600"><input type="checkbox" ${atributo}  name="local_seleccionado" onclick="saveUsuarioLocal(this,${val.id_local})"></a></li>
 								</ul>
 							</td>
                           </tr>`;
@@ -162,7 +170,30 @@ function getLocalesbyMarco() {
     });
 }
 
-function getLocal(id_local) {
+function saveUsuarioLocal(element, id_local) {
+    "use strict";
+    console.log(element);
+    $(element).prop('checked', false);
+    alert_confirm(() => {
+        $.ajax({
+            url: `${BASEURL}/rest/usuario_local/`,
+            type: 'POST',
+            data: {id_directoriolocal: id_local, id_usuario: session.id},
+            success: (response) => {
+                $(element).prop('checked', true);
+                $.ajax({
+                    url: `${BASEURL}/copy_directorio_to_seleccionado/${id_local}/${session.id}/`,
+                    success: (data) => {
+                        console.log(data);
+                    }
+                })
+            }
+        })
+    }, 'Esta usted seguro de seleccionar este Local?')
+}
+
+function getLocal(id_local, directorio = true) {
+    is_directorio = directorio;
     $('#id_local').val(id_local);
     $.ajax({
         url: `${BASE_URL}rest/local/${id_local}`,
@@ -180,16 +211,20 @@ function getLocal(id_local) {
             $('#funcionario_nombre').trigger('change');
             $('#registrar_aulas_modal').prop('disabled', false);
             $('#modal_localesbyubigeo').modal('hide');
+            if (!is_directorio) {
+                getLocalAmbientes();
+            }
 
-            getLocalAmbientes();
         }
     });
 }
 
 function setMarco(id_local) {
-    local_selected = findInObject2(local_marco, id_local, 'id');
+    $('#id_local').val(id_local);
+    local_selected = findInObject2(local_marco, id_local, 'id_local');
     $(`#etapa`).val(1);
     $.each(local_selected, function (key, val) {
+        debugger
         if (key == 'tipo_via' || key == 'turno_uso_local' || key == 'id_curso' || key == 'zona_ubicacion_local' || key == 'funcionario_nombre') {
             $(`select[name=${key}]`).val(val).trigger('change')
         } else {
@@ -417,13 +452,17 @@ $('#registrar').on('click', function () {
     validator.form();
     let url = '';
     let method = '';
-    let title = '';
-    let text = '';
-    if ($('#id_local').val() != '') {
-        url = `${BASE_URL}rest/local/${$('#id_local').val()}/`;
-        method = 'PUT';
+
+    if (is_directorio) {
+        url = `${BASE_URL}rest/directorio_local/`;
     } else {
         url = `${BASE_URL}rest/local/`;
+    }
+
+    if ($('#id_local').val() != '') {
+        url += `${$('#id_local').val()}/`;
+        method = 'PUT';
+    } else {
         method = 'POST';
     }
     if (validator.numberOfInvalids() == 0) {
@@ -456,29 +495,31 @@ $('#registrar').on('click', function () {
                         data: datapost,
                         url: url,
                         success: function (data) {
-                            object = {
-                                'id_local': data.id_local,
-                                'cantidad_usar_aulas': data.cantidad_usar_aulas,
-                                'cantidad_usar_auditorios': data.cantidad_usar_auditorios,
-                                'cantidad_usar_sala': data.cantidad_usar_sala,
-                                'cantidad_usar_oficina': data.cantidad_usar_oficina,
-                                'cantidad_usar_computo': data.cantidad_usar_computo,
-                                'cantidad_usar_otros': data.cantidad_usar_otros,
-                            }
-                            $.ajax({
-                                url: `${BASEURL}/generar_ambientes/`,
-                                type: 'POST',
-                                data: object,
-                                success: response => {
-                                    "use strict";
-                                    resetForm('form_local');
-                                    $('#tabla_aulas').dataTable().fnDestroy();
-                                    $('#tabla_aulas').find('tbody').empty();
-                                    $('#capacidad_total').text(0);
-                                    $('#etapa').val(1);
-                                    getLocal(data.id_local);
+                            if (!is_directorio) {
+                                object = {
+                                    'id_local': data.id_local,
+                                    'cantidad_usar_aulas': data.cantidad_usar_aulas,
+                                    'cantidad_usar_auditorios': data.cantidad_usar_auditorios,
+                                    'cantidad_usar_sala': data.cantidad_usar_sala,
+                                    'cantidad_usar_oficina': data.cantidad_usar_oficina,
+                                    'cantidad_usar_computo': data.cantidad_usar_computo,
+                                    'cantidad_usar_otros': data.cantidad_usar_otros,
                                 }
-                            });
+                                $.ajax({
+                                    url: `${BASEURL}/generar_ambientes/`,
+                                    type: 'POST',
+                                    data: object,
+                                    success: response => {
+                                        "use strict";
+                                        resetForm('form_local');
+                                        $('#tabla_aulas').dataTable().fnDestroy();
+                                        $('#tabla_aulas').find('tbody').empty();
+                                        $('#capacidad_total').text(0);
+                                        $('#etapa').val(1);
+                                        getLocal(data.id_local, false);
+                                    }
+                                });
+                            }
                         }
                     });
                 }

@@ -122,14 +122,49 @@ class TbLocalByMarcoViewSet(generics.ListAPIView):
         return MarcoLocal.objects.filter(ubigeo=ubigeo)
 
 
+class TbDirectorioLocalViewSet(generics.ListAPIView):
+    serializer_class = DirectorioLocalSerializer
+
+    def get_queryset(self):
+        ubigeo = self.kwargs['ubigeo']
+        return DirectorioLocal.objects.filter(ubigeo=ubigeo)
+
+
+def getDirectoriolocal(request, ubigeo):
+    query = DirectorioLocal.objects.filter(ubigeo=ubigeo).values('cantidad_disponible_auditorios',
+                                                                 'cantidad_disponible_aulas',
+                                                                 'cantidad_disponible_computo',
+                                                                 'cantidad_disponible_oficina',
+                                                                 'cantidad_disponible_otros',
+                                                                 'cantidad_disponible_sala',
+                                                                 'cantidad_total_auditorios', 'cantidad_total_aulas',
+                                                                 'cantidad_total_computo', 'cantidad_total_oficina',
+                                                                 'cantidad_total_otros', 'cantidad_total_sala',
+                                                                 'cantidad_usar_auditorios', 'cantidad_usar_aulas',
+                                                                 'cantidad_usar_computo', 'cantidad_usar_oficina',
+                                                                 'cantidad_usar_otros', 'cantidad_usar_sala',
+                                                                 'capacidad_local_total', 'capacidad_local_usar',
+                                                                 'especifique_otros', 'fecha_fin', 'fecha_inicio',
+                                                                 'funcionario_cargo', 'funcionario_celular',
+                                                                 'funcionario_email', 'funcionario_nombre', 'id_curso',
+                                                                 'id_curso_id', 'id_local', 'km_direccion', 'local',
+                                                                 'lote_direccion', 'mz_direccion', 'n_direccion',
+                                                                 'nombre_local', 'nombre_via', 'piso_direccion',
+                                                                 'referencia', 'responsable_celular',
+                                                                 'responsable_email', 'responsable_nombre',
+                                                                 'responsable_telefono', 'telefono_local_celular',
+                                                                 'telefono_local_fijo', 'tipo_via', 'turno_uso_local',
+                                                                 'ubigeo', 'ubigeo_id', 'usuariolocal', 'zona',
+                                                                 'zona_ubicacion_local', 'usuariolocal__id_usuario')
+    return JsonResponse(list(query), safe=False)
+
+
 class TbLocalByZonaViewSet(generics.ListAPIView):
     serializer_class = LocalSerializer
 
     def get_queryset(self):
-        ubigeo = self.kwargs['ubigeo']
-        zona = self.kwargs['zona']
-        id_curso = self.kwargs['id_curso']
-        return Local.objects.filter(ubigeo=ubigeo, zona=zona, id_curso=id_curso)
+        id_usuario = self.kwargs['id_usuario']
+        return Local.objects.filter(usuario_local__id_usuario=id_usuario)
 
 
 # class TbLocalByZonaViewSet(generics.ListAPIView):
@@ -205,6 +240,16 @@ class AmbienteViewSet(viewsets.ModelViewSet):
 class LocalViewSet(viewsets.ModelViewSet):
     queryset = Local.objects.all()
     serializer_class = LocalSerializer
+
+
+class DirectorioLocalViewSet(viewsets.ModelViewSet):
+    queryset = DirectorioLocal.objects.all()
+    serializer_class = DirectorioLocalSerializer
+
+
+class UsuarioLocalViewSet(viewsets.ModelViewSet):
+    queryset = UsuarioLocal.objects.all()
+    serializer_class = UsuarioLocalSerializer
 
 
 class LocalAmbienteViewSet(viewsets.ModelViewSet):
@@ -545,6 +590,28 @@ TURNO
 @csrf_exempt
 def redistribuir_aula(request, id_localambiente):
     PEA_AULA.objects.filter(id_localambiente=id_localambiente).delete()
+
+    return JsonResponse({'msg': True}, safe=False)
+
+
+@csrf_exempt
+def copy_directorio_to_seleccionado(request, id_directoriolocal, id_usuario):
+    usuario_local = UsuarioLocal.objects.get(id_usuario=id_usuario, id_directoriolocal=id_directoriolocal)
+    directorio = DirectorioLocal.objects.get(pk=id_directoriolocal)
+    print directorio
+    local = Local(usuario_local=usuario_local, nombre_local=directorio.nombre_local, nombre_via=directorio.nombre_via,
+                  mz_direccion=directorio.mz_direccion, tipo_via=directorio.tipo_via, referencia=directorio.referencia,
+                  n_direccion=directorio.n_direccion, km_direccion=directorio.km_direccion,
+                  lote_direccion=directorio.lote_direccion, piso_direccion=directorio.piso_direccion,
+                  telefono_local_fijo=directorio.telefono_local_fijo,
+                  telefono_local_celular=directorio.telefono_local_celular,
+                  funcionario_nombre=directorio.funcionario_nombre, funcionario_email=directorio.funcionario_email,
+                  funcionario_cargo=directorio.funcionario_cargo, responsable_nombre=directorio.responsable_nombre,
+                  responsable_email=directorio.responsable_email, responsable_telefono=directorio.responsable_telefono,
+                  responsable_celular=directorio.responsable_celular, ubigeo_id=directorio.ubigeo_id,
+                  zona=directorio.zona)
+
+    local.save()
 
     return JsonResponse({'msg': True}, safe=False)
 
