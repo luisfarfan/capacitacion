@@ -52,7 +52,8 @@ if (session.curso == '4') {
 
 function getLocales() {
     var ubigeo = `${$('#departamentos').val()}${$('#provincias').val()}${$('#distritos').val()}`;
-    let url = session.rol == '3' ? `${BASE_URL}localubigeo/${ubigeo}/${session.curso}/` : `${BASE_URL}localzona/${session.id}/`;
+    //let url = session.rol == '3' ? `${BASE_URL}localubigeo/${ubigeo}/${session.curso}/` : `${BASE_URL}localzona/${session.id}/`;
+    let url = session.rol == '3' ? `${BASE_URL}localubigeo/${ubigeo}/` : `${BASE_URL}localzona/${session.ccdd}${session.ccpp}${session.ccdi}/${session.curso}/${session.zona}`;
     "use strict";
     $.ajax({
         url: url,
@@ -145,7 +146,7 @@ function doAsignacion(show = false) {
     $.ajax({
         url: `${BASEURL}/asignacion/`,
         type: 'POST',
-        data: {ubigeo: ubigeo, zona: `${session.zona}`, id_curso: session.curso},
+        data: {ubigeo: ubigeo, zona: session.zona, id_curso: session.curso},
         success: response => {
             console.log(response);
             $('#modal_pea_sobrante').unblock();

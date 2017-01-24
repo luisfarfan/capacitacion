@@ -378,146 +378,149 @@
                         </div>
                     </fieldset>
                 </div>
-                <fieldset class="content-group" id="ambientesdata">
-                    <legend class="text-bold">Ambientes</legend>
-                    <div class="row">
-                        <div class="col-md-8 col-md-offset-2">
-                            <table class="table table-responsive table-bordered">
+                <div id="ambientes_esconder">
+                    <fieldset class="content-group" id="ambientesdata">
+                        <legend class="text-bold">Ambientes</legend>
+                        <div class="row">
+                            <div class="col-md-8 col-md-offset-2">
+                                <table class="table table-responsive table-bordered">
+                                    <thead>
+                                    <tr class="bg-blue">
+                                        <th>Tipo de Ambiente</th>
+                                        <th>Total</th>
+                                        <th>Disponible</th>
+                                        <th>A usar</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>Aula</td>
+                                        <td><input type="text" name="cantidad_total_aulas"
+                                                   id="cantidad_total_aulas"
+                                                   class="form-control" value="">
+                                        </td>
+                                        <td><input type="text" name="cantidad_disponible_aulas"
+                                                   id="cantidad_disponible_aulas"
+                                                   class="form-control" value="">
+                                        </td>
+                                        <td><input type="text" name="cantidad_usar_aulas"
+                                                   id="cantidad_usar_aulas"
+                                                   class="form-control" value="">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Auditorio</td>
+                                        <td><input type="text" name="cantidad_total_auditorios"
+                                                   id="cantidad_total_auditorios"
+                                                   class="form-control" value="">
+                                        </td>
+                                        <td><input type="text" name="cantidad_disponible_auditorios"
+                                                   id="cantidad_disponible_auditorios"
+                                                   class="form-control" value="">
+                                        </td>
+                                        <td><input type="text" name="cantidad_usar_auditorios"
+                                                   id="cantidad_usar_auditorios"
+                                                   class="form-control" value="">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Sala de Reuniones</td>
+                                        <td><input type="text" name="cantidad_total_sala"
+                                                   id="cantidad_total_sala"
+                                                   class="form-control" value="">
+                                        </td>
+                                        <td><input type="text" name="cantidad_disponible_sala"
+                                                   id="cantidad_disponible_sala"
+                                                   class="form-control" value="">
+                                        </td>
+                                        <td><input type="text" name="cantidad_usar_sala"
+                                                   id="cantidad_usar_sala"
+                                                   class="form-control" value="">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Oficina Administrativa</td>
+                                        <td><input type="text" name="cantidad_total_oficina"
+                                                   id="cantidad_total_oficina"
+                                                   class="form-control" value="">
+                                        </td>
+                                        <td><input type="text" name="cantidad_disponible_oficina"
+                                                   id="cantidad_disponible_oficina"
+                                                   class="form-control" value="">
+                                        </td>
+                                        <td><input type="text" name="cantidad_usar_oficina"
+                                                   id="cantidad_usar_oficina"
+                                                   class="form-control" value="">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Sala de Cómputo</td>
+                                        <td><input type="text" name="cantidad_total_computo"
+                                                   id="cantidad_total_computo"
+                                                   class="form-control" value="">
+                                        </td>
+                                        <td><input type="text" name="cantidad_disponible_computo"
+                                                   id="cantidad_disponible_computo"
+                                                   class="form-control" value="">
+                                        </td>
+                                        <td><input type="text" name="cantidad_usar_computo"
+                                                   id="cantidad_usar_computo"
+                                                   class="form-control" value="">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Otro (Especifique): <input type="text" name="especifique_otros"
+                                                                       id="especifique_otros"
+                                                                       class="form-control" value=""></td>
+                                        <td><input type="text" name="cantidad_total_otros"
+                                                   id="cantidad_total_otros"
+                                                   class="form-control" value="">
+                                        </td>
+                                        <td><input type="text" name="cantidad_disponible_otros"
+                                                   id="cantidad_disponible_otros"
+                                                   class="form-control" value="">
+                                        </td>
+                                        <td><input type="text" name="cantidad_usar_otros"
+                                                   id="cantidad_usar_otros"
+                                                   class="form-control" value="">
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </fieldset>
+                    <fieldset class="content-group">
+                        <legend>REGISTRO DE AULA/S</legend>
+                        <div class="row">
+                            <table id="tabla_aulas" class="table table-bordered table-responsive">
                                 <thead>
-                                <tr class="bg-blue">
+                                <tr>
+                                    <th>N° Ord.</th>
                                     <th>Tipo de Ambiente</th>
-                                    <th>Total</th>
-                                    <th>Disponible</th>
-                                    <th>A usar</th>
+                                    <th>N° Ambiente</th>
+                                    <th>Capacidad</th>
+                                    <th>Piso</th>
+                                    <th>Guardar</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr>
-                                    <td>Aula</td>
-                                    <td><input type="text" name="cantidad_total_aulas"
-                                               id="cantidad_total_aulas"
-                                               class="form-control" value="">
-                                    </td>
-                                    <td><input type="text" name="cantidad_disponible_aulas"
-                                               id="cantidad_disponible_aulas"
-                                               class="form-control" value="">
-                                    </td>
-                                    <td><input type="text" name="cantidad_usar_aulas"
-                                               id="cantidad_usar_aulas"
-                                               class="form-control" value="">
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Auditorio</td>
-                                    <td><input type="text" name="cantidad_total_auditorios"
-                                               id="cantidad_total_auditorios"
-                                               class="form-control" value="">
-                                    </td>
-                                    <td><input type="text" name="cantidad_disponible_auditorios"
-                                               id="cantidad_disponible_auditorios"
-                                               class="form-control" value="">
-                                    </td>
-                                    <td><input type="text" name="cantidad_usar_auditorios"
-                                               id="cantidad_usar_auditorios"
-                                               class="form-control" value="">
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Sala de Reuniones</td>
-                                    <td><input type="text" name="cantidad_total_sala"
-                                               id="cantidad_total_sala"
-                                               class="form-control" value="">
-                                    </td>
-                                    <td><input type="text" name="cantidad_disponible_sala"
-                                               id="cantidad_disponible_sala"
-                                               class="form-control" value="">
-                                    </td>
-                                    <td><input type="text" name="cantidad_usar_sala"
-                                               id="cantidad_usar_sala"
-                                               class="form-control" value="">
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Oficina Administrativa</td>
-                                    <td><input type="text" name="cantidad_total_oficina"
-                                               id="cantidad_total_oficina"
-                                               class="form-control" value="">
-                                    </td>
-                                    <td><input type="text" name="cantidad_disponible_oficina"
-                                               id="cantidad_disponible_oficina"
-                                               class="form-control" value="">
-                                    </td>
-                                    <td><input type="text" name="cantidad_usar_oficina"
-                                               id="cantidad_usar_oficina"
-                                               class="form-control" value="">
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Sala de Cómputo</td>
-                                    <td><input type="text" name="cantidad_total_computo"
-                                               id="cantidad_total_computo"
-                                               class="form-control" value="">
-                                    </td>
-                                    <td><input type="text" name="cantidad_disponible_computo"
-                                               id="cantidad_disponible_computo"
-                                               class="form-control" value="">
-                                    </td>
-                                    <td><input type="text" name="cantidad_usar_computo"
-                                               id="cantidad_usar_computo"
-                                               class="form-control" value="">
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Otro (Especifique): <input type="text" name="especifique_otros"
-                                                                   id="especifique_otros"
-                                                                   class="form-control" value=""></td>
-                                    <td><input type="text" name="cantidad_total_otros"
-                                               id="cantidad_total_otros"
-                                               class="form-control" value="">
-                                    </td>
-                                    <td><input type="text" name="cantidad_disponible_otros"
-                                               id="cantidad_disponible_otros"
-                                               class="form-control" value="">
-                                    </td>
-                                    <td><input type="text" name="cantidad_usar_otros"
-                                               id="cantidad_usar_otros"
-                                               class="form-control" value="">
-                                    </td>
-                                </tr>
+
                                 </tbody>
+                                <tfoot>
+                                <tr style="background-color:#A5C25C">
+                                    <td colspan="3">TOTAL</td>
+                                    <td>
+                                        <span id="capacidad_total"></span>
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                </tfoot>
                             </table>
                         </div>
-                    </div>
-                </fieldset>
-                <fieldset class="content-group">
-                    <legend>REGISTRO DE AULA/S</legend>
-                    <div class="row">
-                        <table id="tabla_aulas" class="table table-bordered table-responsive">
-                            <thead>
-                            <tr>
-                                <th>N° Ord.</th>
-                                <th>Tipo de Ambiente</th>
-                                <th>N° Ambiente</th>
-                                <th>Capacidad</th>
-                                <th>Piso</th>
-                                <th>Guardar</th>
-                            </tr>
-                            </thead>
-                            <tbody>
+                    </fieldset>
+                </div>
 
-                            </tbody>
-                            <tfoot>
-                            <tr style="background-color:#A5C25C">
-                                <td colspan="3">TOTAL</td>
-                                <td>
-                                    <span id="capacidad_total"></span>
-                                </td>
-                                <td></td>
-                            </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-                </fieldset>
                 <div class="row">
                     <div class="text-left">
                         <button type="reset" class="btn btn-primary" id="reset">NUEVO LOCAL <i

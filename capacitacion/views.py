@@ -1,3 +1,4 @@
+from django.db.models.sql.compiler import cursor_iter
 from rest_framework.views import APIView
 from django.db.models import Count, Value
 from django.http import JsonResponse
@@ -165,7 +166,8 @@ class TbLocalByZonaViewSet(generics.ListAPIView):
     def get_queryset(self):
         curso = self.kwargs['curso']
         ubigeo = self.kwargs['ubigeo']
-        return Local.objects.filter(ubigeo=ubigeo, curso_local__curso=curso)
+        zona = self.kwargs['zona']
+        return Local.objects.filter(ubigeo=ubigeo, curso_local__curso=curso, zona=zona)
 
 
 # class TbLocalByZonaViewSet(generics.ListAPIView):
@@ -596,11 +598,11 @@ def redistribuir_aula(request, id_localambiente):
 
 
 @csrf_exempt
-def copy_directorio_to_seleccionado(request, id_directoriolocal, id_usuario):
-    usuario_local = UsuarioLocal.objects.get(id_usuario=id_usuario, id_directoriolocal=id_directoriolocal)
+def copy_directorio_to_seleccionado(request, id_directoriolocal, id_curso):
+    curso_local = CursoLocal.objects.get(curso=id_curso, id_cursolocal=id_directoriolocal)
     directorio = DirectorioLocal.objects.get(pk=id_directoriolocal)
     print directorio
-    local = Local(usuario_local=usuario_local, nombre_local=directorio.nombre_local, nombre_via=directorio.nombre_via,
+    local = Local(curso_local=curso_local, nombre_local=directorio.nombre_local, nombre_via=directorio.nombre_via,
                   mz_direccion=directorio.mz_direccion, tipo_via=directorio.tipo_via, referencia=directorio.referencia,
                   n_direccion=directorio.n_direccion, km_direccion=directorio.km_direccion,
                   lote_direccion=directorio.lote_direccion, piso_direccion=directorio.piso_direccion,
@@ -611,9 +613,15 @@ def copy_directorio_to_seleccionado(request, id_directoriolocal, id_usuario):
                   responsable_email=directorio.responsable_email, responsable_telefono=directorio.responsable_telefono,
                   responsable_celular=directorio.responsable_celular, ubigeo_id=directorio.ubigeo_id,
                   zona=directorio.zona)
-
     local.save()
 
+    return JsonResponse({'msg': True}, safe=False)
+
+
+@csrf_exempt
+def delete_curso_local(request, id_local, curso):
+    cursolocal = CursoLocal.objects.get(id_local=id_local, curso=curso)
+    cursolocal.delete()
     return JsonResponse({'msg': True}, safe=False)
 
 
@@ -805,7 +813,7 @@ def darAltaPea(request):
 def save_nota_final(request):
     if request.method == "POST" and request.is_ajax():
         data = json.loads(request.body)
-
+        aprobado = 0
         for i in data:
             try:
                 pea = PeaNotaFinal.objects.get(id_pea=PEA.objects.get(pk=i['id_pea']),
@@ -814,15 +822,38 @@ def save_nota_final(request):
                 pea = None
 
             if pea is None:
+                if float(i['nota_final']) >= 11:
+                    aprobado = 1
                 pea_nota_final = PeaNotaFinal(nota_final=i['nota_final'],
                                               id_pea=PEA.objects.get(pk=i['id_pea']),
-                                              id_curso=Curso.objects.get(pk=i['id_curso']))
+                                              id_curso=Curso.objects.get(pk=i['id_curso']), aprobado=aprobado)
                 pea_nota_final.save()
             else:
+                if float(i['nota_final']) >= 11:
+                    aprobado = 1
                 pea.nota_final = i['nota_final']
+                pea.aprobado = aprobado
                 pea.save()
 
     return JsonResponse({'msg': True})
+
+
+@csrf_exempt
+def save_aprobado_distrital(request):
+    aprobados = request.POST.getlist('aprobados[]')
+    desaprobados = request.POST.getlist('desaprobados[]')
+
+    for i in aprobados:
+        pea = PeaNotaFinal.objects.get(pk=i)
+        pea.aprobado = 1
+        pea.save()
+
+    for i in desaprobados:
+        pea = PeaNotaFinal.objects.get(pk=i)
+        pea.aprobado = 0
+        pea.save()
+
+    return JsonResponse({'msg': True}, safe=False)
 
 
 class obj(object):

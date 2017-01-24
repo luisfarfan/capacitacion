@@ -15,6 +15,10 @@ var local_marco = [];
 var local_marco_selected = {};
 var is_directorio = true;
 
+function hideAmbientes() {
+    is_directorio ? $('#ambientes_esconder').hide() : $('#ambientes_esconder').show();
+}
+
 $('#etapa').val(1);
 function resetForm(idform) {
     "use strict";
@@ -74,7 +78,8 @@ $(function () {
     });
     getDepartamentos();
     getCursos(1);
-    getMetaPea()
+    getMetaPea();
+    hideAmbientes();
 });
 $('#departamentos').change(function () {
     $('#provincias').find('option').remove();
@@ -108,7 +113,7 @@ $('#cursos').change(() => {
 
 function getLocalesbyUbigeo() {
     var ubigeo = `${$('#departamentos').val()}${$('#provincias').val()}${$('#distritos').val()}`;
-    let url = session.rol == '3' ? `${BASE_URL}localubigeo/${ubigeo}/${session.curso}/` : `${BASE_URL}localzona/${session.ccdd}${session.ccpp}${session.ccdi}/${session.curso}/`;
+    let url = session.rol == '3' ? `${BASE_URL}localubigeo/${ubigeo}/${session.curso}/` : `${BASE_URL}localzona/${session.ccdd}${session.ccpp}${session.ccdi}/${session.curso}/${session.zona}`;
     $.ajax({
         async: false,
         url: url,
@@ -120,7 +125,7 @@ function getLocalesbyUbigeo() {
                             <td>
 								<ul class="icons-list">
                                     <li class="text-primary-600"><a data-popup="tooltip" title="Mostrar" onclick="getLocal(${val.id_local},false)" href="#"><i class="icon-pencil7"></i></a></li>
-                                    <li class="text-danger-600"><a data-popup="tooltip" title="Eliminar" onclick="eliminarLocal(${val.id_local})" href="#"><i class="icon-trash"></i></a></li>
+                                    <li class="text-danger-600"><a data-popup="tooltip" title="Eliminar" onclick="eliminarLocal(${val.id_local},${val.curso_local})" href="#"><i class="icon-trash"></i></a></li>
 								</ul>
 							</td>
                           </tr>`;
@@ -146,7 +151,7 @@ function getLocalesbyMarco() {
             var html = '';
             $.each(data, function (key, val) {
                 let atributo = '';
-                if ('id' in findInObject2(val.usuarios, session.id, 'id')) {
+                if ('id_curso' in findInObject2(val.cursos_locales, session.curso, 'id_curso')) {
                     atributo = 'checked disabled';
                 } else {
                     atributo = '';
@@ -172,17 +177,16 @@ function getLocalesbyMarco() {
 
 function saveUsuarioLocal(element, id_local) {
     "use strict";
-    console.log(element);
     $(element).prop('checked', false);
     alert_confirm(() => {
         $.ajax({
-            url: `${BASEURL}/rest/usuario_local/`,
+            url: `${BASEURL}/rest/curso_local/`,
             type: 'POST',
-            data: {id_directoriolocal: id_local, id_usuario: session.id},
+            data: {id_cursolocal: id_local, curso: session.curso},
             success: (response) => {
                 $(element).prop('checked', true);
                 $.ajax({
-                    url: `${BASEURL}/copy_directorio_to_seleccionado/${id_local}/${session.id}/`,
+                    url: `${BASEURL}/copy_directorio_to_seleccionado/${id_local}/${session.curso}/`,
                     success: (data) => {
                         console.log(data);
                     }
@@ -194,6 +198,7 @@ function saveUsuarioLocal(element, id_local) {
 
 function getLocal(id_local, directorio = true) {
     is_directorio = directorio;
+    hideAmbientes();
     $('#id_local').val(id_local);
     $.ajax({
         url: `${BASE_URL}rest/local/${id_local}`,
@@ -220,11 +225,12 @@ function getLocal(id_local, directorio = true) {
 }
 
 function setMarco(id_local) {
+    is_directorio = true;
+    hideAmbientes();
     $('#id_local').val(id_local);
     local_selected = findInObject2(local_marco, id_local, 'id_local');
     $(`#etapa`).val(1);
     $.each(local_selected, function (key, val) {
-        debugger
         if (key == 'tipo_via' || key == 'turno_uso_local' || key == 'id_curso' || key == 'zona_ubicacion_local' || key == 'funcionario_nombre') {
             $(`select[name=${key}]`).val(val).trigger('change')
         } else {
@@ -691,7 +697,7 @@ function saveLocalambiente(element, id_localambiente) {
 }
 
 
-function eliminarLocal(id_local) {
+function eliminarLocal(id_local, curso_local) {
     alert_confirm(function () {
         var ubigeo = `${$('#departamentos').val()}${$('#provincias').val()}${$('#distritos').val()}`;
         $.ajax({
@@ -700,6 +706,14 @@ function eliminarLocal(id_local) {
             success: response => {
                 validarMetaPea();
                 getLocalesbyUbigeo();
+                $.ajax({
+                    url: `${BASEURL}/rest/curso_local/${curso_local}/`,
+                    type: 'DELETE',
+                    success: response => {
+
+                    }
+
+                })
             },
             error: error => {
                 console.log('ERROR!!', error)

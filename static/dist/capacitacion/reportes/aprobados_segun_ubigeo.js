@@ -62,7 +62,6 @@ function getReporte() {
             });
             $('#tabla_reporte').find('tbody').append(html);
         });
-
     });
 
 

@@ -6,6 +6,13 @@
  */
 $(function () {
     getLocales();
+    if (session.rol == 3) {
+        $('#no_distrital').hide();
+        $('#no_distrital_filtro').hide();
+    } else {
+        $('#tabla_reporte').hide();
+    }
+    getReporte();
 });
 
 var criterios = [];
@@ -36,7 +43,8 @@ function getLocales() {
     let ubigeo = `${session.ccdd}${session.ccpp}${session.ccdi}`;
     //let url = session.rol == '3' ? `${BASE_URL}localubigeo/${ubigeo}/${session.curso}/` : `${BASE_URL}localzona/${ubigeo}/${session.zona}/${session.curso}/`;
     //let url = session.rol == '3' ? `${BASE_URL}localubigeo/${ubigeo}/${session.curso}/` : `${BASE_URL}localzona/${session.id}/`;
-    let url = session.rol == '3' ? `${BASE_URL}localubigeo/${ubigeo}/${session.curso}/` : `${BASE_URL}localzona/${session.id}/`;
+    //let url = session.rol == '3' ? `${BASE_URL}localubigeo/${ubigeo}/${session.curso}/` : `${BASE_URL}localzona/${session.id}/`;
+    let url = session.rol == '3' ? `${BASE_URL}localubigeo/${ubigeo}/${session.curso}/` : `${BASE_URL}localzona/${session.ccdd}${session.ccpp}${session.ccdi}/${session.curso}/${session.zona}`;
     "use strict";
     $.ajax({
         url: url,
@@ -236,80 +244,85 @@ function calcularPromedio(input) {
 
 function saveNotas() {
     "use strict";
-    let data_send = [];
-    let faltantes = 0;
-    let aptos_input = [];
-    $('input[name="aptos"]:checked').map((key, val) => {
-        aptos_input.push($(val).val());
-    });
-    $.each(criterios, (i, v) => {
-        let criterio_input = $(`input[name="${criterios[i].id_cursocriterio}"]`);
-        $.each(criterio_input, (k, v) => {
-            if ($(criterio_input[k]).val() != '') {
-                let json = {
-                    nota: $(criterio_input[k]).val(),
-                    id_peaaula: $(criterio_input[k]).parent().parent().find('input[name="id_peaaula"]').val(),
-                    id_cursocriterio: criterios[i].id_cursocriterio,
-                };
-                data_send.push(json);
-            } else {
-                faltantes++;
-            }
+    if (session.rol == 3) {
+        alert_confirm(saveDistrital,'Esta usted seguro de guardar?')
+    } else {
+        let data_send = [];
+        let faltantes = 0;
+        let aptos_input = [];
+        $('input[name="aptos"]:checked').map((key, val) => {
+            aptos_input.push($(val).val());
         });
-    });
+        $.each(criterios, (i, v) => {
+            let criterio_input = $(`input[name="${criterios[i].id_cursocriterio}"]`);
+            $.each(criterio_input, (k, v) => {
+                if ($(criterio_input[k]).val() != '') {
+                    let json = {
+                        nota: $(criterio_input[k]).val(),
+                        id_peaaula: $(criterio_input[k]).parent().parent().find('input[name="id_peaaula"]').val(),
+                        id_cursocriterio: criterios[i].id_cursocriterio,
+                    };
+                    data_send.push(json);
+                } else {
+                    faltantes++;
+                }
+            });
+        });
 
-    let title = 'Registro de Notas Completo, Guardar?';
-    let type = 'success';
-    if (faltantes > 0) {
-        title = 'Aun tiene personas que no ha registrado sus Notas, desea guardar?';
-        type = 'warning';
-    }
-    swal({
-        title: 'Guardar Notas',
-        text: title,
-        type: type,
-        showCancelButton: true,
-        confirmButtonColor: "#EF5350",
-        confirmButtonText: "Si!",
-        cancelButtonText: "No!",
-        closeOnConfirm: true,
-        closeOnCancel: true,
-        showLoaderOnConfirm: true
-    }, confirm => {
-        if (confirm) {
-            $.ajax({
-                url: `${BASEURL}/save_notas/`,
-                type: 'POST',
-                data: JSON.stringify(data_send),
-                success: function (response) {
-                    swal({
-                        title: "Guardado con éxito!",
-                        confirmButtonColor: "#2196F3"
-                    });
+        let title = 'Registro de Notas Completo, Guardar?';
+        let type = 'success';
+        if (faltantes > 0) {
+            title = 'Aun tiene personas que no ha registrado sus Notas, desea guardar?';
+            type = 'warning';
+        }
+        swal({
+            title: 'Guardar Notas',
+            text: title,
+            type: type,
+            showCancelButton: true,
+            confirmButtonColor: "#EF5350",
+            confirmButtonText: "Si!",
+            cancelButtonText: "No!",
+            closeOnConfirm: true,
+            closeOnCancel: true,
+            showLoaderOnConfirm: true
+        }, confirm => {
+            if (confirm) {
+                $.ajax({
+                    url: `${BASEURL}/save_notas/`,
+                    type: 'POST',
+                    data: JSON.stringify(data_send),
+                    success: function (response) {
+                        swal({
+                            title: "Guardado con éxito!",
+                            confirmButtonColor: "#2196F3"
+                        });
+                        $.ajax({
+                            url: `${BASEURL}/save_nota_final/`,
+                            type: 'POST',
+                            data: JSON.stringify(getPeaNotaFinal()),
+                            success: function (response) {
+
+                            }
+                        });
+
+                    }
+                });
+
+                if (aptos_input.length) {
                     $.ajax({
-                        url: `${BASEURL}/save_nota_final/`,
+                        url: `${BASEURL}/save_aptos/`,
                         type: 'POST',
-                        data: JSON.stringify(getPeaNotaFinal()),
+                        data: {id_peas: aptos_input},
                         success: function (response) {
 
                         }
                     });
-
                 }
-            });
-
-            if (aptos_input.length) {
-                $.ajax({
-                    url: `${BASEURL}/save_aptos/`,
-                    type: 'POST',
-                    data: {id_peas: aptos_input},
-                    success: function (response) {
-
-                    }
-                });
             }
-        }
-    });
+        });
+    }
+
 }
 
 
@@ -333,7 +346,7 @@ $("#btn_exportar_evaluacion").on('click', function () {
 
 function getPeaNotaFinal() {
     let data_nota_final = []
-    $('input[name="nota_final"]').map((key, value)=> {
+    $('input[name="nota_final"]').map((key, value) => {
         data_nota_final.push({
             id_pea: $(value).parent().parent().find('input[name="aptos"]').val(),
             nota_final: value.value,
@@ -341,4 +354,42 @@ function getPeaNotaFinal() {
         })
     })
     return data_nota_final
+}
+
+var url = `${BASEURL}/reportes/aprobados_curso/`;
+var reporte_data;
+function getReporte() {
+    "use strict";
+    let html = '';
+    $.getJSON(`${url}${session.ccdd}${session.ccpp}${session.ccdi}/${session.curso}`, response => {
+        reporte_data = response;
+        response.map((k, v) => {
+            html += `<tr>`;
+            html += `<td>${k.departamento}</td><td>${k.provincia}</td><td>${k.distrito}</td>
+                     <td>${k.id_pea__ape_paterno} ${k.id_pea__ape_materno} ${k.id_pea__nombre}</td>
+                     <td>${k.id_pea__dni}</td><td>${k.cargo}</td><td>${k.zona}</td><td>${k.nota_final}</td><td><input type="checkbox" ${k.aprobado == 1 ? 'checked' : ''} value="${k.id}" name="aprobado"></td>`;
+            html += `</tr>`;
+        });
+        $('#tabla_reporte').find('tbody').append(html);
+    });
+}
+
+function saveDistrital() {
+    let data_post = {aprobados: [], desaprobados: []}
+    $('input[name="aprobado"]').map((key, value) => {
+        if (value.checked) {
+            data_post.aprobados.push(value.value)
+        } else {
+            data_post.desaprobados.push(value.value)
+        }
+    });
+    $.ajax({
+        url: `${BASEURL}/save_aprobado_distrital/`,
+        type: 'POST',
+        data: data_post,
+        success: response => {
+
+        }
+
+    })
 }
