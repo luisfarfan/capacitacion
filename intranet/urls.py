@@ -44,7 +44,7 @@ urlpatterns = [
     url('^copy_directorio_to_seleccionado/(?P<id_directoriolocal>.+)/(?P<id_usuario>.+)/$',
         copy_directorio_to_seleccionado),
     url('^getDirectoriolocal/(?P<ubigeo>.+)/$', getDirectoriolocal),
-    url('^localzona/(?P<id_usuario>.+)/$', TbLocalByZonaViewSet.as_view()),
+    url('^localzona/(?P<ubigeo>.+)/(?P<curso>.+)/$', TbLocalByZonaViewSet.as_view()),
     url('^localambiente/(?P<id_local>[0-9]+)/$', TbLocalAmbienteByLocalViewSet),
     url('^localambiente/(?P<id_local>[0-9]+)/(?P<fecha>[0-9]+)/$', TbLocalAmbienteByLocalViewSet),
     url('^cursobyetapa/(?P<id_etapa>.+)/$', CursobyEtapaViewSet.as_view()),

@@ -110,8 +110,7 @@ class LocalAmbiente(models.Model):
 
 class Local(models.Model):
     id_local = models.AutoField(primary_key=True, db_column='id_local')
-    marcolocal = models.ForeignKey('MarcoLocal', null=True, blank=True)
-    usuario_local = models.ForeignKey('UsuarioLocal',null=True)
+    curso_local = models.ForeignKey('CursoLocal', null=True)
     ambientes = models.ManyToManyField(Ambiente, through='LocalAmbiente')
     ubigeo = models.ForeignKey(Ubigeo)
     zona = models.CharField(max_length=5, blank=True, null=True)
@@ -310,7 +309,7 @@ class DirectorioLocal(models.Model):
     id_local = models.AutoField(primary_key=True, db_column='id_local')
     ubigeo = models.ForeignKey(Ubigeo)
     zona = models.CharField(max_length=5, blank=True, null=True)
-    id_curso = models.ForeignKey('Curso', null=True)
+    id_curso = models.ForeignKey('Curso', null=True, related_name='curso_directorio')
     nombre_local = models.CharField(max_length=300, blank=True, null=True)
     zona_ubicacion_local = models.CharField(max_length=5, blank=True, null=True)
     tipo_via = models.CharField(max_length=300, blank=True, null=True)
@@ -355,17 +354,17 @@ class DirectorioLocal(models.Model):
     cantidad_total_computo = models.IntegerField(blank=True, null=True)
     cantidad_disponible_computo = models.IntegerField(blank=True, null=True)
     cantidad_usar_computo = models.IntegerField(blank=True, null=True)
-    usuarios = models.ManyToManyField(User, through='UsuarioLocal')
+    cursos_locales = models.ManyToManyField(Curso, through='CursoLocal', related_name='cursos_local')
 
     class Meta:
         managed = True
         db_table = 'DIRECTORIO_LOCAL'
 
 
-class UsuarioLocal(models.Model):
-    id_directoriolocal = models.ForeignKey('DirectorioLocal')
-    id_usuario = models.ForeignKey(User)
+class CursoLocal(models.Model):
+    id_cursolocal = models.ForeignKey('DirectorioLocal')
+    curso = models.ForeignKey('Curso')
 
     class Meta:
         managed = True
-        db_table = 'USUARIO_LOCALES'
+        db_table = 'CURSO_LOCAL'

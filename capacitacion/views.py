@@ -163,8 +163,9 @@ class TbLocalByZonaViewSet(generics.ListAPIView):
     serializer_class = LocalSerializer
 
     def get_queryset(self):
-        id_usuario = self.kwargs['id_usuario']
-        return Local.objects.filter(usuario_local__id_usuario=id_usuario)
+        curso = self.kwargs['curso']
+        ubigeo = self.kwargs['ubigeo']
+        return Local.objects.filter(ubigeo=ubigeo, curso_local__curso=curso)
 
 
 # class TbLocalByZonaViewSet(generics.ListAPIView):
@@ -247,9 +248,9 @@ class DirectorioLocalViewSet(viewsets.ModelViewSet):
     serializer_class = DirectorioLocalSerializer
 
 
-class UsuarioLocalViewSet(viewsets.ModelViewSet):
-    queryset = UsuarioLocal.objects.all()
-    serializer_class = UsuarioLocalSerializer
+class CursoLocalViewSet(viewsets.ModelViewSet):
+    queryset = CursoLocal.objects.all()
+    serializer_class = CursoLocalSerializer
 
 
 class LocalAmbienteViewSet(viewsets.ModelViewSet):

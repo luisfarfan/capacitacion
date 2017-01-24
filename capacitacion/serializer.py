@@ -21,9 +21,9 @@ class MarcoLocalSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class UsuarioLocalSerializer(serializers.ModelSerializer):
+class CursoLocalSerializer(serializers.ModelSerializer):
     class Meta:
-        model = UsuarioLocal
+        model = CursoLocal
         fields = '__all__'
 
 
@@ -33,8 +33,14 @@ class UserSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class CursoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Curso
+        fields = '__all__'
+
+
 class DirectorioLocalSerializer(serializers.ModelSerializer):
-    usuarios = UserSerializer(many=True, read_only=True)
+    cursos_locales = CursoSerializer(many=True, read_only=True)
 
     class Meta:
         model = DirectorioLocal
@@ -58,12 +64,6 @@ class LocalAmbienteSerializer(serializers.ModelSerializer):
 class PEA_Serializer(serializers.ModelSerializer):
     class Meta:
         model = PEA
-        fields = '__all__'
-
-
-class CursoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Curso
         fields = '__all__'
 
 

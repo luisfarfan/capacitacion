@@ -14,7 +14,7 @@ router.register(r'pea_aula', PEA_BY_AULAViewSet)
 router.register(r'pea_asistencia', PEA_ASISTENCIAViewSet)
 router.register(r'pea', PEAViewSet)
 router.register(r'pea_nota_final', PeaNotaFinalViewSet)
-router.register(r'usuario_local', UsuarioLocalViewSet)
+router.register(r'curso_local', CursoLocalViewSet)
 
 
 # router.register(r'pea_cursocriterio', PEA_CURSOCRITERIOViewSet)
