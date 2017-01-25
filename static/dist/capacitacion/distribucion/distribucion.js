@@ -273,3 +273,45 @@ function redistribuirAula(id_localambiente) {
     }, 'Esta usted seguro de redistribuir la PEA de esta aula?')
 
 }
+
+function reporte_pea_asistencia_blanco() {
+    "use strict";
+    let html = `<tr><th rowspan="2">N°</th><th rowspan="2">APELLIDOS</th><th rowspan="2">NOMBRES</th><th rowspan="2">CARGO</th>`;
+    let td_mt = `<tr>`;
+    $.each(rangofechas, (i, v) => {
+        html += `<th colspan="2">${v.substring(0, 5)}</th>`;
+        td_mt += `<th>M</th><th>T</th>`;
+    });
+    html += `</tr>`;
+    td_mt += `</tr>`;
+    html = html + td_mt;
+
+    $('#tabla_reporte_pea_asistencia').find('thead').html(html);
+    set_reporte_pea_asistencia_blanco();
+    $('#modal_reporte_pea_exportar').modal('show');
+}
+
+function set_reporte_pea_asistencia_blanco() {
+    "use strict";
+    let html = '';
+    let pea_por_fecha = [];
+    if (session.curso == 4) {
+        pea_por_fecha = peaaula.filter(function (e) {
+            return e.pea_fecha == $('#fechas').val();
+        });
+    } else {
+        pea_por_fecha = peaaula;
+    }
+    pea_por_fecha.map((key, val) => {
+        html += `<tr>`;
+        html += `<td>${val + 1}</td>`;
+        html += `<td>${key.id_pea.ape_paterno} ${key.id_pea.ape_materno}</td>`;
+        html += `<td>${key.id_pea.nombre}</td>`;
+        html += `<td>${key.id_pea.id_cargofuncional.nombre_funcionario}</td>`;
+        rangofechas.map(fecha => {
+            html += `<td></td><td></td>`;
+        });
+        html += `</tr>`;
+    });
+    $('#tabla_reporte_pea_asistencia').find('tbody').html(html);
+}
