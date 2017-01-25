@@ -103,7 +103,7 @@
                                     <li id="notas"><a href="{% url 'evaluacion' %}">Modulo de Registro de Notas y
                                         Resultado</a>
                                     </li>
-                                    
+
                                 </ul>
                             </li>
                             <!-- /main -->
@@ -413,7 +413,13 @@
         $('#modulo_registro').hide();
         $('#distribucion').hide();
     }
+
+    if (session.curso == 1) {
+        $('#distritos').removeAttr('disabled')
+        $('#provincias').trigger('change');
+    }
     setUserData();
+
     function setUserData() {
         $('#usuario').text(`${session.rol__rol}`);
         $('#tipo_cargo').text(`${session.curso__nombre_curso}`);

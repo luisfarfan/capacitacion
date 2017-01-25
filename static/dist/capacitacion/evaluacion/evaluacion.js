@@ -45,7 +45,7 @@ function getLocales() {
     //let url = session.rol == '3' ? `${BASE_URL}localubigeo/${ubigeo}/${session.curso}/` : `${BASE_URL}localzona/${ubigeo}/${session.zona}/${session.curso}/`;
     //let url = session.rol == '3' ? `${BASE_URL}localubigeo/${ubigeo}/${session.curso}/` : `${BASE_URL}localzona/${session.id}/`;
     //let url = session.rol == '3' ? `${BASE_URL}localubigeo/${ubigeo}/${session.curso}/` : `${BASE_URL}localzona/${session.id}/`;
-    let url = session.rol == '3' ? `${BASE_URL}localubigeo/${ubigeo}/${session.curso}/` : `${BASE_URL}localzona/${session.ccdd}${session.ccpp}${session.ccdi}/${session.curso}/${session.zona}`;
+    let url = session.rol__id == 1 || session.rol__id == 2 ? `${BASE_URL}localubigeo/${ubigeo}/${session.curso}/` : `${BASE_URL}localzona/${session.ccdd}${session.ccpp}${session.ccdi}/${session.curso}/${session.zona}`;
     "use strict";
     $.ajax({
         url: url,
@@ -362,7 +362,8 @@ var reporte_data;
 function getReporte() {
     "use strict";
     let html = '';
-    $.getJSON(`${url}${session.ccdd}${session.ccpp}${session.ccdi}/${session.zona}/${session.curso}`, response => {
+    let zona = session.zona == '' ? '00' : session.zona;
+    $.getJSON(`${url}${session.ccdd}${session.ccpp}${session.ccdi}/${zona}/${session.curso}`, response => {
         reporte_data = response;
         response.map((k, v) => {
             html += `<tr>`;

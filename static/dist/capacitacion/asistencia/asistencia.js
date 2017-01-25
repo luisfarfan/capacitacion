@@ -68,7 +68,7 @@ function getLocales() {
     let ubigeo = `${session.ccdd}${session.ccpp}${session.ccdi}`;
     //let url = session.rol == '3' ? `${BASE_URL}localubigeo/${ubigeo}/${session.curso}/` : `${BASE_URL}localzona/${ubigeo}/${session.zona}/${session.curso}/`;
     //let url = session.rol == '3' ? `${BASE_URL}localubigeo/${ubigeo}/${session.curso}/` : `${BASE_URL}localzona/${session.id}/`;
-    let url = session.rol == '3' ? `${BASE_URL}localubigeo/${ubigeo}/` : `${BASE_URL}localzona/${session.ccdd}${session.ccpp}${session.ccdi}/${session.curso}/${session.zona}`;
+    let url = session.rol__id == 1 || session.rol__id == 2 ? `${BASE_URL}localubigeo/${ubigeo}/${session.curso}/` : `${BASE_URL}localzona/${session.ccdd}${session.ccpp}${session.ccdi}/${session.curso}/${session.zona}`;
     "use strict";
     $.ajax({
         url: url,
@@ -557,11 +557,11 @@ $("#btn_exportar_evaluacion").on('click', function () {
 function doAsignacion(alta, show = false) {
     let ubigeo = `${session.ccdd}${session.ccpp}${session.ccdi}`;
     let data = session.curso == 4 ? {
-        ubigeo: ubigeo,
-        zona: `${session.zona}`,
-        id_curso: session.curso,
-        alta: 1
-    } : {ubigeo: ubigeo, zona: `${session.zona}`, id_curso: session.curso, alta: alta};
+            ubigeo: ubigeo,
+            zona: `${session.zona}`,
+            id_curso: session.curso,
+            alta: 1
+        } : {ubigeo: ubigeo, zona: `${session.zona}`, id_curso: session.curso, alta: alta};
     $.ajax({
         url: `${BASEURL}/asignacion/`,
         type: 'POST',

@@ -365,13 +365,21 @@ def sobrantes_zona(request):
         zona = request.POST['zona']
         id_curso = request.POST['id_curso']
         contingencia = request.POST['contingencia']
-        sobrantes = PEA.objects.exclude(id_pea__in=PEA_AULA.objects.values('id_pea')).annotate(
-            cargo=F('id_cargofuncional__nombre_funcionario')).filter(ubigeo=ubigeo,
-                                                                     zona=zona,
-                                                                     id_cargofuncional__cursofuncionario__id_curso_id=id_curso,
-                                                                     contingencia=contingencia, baja_estado=0).order_by(
-            'ape_paterno').values('dni', 'ape_paterno', 'ape_materno', 'nombre',
-                                  'cargo', 'id_pea')
+        if id_curso == "1":
+            sobrantes = PEA.objects.exclude(id_pea__in=PEA_AULA.objects.values('id_pea')).annotate(
+                cargo=F('id_cargofuncional__nombre_funcionario')).filter(
+                dni__in=['25709168', '10172799', '08158910']).order_by('ape_paterno').values('dni', 'ape_paterno',
+                                                                                             'ape_materno', 'nombre',
+                                                                                             'cargo', 'id_pea')
+        else:
+            sobrantes = PEA.objects.exclude(id_pea__in=PEA_AULA.objects.values('id_pea')).annotate(
+                cargo=F('id_cargofuncional__nombre_funcionario')).filter(ubigeo=ubigeo,
+                                                                         zona=zona,
+                                                                         id_cargofuncional__cursofuncionario__id_curso_id=id_curso,
+                                                                         contingencia=contingencia,
+                                                                         baja_estado=0).order_by(
+                'ape_paterno').values('dni', 'ape_paterno', 'ape_materno', 'nombre',
+                                      'cargo', 'id_pea')
         return JsonResponse(list(sobrantes), safe=False)
 
     return JsonResponse({'msg': False})
@@ -433,6 +441,8 @@ def asignar(request):
 
         if curso == '4':
             return JsonResponse(distribucion_curso4(ubigeo, zona, curso, alta), safe=False)
+        elif curso == '1':
+            return JsonResponse(distribucion_curso1(), safe=False)
         else:
             if 'alta' in data:
                 pea_baja = PEA_AULA.objects.filter(id_localambiente__id_local__ubigeo=ubigeo,
@@ -542,6 +552,17 @@ def distribucion_curso4(ubigeo, zona, curso, alta=None):
                                                    pea_fecha=l.fecha_fin)
                                 ubicada.save()
     return pea_distribuida
+
+
+def distribucion_curso1():
+    personas = PEA.objects.filter(dni__in=['25709168', '10172799', '08158910']).values_list('id_pea', flat=True)
+    locales = Local.objects.all().filter(id_curso=1)
+    for i in locales:
+        for l in i.localambiente_set.all():
+            for p in personas:
+                save = PEA_AULA(id_localambiente_id=l.id_localambiente, id_pea_id=p)
+                save.save()
+    return [{'msg': True}]
 
 
 def distribucion_curso5(ubigeo, zona, curso):

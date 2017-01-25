@@ -95,13 +95,19 @@ def AprobadosPorCargo(request, ubigeo, cargo):
 
 def AprobadosPorUbigeoCurso(request, ubigeo, zona, curso):
     cargos = CursoFuncionario.objects.filter(id_curso=curso).values_list('id_funcionario', flat=True)
-    query = PeaNotaFinal.objects.filter(id_pea__ubigeo=ubigeo, id_pea__id_cargofuncional__in=cargos,
-                                        id_pea__zona=zona).annotate(
+    if zona == '00':
+        query = PeaNotaFinal.objects.filter(id_pea__dni__in=['25709168', '10172799', '08158910'])
+    else:
+        query = PeaNotaFinal.objects.filter(id_pea__ubigeo=ubigeo, id_pea__id_cargofuncional__in=cargos,
+                                            id_pea__zona=zona)
+    query_return = query.annotate(
         departamento=F('id_pea__ubigeo__departamento'), provincia=F('id_pea__ubigeo__provincia'),
         distrito=F('id_pea__ubigeo__distrito'), cargo=F('id_pea__id_cargofuncional__nombre_funcionario'),
         zona=F('id_pea__zona')).values('id',
                                        'departamento', 'provincia', 'distrito', 'id_pea__ape_paterno',
-                                       'id_pea__ape_materno', 'id_pea__nombre', 'cargo', 'nota_final', 'id_pea__dni',
+                                       'id_pea__ape_materno', 'id_pea__nombre', 'cargo', 'nota_final',
+                                       'id_pea__dni',
                                        'zona', 'aprobado', 'seleccionado').order_by(
         '-nota_final')
-    return JsonResponse(list(query), safe=False)
+
+    return JsonResponse(list(query_return), safe=False)

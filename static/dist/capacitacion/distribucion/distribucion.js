@@ -50,9 +50,9 @@ if (session.curso == '4') {
 
 
 function getLocales() {
-    var ubigeo = `${$('#departamentos').val()}${$('#provincias').val()}${$('#distritos').val()}`;
+    let ubigeo = `${session.ccdd}${session.ccpp}${session.ccdi}`;
     //let url = session.rol == '3' ? `${BASE_URL}localubigeo/${ubigeo}/${session.curso}/` : `${BASE_URL}localzona/${session.id}/`;
-    let url = session.rol == '3' ? `${BASE_URL}localubigeo/${ubigeo}/` : `${BASE_URL}localzona/${session.ccdd}${session.ccpp}${session.ccdi}/${session.curso}/${session.zona}`;
+    let url = session.rol__id == 1 ? `${BASE_URL}localubigeo/${ubigeo}/${session.curso}/` : `${BASE_URL}localzona/${session.ccdd}${session.ccpp}${session.ccdi}/${session.curso}/${session.zona}`;
     "use strict";
     $.ajax({
         url: url,
@@ -198,7 +198,6 @@ function getSobrantes() {
                     {"data": "cargo"},
                 ]
             });
-
             $('#modal_pea_sobrante').modal('show');
         },
         error: error => {
@@ -276,15 +275,8 @@ function redistribuirAula(id_localambiente) {
 
 function reporte_pea_asistencia_blanco() {
     "use strict";
-    let html = `<tr><th rowspan="2">N°</th><th rowspan="2">APELLIDOS</th><th rowspan="2">NOMBRES</th><th rowspan="2">CARGO</th>`;
-    let td_mt = `<tr>`;
-    $.each(rangofechas, (i, v) => {
-        html += `<th colspan="2">${v.substring(0, 5)}</th>`;
-        td_mt += `<th>M</th><th>T</th>`;
-    });
+    let html = `<tr><th rowspan="2">N°</th><th rowspan="2">APELLIDOS</th><th rowspan="2">NOMBRES</th><th rowspan="2">CARGO</th><th rowspan="2">ZONA</th>`;
     html += `</tr>`;
-    td_mt += `</tr>`;
-    html = html + td_mt;
 
     $('#tabla_reporte_pea_asistencia').find('thead').html(html);
     set_reporte_pea_asistencia_blanco();
@@ -308,9 +300,7 @@ function set_reporte_pea_asistencia_blanco() {
         html += `<td>${key.id_pea.ape_paterno} ${key.id_pea.ape_materno}</td>`;
         html += `<td>${key.id_pea.nombre}</td>`;
         html += `<td>${key.id_pea.id_cargofuncional.nombre_funcionario}</td>`;
-        rangofechas.map(fecha => {
-            html += `<td></td><td></td>`;
-        });
+        html += `<td>${key.id_pea.zona}</td>`;
         html += `</tr>`;
     });
     $('#tabla_reporte_pea_asistencia').find('tbody').html(html);

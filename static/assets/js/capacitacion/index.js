@@ -2,7 +2,7 @@
  * Created by LFarfan on 21/11/2016.
  */
 //BASE_URL = `http://localhost:8000/`;
-if (session.rol == '3') {
+if (session.rol__id == 1) {
     $('#zona').parent().remove();
     //$('#zona_ubicacion_local').parent().remove()
 } else {
@@ -18,7 +18,7 @@ var is_directorio = true;
 
 function getLocalesbyUbigeo() {
     var ubigeo = `${$('#departamentos').val()}${$('#provincias').val()}${$('#distritos').val()}`;
-    let url = session.rol == '3' ? `${BASE_URL}localubigeo/${ubigeo}/${session.curso}/` : `${BASE_URL}localzona/${session.ccdd}${session.ccpp}${session.ccdi}/${session.curso}/${session.zona}`;
+    let url = session.rol__id == 1 ? `${BASE_URL}localubigeo/${ubigeo}/${session.curso}/` : `${BASE_URL}localzona/${session.ccdd}${session.ccpp}${session.ccdi}/${session.curso}/${session.zona}`;
     $.ajax({
         async: false,
         url: url,
@@ -319,6 +319,9 @@ function getMetaPea() {
             $('#cant_reclutada').val(1500);
             if (session.curso == '1') {
                 $('#capacidad_ambiente').val(response.total_ambientes_distrito)
+                $('#cant_meta').val(3);
+                $('#cant_reclutada').val(10);
+                $('#aulas_meta_cantidad').val(1);
             } else {
                 $('#capacidad_ambiente').val(response.total_ambientes_zona)
             }
