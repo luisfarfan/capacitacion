@@ -44,7 +44,7 @@ urlpatterns = [
         PersonalQueSeDioDeAltaPorCurso),
     url(r'^aprobados_segun_cargo/(?P<ubigeo>[0-9]+)/(?P<cargo>[0-9]+)/$',
         AprobadosPorCargo),
-    url(r'^aprobados_curso/(?P<ubigeo>[0-9]+)/(?P<curso>[0-9]+)/$',
+    url(r'^aprobados_curso/(?P<ubigeo>[0-9]+)/(?P<zona>[0-9]+)/(?P<curso>[0-9]+)/$',
         AprobadosPorUbigeoCurso),
 
 ]

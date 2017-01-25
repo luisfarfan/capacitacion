@@ -299,6 +299,7 @@ class PeaNotaFinal(models.Model):
     id_curso = models.ForeignKey(Curso)
     nota_final = models.FloatField()
     aprobado = models.IntegerField(null=True)
+    seleccionado = models.IntegerField(null=True, default=0)
 
     class Meta:
         managed = True

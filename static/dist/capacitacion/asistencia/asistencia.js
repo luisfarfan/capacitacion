@@ -327,7 +327,7 @@ function fn_darAlta() {
         data: {'id_peas': id_pea},
         success: response => {
             $('#modal_pea_dar_alta').modal('hide');
-            doAsignacion();
+            doAsignacion(1);
         }
     });
 }
@@ -554,14 +554,14 @@ $("#btn_exportar_evaluacion").on('click', function () {
     Imprimir($('#tabla_reporte_pea_asistencia').parent().html());
 });
 
-function doAsignacion(show = false) {
+function doAsignacion(alta, show = false) {
     let ubigeo = `${session.ccdd}${session.ccpp}${session.ccdi}`;
     let data = session.curso == 4 ? {
-            ubigeo: ubigeo,
-            zona: `${session.zona}`,
-            id_curso: session.curso,
-            alta: 1
-        } : {ubigeo: ubigeo, zona: `${session.zona}`, id_curso: session.curso};
+        ubigeo: ubigeo,
+        zona: `${session.zona}`,
+        id_curso: session.curso,
+        alta: 1
+    } : {ubigeo: ubigeo, zona: `${session.zona}`, id_curso: session.curso, alta: alta};
     $.ajax({
         url: `${BASEURL}/asignacion/`,
         type: 'POST',

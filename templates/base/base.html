@@ -452,16 +452,19 @@
         });
     });
 
-    if (session.rol == 1) {
-        $('#asistencia').hide();
-        $('#notas').hide();
-    } else if (session.rol == 2) {
+    if (session.rol__id == 1 || session.rol__id == 3) {
+        $('#distribucion').hide();
+
+    } else if (session.rol__id == 2 || session.rol__id == 4) {
         $('#modulo_registro').hide();
         $('#distribucion').hide();
     }
-    if (session.curso == 4 || session.curso == 6) {
-        $('#notas').hide();
+    setUserData();
+    function setUserData() {
+        $('#usuario').text(`${session.rol__rol}`);
+        $('#tipo_cargo').text(`${session.curso__nombre_curso}`);
     }
+
 
     function getDepartamentos() {
         let array_departamentos = [{id: '', text: 'Seleccione'}];

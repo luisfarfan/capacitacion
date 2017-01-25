@@ -6,7 +6,7 @@
  */
 $(function () {
     getLocales();
-    if (session.rol == 3) {
+    if (session.rol__id == 3 || session.rol__id == 1) {
         $('#no_distrital').hide();
         $('#no_distrital_filtro').hide();
     } else {
@@ -244,8 +244,8 @@ function calcularPromedio(input) {
 
 function saveNotas() {
     "use strict";
-    if (session.rol == 3) {
-        alert_confirm(saveDistrital,'Esta usted seguro de guardar?')
+    if (session.rol__id == 3 || session.rol__id == 1) {
+        alert_confirm(saveDistrital, 'Esta usted seguro de guardar?')
     } else {
         let data_send = [];
         let faltantes = 0;
@@ -361,22 +361,29 @@ var reporte_data;
 function getReporte() {
     "use strict";
     let html = '';
-    $.getJSON(`${url}${session.ccdd}${session.ccpp}${session.ccdi}/${session.curso}`, response => {
+    $.getJSON(`${url}${session.ccdd}${session.ccpp}${session.ccdi}/${session.zona}/${session.curso}`, response => {
         reporte_data = response;
         response.map((k, v) => {
             html += `<tr>`;
             html += `<td>${k.departamento}</td><td>${k.provincia}</td><td>${k.distrito}</td>
                      <td>${k.id_pea__ape_paterno} ${k.id_pea__ape_materno} ${k.id_pea__nombre}</td>
-                     <td>${k.id_pea__dni}</td><td>${k.cargo}</td><td>${k.zona}</td><td>${k.nota_final}</td><td><input type="checkbox" ${k.aprobado == 1 ? 'checked' : ''} value="${k.id}" name="aprobado"></td>`;
+                     <td>${k.id_pea__dni}</td><td>${k.cargo}</td><td>${k.zona}</td><td>${k.nota_final}</td><td><input type="checkbox" ${k.aprobado == 1 ? 'checked' : ''} value="${k.id}" name="aprobado"></td>
+                     <td><input type="checkbox" ${k.seleccionado == 1 ? 'checked' : ''} value="${k.id}" name="seleccionado"></td>`;
             html += `</tr>`;
         });
         $('#tabla_reporte').find('tbody').append(html);
+        disabledApto();
     });
 }
 
+function disabledApto() {
+    $('input[name="aprobado"]').map((key, value) => {
+        $(value).prop('disabled', true)
+    });
+}
 function saveDistrital() {
     let data_post = {aprobados: [], desaprobados: []}
-    $('input[name="aprobado"]').map((key, value) => {
+    $('input[name="seleccionado"]').map((key, value) => {
         if (value.checked) {
             data_post.aprobados.push(value.value)
         } else {

@@ -426,6 +426,7 @@ def asignar(request):
         ubigeo = data['ubigeo']
         zona = data['zona']
         curso = data['id_curso']
+        cargos = list(CursoFuncionario.objects.filter(id_curso=curso).values_list('id_funcionario', flat=True))
         alta = None
         if 'alta' in data:
             alta = data['alta']
@@ -433,31 +434,50 @@ def asignar(request):
         if curso == '4':
             return JsonResponse(distribucion_curso4(ubigeo, zona, curso, alta), safe=False)
         else:
-            if 'zona' in data:
-                locales_zona = Local.objects.filter(ubigeo=ubigeo, zona=zona, id_curso=curso)
-            else:
-                locales_zona = Local.objects.filter(ubigeo=ubigeo, id_curso=curso)
+            if 'alta' in data:
+                pea_baja = PEA_AULA.objects.filter(id_localambiente__id_local__ubigeo=ubigeo,
+                                                   id_localambiente__id_local__zona=zona,
+                                                   id_pea__id_cargofuncional__in=cargos,
+                                                   id_pea__baja_estado=1).values('id_localambiente_id', 'id_pea_id',
+                                                                                 'pea_fecha')
 
-            for e in locales_zona:
-                aulas_by_local = LocalAmbiente.objects.filter(id_local=e.id_local).order_by('-capacidad')
-                for a in aulas_by_local:
-                    disponibilidad = disponibilidad_aula(a.id_localambiente)
-                    if disponibilidad > 0:
-                        if 'contingencia' not in data:
-                            pea_ubicar = PEA.objects.exclude(
-                                id_pea__in=PEA_AULA.objects.values('id_pea')).filter(
-                                ubigeo=ubigeo, zona=zona, contingencia=0, baja_estado=0,
-                                id_cargofuncional__in=Funcionario.objects.filter(id_curso=e.id_curso)).order_by(
-                                'ape_paterno')[:a.capacidad]
-                        else:
-                            pea_ubicar = PEA.objects.exclude(
-                                id_pea__in=PEA_AULA.objects.filter(id_pea__baja_estado=0).values('id_pea')).filter(
-                                pk__in=data['contingencia'])[:disponibilidad]
-                        for p in pea_ubicar:
-                            pea = PEA.objects.get(pk=p.id_pea)
-                            aula = LocalAmbiente.objects.get(pk=a.id_localambiente)
-                            pea_aula = PEA_AULA(id_pea=pea, id_localambiente=aula)
-                            pea_aula.save()
+                for i in pea_baja:
+                    _pea = list(
+                        PEA.objects.exclude(id_pea__in=PEA_AULA.objects.values('id_pea')).filter(ubigeo=ubigeo,
+                                                                                                 zona=zona,
+                                                                                                 id_cargofuncional__in=cargos,
+                                                                                                 contingencia=0,
+                                                                                                 alta_estado=1).values_list(
+                            'id_pea', flat=True))[:1]
+                    dar_alta = PEA_AULA(id_localambiente_id=i['id_localambiente_id'], pea_fecha=i['pea_fecha'],
+                                        id_pea_id=_pea[0])
+                    dar_alta.save()
+            else:
+                if 'zona' in data:
+                    locales_zona = Local.objects.filter(ubigeo=ubigeo, zona=zona, id_curso=curso)
+                else:
+                    locales_zona = Local.objects.filter(ubigeo=ubigeo, id_curso=curso)
+
+                for e in locales_zona:
+                    aulas_by_local = LocalAmbiente.objects.filter(id_local=e.id_local).order_by('-capacidad')
+                    for a in aulas_by_local:
+                        disponibilidad = disponibilidad_aula(a.id_localambiente)
+                        if disponibilidad > 0:
+                            if 'alta' not in data:
+                                pea_ubicar = PEA.objects.exclude(
+                                    id_pea__in=PEA_AULA.objects.values('id_pea')).filter(
+                                    ubigeo=ubigeo, zona=zona, contingencia=0, baja_estado=0,
+                                    id_cargofuncional__in=Funcionario.objects.filter(id_curso=e.id_curso)).order_by(
+                                    'ape_paterno')[:a.capacidad]
+                            else:
+                                pea_ubicar = PEA.objects.exclude(
+                                    id_pea__in=PEA_AULA.objects.filter(id_pea__baja_estado=0).values('id_pea')).filter(
+                                    alta_estado=1)[:disponibilidad]
+                            for p in pea_ubicar:
+                                pea = PEA.objects.get(pk=p.id_pea)
+                                aula = LocalAmbiente.objects.get(pk=a.id_localambiente)
+                                pea_aula = PEA_AULA(id_pea=pea, id_localambiente=aula)
+                                pea_aula.save()
 
             return JsonResponse({'msg': True})
 
@@ -637,11 +657,31 @@ def copy_directorio_to_seleccionado(request, id_directoriolocal, id_curso):
                   funcionario_cargo=directorio.funcionario_cargo, responsable_nombre=directorio.responsable_nombre,
                   responsable_email=directorio.responsable_email, responsable_telefono=directorio.responsable_telefono,
                   responsable_celular=directorio.responsable_celular, ubigeo_id=directorio.ubigeo_id,
-                  fecha_inicio=directorio.fecha_inicio, fecha_fin=directorio.fin,
-                  zona=directorio.zona)
+                  fecha_inicio=directorio.fecha_inicio, fecha_fin=directorio.fecha_fin,
+                  cantidad_total_aulas=directorio.cantidad_total_aulas,
+                  cantidad_disponible_aulas=directorio.cantidad_disponible_aulas,
+                  cantidad_usar_aulas=directorio.cantidad_usar_aulas,
+                  cantidad_total_auditorios=directorio.cantidad_total_auditorios,
+                  cantidad_disponible_auditorios=directorio.cantidad_disponible_auditorios,
+                  cantidad_usar_auditorios=directorio.cantidad_usar_auditorios,
+                  cantidad_total_sala=directorio.cantidad_total_sala,
+                  cantidad_disponible_sala=directorio.cantidad_disponible_sala,
+                  cantidad_usar_sala=directorio.cantidad_usar_sala,
+                  cantidad_total_oficina=directorio.cantidad_total_oficina,
+                  cantidad_disponible_oficina=directorio.cantidad_disponible_oficina,
+                  cantidad_usar_oficina=directorio.cantidad_usar_oficina,
+                  cantidad_total_otros=directorio.cantidad_total_otros,
+                  cantidad_disponible_otros=directorio.cantidad_disponible_otros,
+                  cantidad_usar_otros=directorio.cantidad_usar_otros,
+                  especifique_otros=directorio.especifique_otros,
+                  cantidad_total_computo=directorio.cantidad_total_computo,
+                  cantidad_disponible_computo=directorio.cantidad_disponible_computo,
+                  cantidad_usar_computo=directorio.cantidad_usar_computo,
+                  zona=directorio.zona, id_curso=directorio.id_curso)
     local.save()
     for i in localambientes:
-        ambientes = LocalAmbiente(id_local=local.id_local, id_ambiente=i.id_ambiente)
+        ambientes = LocalAmbiente(id_local_id=local.id_local, id_ambiente_id=i.id_ambiente_id, capacidad=i.capacidad,
+                                  n_piso=i.n_piso)
         ambientes.save()
 
     return JsonResponse({'msg': True}, safe=False)
@@ -853,7 +893,6 @@ def darAltaPea(request):
 def save_nota_final(request):
     if request.method == "POST" and request.is_ajax():
         data = json.loads(request.body)
-        aprobado = 0
         for i in data:
             try:
                 pea = PeaNotaFinal.objects.get(id_pea=PEA.objects.get(pk=i['id_pea']),
@@ -889,12 +928,7 @@ def save_aprobado_distrital(request):
 
     for i in aprobados:
         pea = PeaNotaFinal.objects.get(pk=i)
-        pea.aprobado = 1
-        pea.save()
-
-    for i in desaprobados:
-        pea = PeaNotaFinal.objects.get(pk=i)
-        pea.aprobado = 0
+        pea.seleccionado = 1
         pea.save()
 
     return JsonResponse({'msg': True}, safe=False)
