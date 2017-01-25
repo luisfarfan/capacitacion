@@ -207,7 +207,7 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
-CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = False
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (

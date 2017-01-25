@@ -4,7 +4,7 @@
 //BASE_URL = `http://localhost:8000/`;
 if (session.rol == '3') {
     $('#zona').parent().remove();
-    $('#zona_ubicacion_local').parent().remove()
+    //$('#zona_ubicacion_local').parent().remove()
 } else {
     $('#zona').parent().show();
 }
@@ -15,101 +15,6 @@ var local_marco = [];
 var local_marco_selected = {};
 var is_directorio = true;
 
-function hideAmbientes() {
-    is_directorio ? $('#ambientes_esconder').hide() : $('#ambientes_esconder').show();
-}
-
-$('#etapa').val(1);
-function resetForm(idform) {
-    "use strict";
-    $('#' + idform + ' :input').map(function () {
-        $(this).val('')
-    });
-    $('#' + idform + ' :input[type="checkbox"]').map(function () {
-        $(this).prop('checked', false);
-        $.uniform.update();
-    });
-}
-$(function () {
-    jQuery.extend(jQuery.validator.messages, {
-        required: "Este campo es obligatorio.",
-        remote: "Por favor, rellena este campo.",
-        email: "Por favor, escribe una dirección de correo válida",
-        url: "Por favor, escribe una URL válida.",
-        date: "Por favor, escribe una fecha válida.",
-        dateISO: "Por favor, escribe una fecha (ISO) válida.",
-        number: "Por favor, escribe un número entero válido.",
-        digits: "Por favor, escribe sólo dígitos.",
-        creditcard: "Por favor, escribe un número de tarjeta válido.",
-        equalTo: "Por favor, escribe el mismo valor de nuevo.",
-        accept: "Por favor, escribe un valor con una extensión aceptada.",
-        maxlength: jQuery.validator.format("Por favor, no escribas más de {0} caracteres."),
-        minlength: jQuery.validator.format("Por favor, no escribas menos de {0} caracteres."),
-        rangelength: jQuery.validator.format("Por favor, escribe un valor entre {0} y {1} caracteres."),
-        range: jQuery.validator.format("Por favor, escribe un valor entre {0} y {1}."),
-        max: jQuery.validator.format("Por favor, escribe un valor menor o igual a {0}."),
-        min: jQuery.validator.format("Por favor, escribe un valor mayor o igual a {0}.")
-    });
-    $('.select').select2();
-    $(".styled, .multiselect-container input").uniform({
-        radioClass: 'choice'
-    });
-
-    $('input[name="fecha_inicio"]').daterangepicker({
-        "minDate": fecha_hoy,
-        "maxDate": "31/10/2017",
-        singleDatePicker: true,
-        locale: {
-            format: 'DD/MM/YYYY'
-        }
-    }, function (chosen_date) {
-        $('input[name="fecha_inicio"]').val(chosen_date.format('DD/MM/YYYY'));
-    });
-
-    $('input[name="fecha_fin"]').daterangepicker({
-        "minDate": fecha_hoy,
-        "maxDate": "31/10/2017",
-        singleDatePicker: true,
-        locale: {
-            format: 'DD/MM/YYYY'
-        }
-    }, function (chosen_date) {
-        $('input[name="fecha_fin"]').val(chosen_date.format('DD/MM/YYYY'));
-    });
-    getDepartamentos();
-    getCursos(1);
-    getMetaPea();
-    hideAmbientes();
-});
-$('#departamentos').change(function () {
-    $('#provincias').find('option').remove();
-    getProvincias();
-});
-
-$('#provincias').change(function () {
-    $("#distritos").find('option').remove();
-    getDistritos();
-});
-
-$('#distritos').change(function () {
-    $("#zona").find('option').remove();
-    $('#zona_ubicacion_local').find('option').remove();
-    getZonas();
-});
-
-$('#buscarlocal').click(function () {
-    getLocalesbyUbigeo();
-});
-
-$('#buscarlocalmarco').click(function () {
-    getLocalesbyMarco();
-});
-
-
-$('#cursos').change(() => {
-    "use strict";
-    getMetaPea();
-});
 
 function getLocalesbyUbigeo() {
     var ubigeo = `${$('#departamentos').val()}${$('#provincias').val()}${$('#distritos').val()}`;
@@ -198,10 +103,15 @@ function saveUsuarioLocal(element, id_local) {
 
 function getLocal(id_local, directorio = true) {
     is_directorio = directorio;
-    hideAmbientes();
+    let url = '';
+    if (is_directorio) {
+        url = `${BASE_URL}rest/directorio_local/`;
+    } else {
+        url = `${BASE_URL}rest/local/`;
+    }
     $('#id_local').val(id_local);
     $.ajax({
-        url: `${BASE_URL}rest/local/${id_local}`,
+        url: `${url}${id_local}`,
         success: function (data) {
             local_selected = data;
             $(`#etapa`).val(1);
@@ -216,9 +126,7 @@ function getLocal(id_local, directorio = true) {
             $('#funcionario_nombre').trigger('change');
             $('#registrar_aulas_modal').prop('disabled', false);
             $('#modal_localesbyubigeo').modal('hide');
-            if (!is_directorio) {
-                getLocalAmbientes();
-            }
+            getLocalAmbientes()
 
         }
     });
@@ -226,7 +134,7 @@ function getLocal(id_local, directorio = true) {
 
 function setMarco(id_local) {
     is_directorio = true;
-    hideAmbientes();
+
     $('#id_local').val(id_local);
     local_selected = findInObject2(local_marco, id_local, 'id_local');
     $(`#etapa`).val(1);
@@ -237,8 +145,12 @@ function setMarco(id_local) {
             $(`input[name=${key}]`).val(val)
         }
     });
+    $('#capacidad_total').text(0);
+    $('#funcionario_nombre').trigger('change');
+    $('#registrar_aulas_modal').prop('disabled', false);
+    $('#modal_localesbyubigeo').modal('hide');
+    getLocalAmbientes();
     $('#modal_localesmarco').modal('hide');
-
 }
 function getCursos(id_etapa) {
     $('#cursos').find('option').remove();
@@ -251,208 +163,6 @@ function getCursos(id_etapa) {
         $('#cursos').val(session.curso);
     });
 }
-
-jQuery.validator.addMethod("validateFechaInicio", function (value, element) {
-    let fechafin = $('input[name="fecha_fin"]').val();
-    var part_ff = fechafin.split("/");
-    var fin = new Date(`${part_ff[1]}/${part_ff[0]}/${part_ff[2]}`);
-    var part_fi = value.split("/");
-    var inicio = new Date(`${part_fi[1]}/${part_fi[0]}/${part_fi[2]}`);
-
-    var f = Date.parse(fin);
-    var i = Date.parse(inicio);
-    return f >= i
-}, jQuery.validator.format("Fecha de Inicio tiene que ser menor que la Fecha Fin"));
-
-jQuery.validator.addMethod("esMenor", function (value, element) {
-    var nameelement = $(element).attr('name');
-    nameelement = nameelement.replace('usar', 'disponible');
-    var val_ne = $('#' + nameelement).val();
-    if (value == '') {
-        return true
-    } else {
-        return parseInt(value) <= parseInt(val_ne)
-    }
-
-}, jQuery.validator.format("Debe ser menor a Disponible"));
-
-jQuery.validator.addMethod("esMenor2", function (value, element) {
-    var nameelement = $(element).attr('name');
-    nameelement = nameelement.replace('disponible', 'total');
-    var val_ne = $('#' + nameelement).val();
-    if (value == '') {
-        return true
-    } else {
-        return parseInt(value) <= parseInt(val_ne)
-    }
-
-}, jQuery.validator.format("Debe ser menor a Total"));
-
-
-jQuery.validator.addMethod("validar9", function (value, element) {
-    var count = 0;
-    if (value.length > 0) {
-        for (let k in value) {
-            if (value[0] == value[parseInt(k) + 1]) {
-                count++;
-            }
-        }
-    }
-    console.log(count);
-    return (count > 5) ? false : true;
-}, jQuery.validator.format("Número no permitido"));
-
-jQuery.validator.addMethod("validateFechaFin", function (value, element) {
-    let fechafin = $('input[name="fecha_inicio"]').val();
-    var part_ff = fechafin.split("/");
-    var fin = new Date(`${part_ff[1]}/${part_ff[0]}/${part_ff[2]}`);
-    var part_fi = value.split("/");
-    var inicio = new Date(`${part_fi[1]}/${part_fi[0]}/${part_fi[2]}`);
-
-    var f = Date.parse(fin);
-    var i = Date.parse(inicio);
-
-    console.log(f, i);
-    console.log(f < i);
-    return f <= i
-}, jQuery.validator.format("Fecha de Fin tiene que ser mayor que la Fecha Inicio"));
-
-var validator = $(".form-validate-jquery").validate({
-    ignore: 'input[type=hidden], .select2-search__field', // ignore hidden fields
-    errorClass: 'validation-error-label',
-    successClass: 'validation-valid-label',
-    highlight: function (element, errorClass) {
-        $(element).removeClass(errorClass);
-    },
-    unhighlight: function (element, errorClass) {
-        $(element).removeClass(errorClass);
-    },
-
-    // Different components require proper error label placement
-    errorPlacement: function (error, element) {
-
-        // Styled checkboxes, radios, bootstrap switch
-        if (element.parents('div').hasClass("checker") || element.parents('div').hasClass("choice") || element.parent().hasClass('bootstrap-switch-container')) {
-            if (element.parents('label').hasClass('checkbox-inline') || element.parents('label').hasClass('radio-inline')) {
-                error.appendTo(element.parent().parent().parent().parent());
-            } else {
-                error.appendTo(element.parent().parent().parent().parent().parent());
-            }
-        }
-
-        // Unstyled checkboxes, radios
-        else if (element.parents('div').hasClass('checkbox') || element.parents('div').hasClass('radio')) {
-            error.appendTo(element.parent().parent().parent());
-        }
-
-        // Input with icons and Select2
-        else if (element.parents('div').hasClass('has-feedback') || element.hasClass('select2-hidden-accessible')) {
-            error.appendTo(element.parent());
-        }
-
-        // Inline checkboxes, radios
-        else if (element.parents('label').hasClass('checkbox-inline') || element.parents('label').hasClass('radio-inline')) {
-            error.appendTo(element.parent().parent());
-        }
-
-        // Input group, styled file input
-        else if (element.parent().hasClass('uploader') || element.parents().hasClass('input-group')) {
-            error.appendTo(element.parent().parent());
-        } else {
-            error.insertAfter(element);
-        }
-    },
-    validClass: "validation-valid-label",
-    rules: {
-        nombre_local: {
-            maxlength: 100
-        },
-        nombre_via: {
-            maxlength: 200
-        },
-        referencia: {
-            maxlength: 100
-        },
-        n_direccion: {
-            maxlength: 4
-        },
-        km_direccion: {
-            maxlength: 3
-        },
-        mz_direccion: {
-            maxlength: 4
-        },
-        lote_direccion: {
-            maxlength: 4
-        },
-        piso_direccion: {
-            maxlength: 1
-        },
-        telefono_local_fijo: {
-            maxlength: 9
-        },
-        telefono_local_celular: {
-            maxlength: 10,
-            validar9: true
-        },
-        fecha_fin: {
-            validateFechaFin: true,
-        },
-        responsable_nombre: {
-            minlength: 9,
-        },
-        responsable_email: {
-            minlength: 1,
-        },
-        responsable_telefono: {
-            maxlength: 9
-        },
-        responsable_celular: {
-            maxlength: 10,
-            validar9: true
-        },
-        cantidad_disponible_aulas: {
-            esMenor2: true
-        },
-        cantidad_disponible_auditorios: {
-            esMenor2: true
-        },
-        cantidad_disponible_sala: {
-            esMenor2: true
-        },
-        cantidad_disponible_oficina: {
-            esMenor2: true
-        },
-        cantidad_disponible_otros: {
-            esMenor2: true
-        },
-        cantidad_usar_aulas: {
-            esMenor: true
-        },
-        cantidad_usar_auditorios: {
-            esMenor: true
-        },
-        cantidad_usar_sala: {
-            esMenor: true
-        },
-        cantidad_usar_oficina: {
-            esMenor: true
-        },
-        cantidad_usar_otros: {
-            esMenor: true
-        },
-    },
-    messages: {
-        custom: {
-            required: "El campo es requerido",
-        },
-        agree: "Please accept our policy"
-    }
-});
-
-$('#reset').on('click', function () {
-    location.reload();
-});
 
 $('#registrar').on('click', function () {
     validator.form();
@@ -492,40 +202,44 @@ $('#registrar').on('click', function () {
                     var array_ambientes = [];
                     $.each(data, function (key, val) {
                         datapost[val.name] = val.value;
+                        if (val.name == "zona_ubicacion_local") {
+                            datapost['zona'] = val.value;
+                        }
                     });
                     datapost['ubigeo'] = `${$('#departamentos').val()}${$('#provincias').val()}${$('#distritos').val()}`;
-                    datapost['zona'] = `${session.zona}`;
+                    session.zona != null ? datapost['zona'] = session.zona : '';
 
                     $.ajax({
                         method: method,
                         data: datapost,
                         url: url,
                         success: function (data) {
-                            if (!is_directorio) {
-                                object = {
-                                    'id_local': data.id_local,
-                                    'cantidad_usar_aulas': data.cantidad_usar_aulas,
-                                    'cantidad_usar_auditorios': data.cantidad_usar_auditorios,
-                                    'cantidad_usar_sala': data.cantidad_usar_sala,
-                                    'cantidad_usar_oficina': data.cantidad_usar_oficina,
-                                    'cantidad_usar_computo': data.cantidad_usar_computo,
-                                    'cantidad_usar_otros': data.cantidad_usar_otros,
-                                }
-                                $.ajax({
-                                    url: `${BASEURL}/generar_ambientes/`,
-                                    type: 'POST',
-                                    data: object,
-                                    success: response => {
-                                        "use strict";
-                                        resetForm('form_local');
-                                        $('#tabla_aulas').dataTable().fnDestroy();
-                                        $('#tabla_aulas').find('tbody').empty();
-                                        $('#capacidad_total').text(0);
-                                        $('#etapa').val(1);
-                                        getLocal(data.id_local, false);
-                                    }
-                                });
+                            object = {
+                                'id_local': data.id_local,
+                                'cantidad_usar_aulas': data.cantidad_usar_aulas,
+                                'cantidad_usar_auditorios': data.cantidad_usar_auditorios,
+                                'cantidad_usar_sala': data.cantidad_usar_sala,
+                                'cantidad_usar_oficina': data.cantidad_usar_oficina,
+                                'cantidad_usar_computo': data.cantidad_usar_computo,
+                                'cantidad_usar_otros': data.cantidad_usar_otros,
+                                'directorio': 1
                             }
+                            is_directorio ? object.directorio = 1 : object.directorio = 0;
+                            console.log(object);
+                            $.ajax({
+                                url: `${BASEURL}/generar_ambientes/`,
+                                type: 'POST',
+                                data: object,
+                                success: response => {
+                                    "use strict";
+                                    resetForm('form_local');
+                                    $('#tabla_aulas').dataTable().fnDestroy();
+                                    $('#tabla_aulas').find('tbody').empty();
+                                    $('#capacidad_total').text(0);
+                                    $('#etapa').val(1);
+                                    getLocal(data.id_local, is_directorio);
+                                }
+                            });
                         }
                     });
                 }
@@ -535,13 +249,17 @@ $('#registrar').on('click', function () {
 
 function getLocalAmbientes() {
     let id_local = $('#id_local').val();
-    let url = `${BASE_URL}localambiente/${id_local}/`;
+
+    let url = ``;
+    if (is_directorio) {
+        url = `${BASE_URL}directorio_localambiente/${id_local}`;
+    } else {
+        url = `${BASE_URL}localambiente/${id_local}/`;
+    }
 
     let html = '';
     $('#tabla_aulas').dataTable().fnDestroy();
-
     $.getJSON(url, function (data) {
-        console.log(data);
         let capacidad_total = 0;
         $('#tabla_aulas').find('tbody').empty();
         let otros_label = `Otros(${local_selected.especifique_otros})`;
@@ -564,7 +282,6 @@ function getLocalAmbientes() {
                 "lengthMenu": [[5, 10, 30, -1], [5, 10, 30, "All"]]
             });
             validarMetaPea();
-
         }
     });
 }
@@ -651,27 +368,17 @@ function eliminarAmbiente(id_localambiente) {
 }
 
 
-$('#funcionario_nombre').change(e => {
-    "use strict";
-    let id_per = $('#funcionario_nombre').val();
-    id_per = id_per.trim();
-    $.getJSON(`${BASEURL}/get_funcionarioinei/${id_per}/`, response => {
-        $('input[name="funcionario_email"]').val(response[0].correo);
-        $('input[name="funcionario_cargo"]').val(response[0].cargo);
-        $('input[name="funcionario_celular"]').val(response[0].celular);
-    });
-});
-
 function saveLocalambiente(element, id_localambiente) {
     "use strict";
     let id_local = $('#id_local').val();
     let url = `${BASE_URL}localambiente/${id_local}/`;
 
+    let url_set_capacidad = is_directorio ? `${BASE_URL}rest/directorio_localambiente/${id_localambiente}/` : `${BASE_URL}rest/localambiente/${id_localambiente}/`;
     let tr = $(element).parent().parent().parent().parent();
     let capacidad = $(tr).find('input[name="capacidad_ambiente"]').val();
     let piso = $(tr).find('input[name="piso_ambiente"]').val();
     $.ajax({
-        url: `${BASE_URL}rest/localambiente/${id_localambiente}/`,
+        url: url_set_capacidad,
         type: 'PATCH',
         data: {capacidad: capacidad, n_piso: piso},
         success: response => {

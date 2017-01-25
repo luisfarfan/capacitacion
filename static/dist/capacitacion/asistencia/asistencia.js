@@ -132,10 +132,6 @@ function getPEA(id_localambiente) {
         type: 'GET',
         success: response => {
             peaaula = response;
-            if (response[0]['id_instructor'] !== undefined) {
-                response[0].id_instructor != null ? $('#instructor').val(response[0].id_instructor).trigger("change") : $('#instructor').val(-1).trigger("change");
-            }
-
             let fecha_selected = $('#fechas').val();
             let json = {};
             let html = '';
@@ -144,23 +140,27 @@ function getPEA(id_localambiente) {
                             <th>Nombre Completo</th>
                             <th>Cargo</th>`;
             let pea_por_fecha = [];
-            if (session.curso == 4) {
-                pea_por_fecha = peaaula.filter(function (e) {
-                    return e.pea_fecha == $('#fechas').val();
-                });
-            } else {
-                pea_por_fecha = peaaula;
-            }
-
-            $.each(pea_por_fecha, (key, val) => {
-                html += `<tr ${val.id_pea.baja_estado == 1 ? 'style="background-color: #f1a6a6"' : "" }>`;
-                html += `<td>${key + 1}</td>`;
-                html += `<td>${val.id_pea.ape_paterno} ${val.id_pea.ape_materno} ${val.id_pea.nombre}</td><td>${val.id_pea.id_cargofuncional.nombre_funcionario}</td>`;
-
-                if (val.id_pea.baja_estado == 1) {
-                    html += `<td></td><td></td>`;
+            if (peaaula.length > 0) {
+                if ('id_instructor' in response[0]) {
+                    response[0].id_instructor != null ? $('#instructor').val(response[0].id_instructor).trigger("change") : $('#instructor').val(-1).trigger("change");
+                }
+                if (session.curso == 4) {
+                    pea_por_fecha = peaaula.filter(function (e) {
+                        return e.pea_fecha == $('#fechas').val();
+                    });
                 } else {
-                    html += `<td><div name="m${fecha_selected}" class="form-group">
+                    pea_por_fecha = peaaula;
+                }
+
+                $.each(pea_por_fecha, (key, val) => {
+                    html += `<tr ${val.id_pea.baja_estado == 1 ? 'style="background-color: #f1a6a6"' : "" }>`;
+                    html += `<td>${key + 1}</td>`;
+                    html += `<td>${val.id_pea.ape_paterno} ${val.id_pea.ape_materno} ${val.id_pea.nombre}</td><td>${val.id_pea.id_cargofuncional.nombre_funcionario}</td>`;
+
+                    if (val.id_pea.baja_estado == 1) {
+                        html += `<td></td><td></td>`;
+                    } else {
+                        html += `<td><div name="m${fecha_selected}" class="form-group">
                                         <input type="hidden" id="id_peaaula" name="id_peaaula${val.id_peaaula}" value="${val.id_peaaula}">
 										<div class="checkbox checkbox-right">
 											<label>
@@ -181,7 +181,7 @@ function getPEA(id_localambiente) {
 											</label>
 										</div>
 									</div></td>`;
-                    html += `<td><div name="${fecha_selected}" class="form-group">
+                        html += `<td><div name="${fecha_selected}" class="form-group">
                                         <input type="hidden" id="id_peaaula" name="id_peaaula${val.id_peaaula}" value="${val.id_peaaula}">
 										<div class="checkbox checkbox-right">
 											<label>
@@ -203,17 +203,19 @@ function getPEA(id_localambiente) {
 											</label>
 										</div>
 									</div></td>`;
-                }
-                html += '</tr>';
-            });
-            thead += `<th>MAÑANA</th><th>TARDE</th>`;
-            thead += `</tr>`;
-            json.html = html;
+                    }
+                    html += '</tr>';
+                });
+                thead += `<th>MAÑANA</th><th>TARDE</th>`;
+                thead += `</tr>`;
+                json.html = html;
+            } else {
+                $('#instructor').val(-1).trigger("change");
+            }
             $('#tabla_pea').find('thead').html(thead);
             setTable('tabla_pea', json);
             disabledTurnos(turno);
             $('#tabla_pea').DataTable();
-
         },
         error: error => {
             console.log('ERROR!!', error)

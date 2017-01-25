@@ -219,7 +219,25 @@ def TbLocalAmbienteByLocalViewSet(request, id_local, fecha=None):
             nombre_ambiente=F('id_ambiente__nombre_ambiente'), cant_pea=Count('pea')).values(
             'id_localambiente', 'numero', 'capacidad', 'nombre_ambiente', 'n_piso', 'cant_pea').order_by(
             'id_ambiente')
-    print fecha
+    return JsonResponse(
+        {'ambientes': list(query_response), 'ubigeo': local.ubigeo_id, 'zona': local.zona,
+         'id_curso': local.id_curso_id},
+        safe=False)
+
+
+def Directorio_Local_Ambientes(request, id_local, is_directorio="1"):
+    if is_directorio == "1":
+        local = DirectorioLocal.objects.get(pk=id_local)
+        ambientes = DirectorioLocalAmbiente
+    else:
+        local = Local.objects.get(pk=id_local)
+        ambientes = LocalAmbiente
+
+    query_response = ambientes.objects.order_by('-capacidad').filter(id_local=id_local).annotate(
+        nombre_ambiente=F('id_ambiente__nombre_ambiente')).values(
+        'id_localambiente', 'numero', 'capacidad', 'nombre_ambiente', 'n_piso').order_by(
+        'id_ambiente')
+
     return JsonResponse(
         {'ambientes': list(query_response), 'ubigeo': local.ubigeo_id, 'zona': local.zona,
          'id_curso': local.id_curso_id},
@@ -248,6 +266,11 @@ class LocalViewSet(viewsets.ModelViewSet):
 class DirectorioLocalViewSet(viewsets.ModelViewSet):
     queryset = DirectorioLocal.objects.all()
     serializer_class = DirectorioLocalSerializer
+
+
+class DirectorioLocalAmbienteViewSet(viewsets.ModelViewSet):
+    queryset = DirectorioLocalAmbiente.objects.all()
+    serializer_class = DirectorioLocalAmbienteSerializer
 
 
 class CursoLocalViewSet(viewsets.ModelViewSet):
@@ -601,8 +624,10 @@ def redistribuir_aula(request, id_localambiente):
 def copy_directorio_to_seleccionado(request, id_directoriolocal, id_curso):
     curso_local = CursoLocal.objects.get(curso=id_curso, id_cursolocal=id_directoriolocal)
     directorio = DirectorioLocal.objects.get(pk=id_directoriolocal)
+    localambientes = DirectorioLocalAmbiente.objects.filter(id_local=id_directoriolocal)
     print directorio
     local = Local(curso_local=curso_local, nombre_local=directorio.nombre_local, nombre_via=directorio.nombre_via,
+                  zona_ubicacion_local=directorio.zona_ubicacion_local,
                   mz_direccion=directorio.mz_direccion, tipo_via=directorio.tipo_via, referencia=directorio.referencia,
                   n_direccion=directorio.n_direccion, km_direccion=directorio.km_direccion,
                   lote_direccion=directorio.lote_direccion, piso_direccion=directorio.piso_direccion,
@@ -612,8 +637,12 @@ def copy_directorio_to_seleccionado(request, id_directoriolocal, id_curso):
                   funcionario_cargo=directorio.funcionario_cargo, responsable_nombre=directorio.responsable_nombre,
                   responsable_email=directorio.responsable_email, responsable_telefono=directorio.responsable_telefono,
                   responsable_celular=directorio.responsable_celular, ubigeo_id=directorio.ubigeo_id,
+                  fecha_inicio=directorio.fecha_inicio, fecha_fin=directorio.fin,
                   zona=directorio.zona)
     local.save()
+    for i in localambientes:
+        ambientes = LocalAmbiente(id_local=local.id_local, id_ambiente=i.id_ambiente)
+        ambientes.save()
 
     return JsonResponse({'msg': True}, safe=False)
 
@@ -739,35 +768,46 @@ def generar_ambientes(request):
                 ambientes[i] = int(data[i])
 
         id_local = data['id_local']
+
+        if data['directorio'] == "1":
+            ambiente_local = DirectorioLocalAmbiente
+            local = DirectorioLocal
+        else:
+            ambiente_local = LocalAmbiente
+            local = Local
+
         object = {
-            'cantidad_usar_aulas': [restar(LocalAmbiente.objects.filter(id_local=id_local, id_ambiente=1).count(),
+            'cantidad_usar_aulas': [restar(ambiente_local.objects.filter(id_local=id_local, id_ambiente=1).count(),
                                            ambientes['cantidad_usar_aulas']), 1],
-            'cantidad_usar_auditorios': [restar(LocalAmbiente.objects.filter(id_local=id_local, id_ambiente=2).count(),
-                                                ambientes['cantidad_usar_auditorios']), 2],
-            'cantidad_usar_sala': [restar(LocalAmbiente.objects.filter(id_local=id_local, id_ambiente=3).count(),
+            'cantidad_usar_auditorios': [
+                restar(ambiente_local.objects.filter(id_local=id_local, id_ambiente=2).count(),
+                       ambientes['cantidad_usar_auditorios']), 2],
+            'cantidad_usar_sala': [restar(ambiente_local.objects.filter(id_local=id_local, id_ambiente=3).count(),
                                           ambientes['cantidad_usar_sala']), 3],
-            'cantidad_usar_oficina': [restar(LocalAmbiente.objects.filter(id_local=id_local, id_ambiente=4).count(),
-                                             ambientes['cantidad_usar_oficina']), 4],
-            'cantidad_usar_computo': [restar(LocalAmbiente.objects.filter(id_local=id_local, id_ambiente=5).count(),
-                                             ambientes['cantidad_usar_computo']), 5],
-            'cantidad_usar_otros': [restar(LocalAmbiente.objects.filter(id_local=id_local, id_ambiente=6).count(),
+            'cantidad_usar_oficina': [
+                restar(ambiente_local.objects.filter(id_local=id_local, id_ambiente=4).count(),
+                       ambientes['cantidad_usar_oficina']), 4],
+            'cantidad_usar_computo': [
+                restar(ambiente_local.objects.filter(id_local=id_local, id_ambiente=5).count(),
+                       ambientes['cantidad_usar_computo']), 5],
+            'cantidad_usar_otros': [restar(ambiente_local.objects.filter(id_local=id_local, id_ambiente=6).count(),
                                            ambientes['cantidad_usar_otros']), 6]
         }
 
         for i in object:
             if object[i][0] > 0:
                 for a in range(object[i][0]):
-                    localambiente = LocalAmbiente(id_local=Local.objects.get(pk=id_local),
-                                                  id_ambiente=Ambiente.objects.get(pk=object[i][1]))
+                    localambiente = ambiente_local(id_local=local.objects.get(pk=id_local),
+                                                   id_ambiente=Ambiente.objects.get(pk=object[i][1]))
                     localambiente.save()
             elif object[i][0] < 0:
-                borrar = LocalAmbiente.objects.filter(id_local=Local.objects.get(pk=id_local),
-                                                      id_ambiente=Ambiente.objects.get(pk=object[i][1])). \
+                borrar = ambiente_local.objects.filter(id_local=local.objects.get(pk=id_local),
+                                                       id_ambiente=Ambiente.objects.get(pk=object[i][1])). \
                              order_by('-id_localambiente')[:(-1 * object[i][0])]
 
-                LocalAmbiente.objects.filter(pk__in=borrar).delete()
+                ambiente_local.objects.filter(pk__in=borrar).delete()
 
-    return JsonResponse({'msg': True})
+        return JsonResponse(list(object), safe=False)
 
 
 @csrf_exempt
@@ -824,6 +864,8 @@ def save_nota_final(request):
             if pea is None:
                 if float(i['nota_final']) >= 11:
                     aprobado = 1
+                else:
+                    aprobado = 0
                 pea_nota_final = PeaNotaFinal(nota_final=i['nota_final'],
                                               id_pea=PEA.objects.get(pk=i['id_pea']),
                                               id_curso=Curso.objects.get(pk=i['id_curso']), aprobado=aprobado)
@@ -831,6 +873,8 @@ def save_nota_final(request):
             else:
                 if float(i['nota_final']) >= 11:
                     aprobado = 1
+                else:
+                    aprobado = 0
                 pea.nota_final = i['nota_final']
                 pea.aprobado = aprobado
                 pea.save()

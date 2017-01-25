@@ -18,11 +18,13 @@ function do_login() {
         type: 'POST',
         data: {usuario: $('#usuario').val(), clave: $('#clave').val()},
         success: function (response) {
+            let modulo = 'modulo_registro';
             if (response.length > 0) {
-                session_response = response[0];
-                session_response[0]['descripcion_curso'] = response[1];
-                localStorage.setItem('usuario', JSON.stringify(session_response[0]));
-                window.location.replace(`${BASEURL}/modulo_registro`);
+                localStorage.setItem('usuario', JSON.stringify(response[0]));
+                if (response[0].rol__id == 2 || response[0].rol__id == 4) {
+                    modulo = 'asistencia';
+                }
+                window.location.replace(`${BASEURL}/${modulo}`);
             } else {
                 alert('ERROR!')
             }

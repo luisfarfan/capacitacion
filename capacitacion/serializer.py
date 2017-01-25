@@ -61,6 +61,12 @@ class LocalAmbienteSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class DirectorioLocalAmbienteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DirectorioLocal
+        fields = '__all__'
+
+
 class PEA_Serializer(serializers.ModelSerializer):
     class Meta:
         model = PEA

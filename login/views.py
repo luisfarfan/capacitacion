@@ -21,10 +21,10 @@ def do_login(request):
     if request.method == "POST" and request.is_ajax():
         usuario = request.POST['usuario']
         clave = request.POST['clave']
-        user = User.objects.filter(usuario=usuario, clave=clave).values()
-        curso = Curso.objects.get(pk=user[0]['curso'])
+        user = User.objects.filter(usuario=usuario, clave=clave).values('usuario', 'ccdd', 'ccpp', 'ccdi', 'zona',
+                                                                        'curso', 'rol__rol', 'curso__nombre_curso','rol__id')
 
         if user is not None:
-            return JsonResponse([list(user), curso.nombre_curso], safe=False)
+            return JsonResponse(list(user), safe=False)
 
-    return JsonResponse({'msg': True}, safe=False)
+        return JsonResponse({'msg': True}, safe=False)

@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 
 from django.db import models
-from login.models import User
 
 
 # Create your models here.
@@ -360,6 +359,26 @@ class DirectorioLocal(models.Model):
     class Meta:
         managed = True
         db_table = 'DIRECTORIO_LOCAL'
+
+
+class DirectorioLocalAmbiente(models.Model):
+    id_localambiente = models.AutoField(primary_key=True, db_column='id_localambiente')
+    id_local = models.ForeignKey('DirectorioLocal', on_delete=models.CASCADE)
+    id_ambiente = models.ForeignKey('Ambiente')
+    numero = models.IntegerField(blank=True, null=True)
+    n_piso = models.IntegerField(blank=True, null=True)
+    capacidad = models.IntegerField(blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = 'DIRECTORIOLOCAL_AMBIENTE'
+
+    def save(self, *args, **kwargs):
+        if self.id_localambiente is None:
+            self.numero = DirectorioLocalAmbiente.objects.filter(id_local=self.id_local,
+                                                                 id_ambiente=self.id_ambiente).count()
+            self.numero = self.numero + 1
+        return super(DirectorioLocalAmbiente, self).save(*args, **kwargs)
 
 
 class CursoLocal(models.Model):
