@@ -376,8 +376,8 @@ class DirectorioLocalAmbiente(models.Model):
 
     def save(self, *args, **kwargs):
         if self.id_localambiente is None:
-            self.numero = DirectorioLocalAmbiente.objects.filter(id_local=self.id_local,
-                                                                 id_ambiente=self.id_ambiente).count()
+            self.numero = DirectorioLocalAmbiente.objects.filter(id_local_id=self.id_local,
+                                                                 id_ambiente_id=self.id_ambiente).count()
             self.numero = self.numero + 1
         return super(DirectorioLocalAmbiente, self).save(*args, **kwargs)
 

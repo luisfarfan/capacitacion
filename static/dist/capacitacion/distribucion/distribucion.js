@@ -16,6 +16,7 @@ var id_localambiente;
 var id_ambiente = undefined;
 var locales = [];
 var local_selected = {};
+var peaaula = [];
 //
 
 $('#local').change(e => {
@@ -23,8 +24,6 @@ $('#local').change(e => {
     getRangoFechas($('#local').val());
     $('#tabla_pea').find('tbody').empty();
     local_selected = findInObject2(locales, $('#local').val(), 'id_local');
-    console.log(local_selected);
-    console.log(rangofechas);
     setTimeout(getAmbientes($('#local').val(), 0), 1000);
 });
 
@@ -122,6 +121,7 @@ function getPEA(id_ambiente) {
     }
     ajax_options['success'] = (response => {
         let html = '';
+        peaaula = response;
         $('#tabla_pea').find('tbody').empty();
         $.each(response, (key, val) => {
             html += `<tr>`;

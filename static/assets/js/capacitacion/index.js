@@ -122,6 +122,7 @@ function getLocal(id_local, directorio = true) {
                     $(`input[name=${key}]`).val(val)
                 }
             });
+            $('#cursos').val(session.curso);
             $('#capacidad_total').text(0);
             $('#funcionario_nombre').trigger('change');
             $('#registrar_aulas_modal').prop('disabled', false);

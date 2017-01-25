@@ -63,7 +63,7 @@ class LocalAmbienteSerializer(serializers.ModelSerializer):
 
 class DirectorioLocalAmbienteSerializer(serializers.ModelSerializer):
     class Meta:
-        model = DirectorioLocal
+        model = DirectorioLocalAmbiente
         fields = '__all__'
 
 

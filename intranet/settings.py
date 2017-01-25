@@ -26,7 +26,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['172.16.2.205', 'localhost','192.168.200.123']
 
-DEPLOY = 'CASA'
+DEPLOY = 'INEI'
 # Application definition
 
 INSTALLED_APPS = [

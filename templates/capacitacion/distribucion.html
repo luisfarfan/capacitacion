@@ -30,6 +30,7 @@
                     </button>
                     <button data-toggle="modal" onclick="getReserva()" class="btn btn-primary">PEA CONTINGENCIA
                     </button>
+                    <button onclick="reporte_pea_asistencia_blanco()" class="btn btn-primary">Ver Listado Reporte</button>
                 </div>
             </div>
         </div>
@@ -206,7 +207,46 @@
             </div>
         </div>
     </div>
+    <div id="modal_reporte_pea_exportar" class="modal fade">
+        <div class="modal-dialog modal-full">
+            <div class="row">
+                <a href="#" download="" id="btn_exportar_evaluacion" class="btn btn-primary">Exportar</a>
+            </div>
+            <div id="div_listado_reporte" class="modal-content">
+                <div class="modal-header bg-primary">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h6 class="modal-title">Reporte PEA Asistencia</h6>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="table table-responsive">
+                            <table align="left" style="font-family:Arial; font-size:10px; width: 90%;" border="1"
+                                   cellpadding="2" cellspacing="2" bordercolor="#DFDFDF"
+                                   id="tabla_reporte_pea_asistencia" class="table table-bordered">
+                                <caption>
+                                    <center><h4 class="text-center">CENSOS NACIONALES 2017: XII DE POBLACIÓN, VII DE
+                                        VIVIENDA Y III DE COMNIDADES INDÍGENAS</h4>
+                                        <h4 class="text-center">CENSO EXPERIMENTAL</h4>
+                                        <h4 id="descripcion_curso_aula" class="text-center"></h4>
+                                        <h4 id="descripcion_aula" class="text-center"></h4></center>
+                                </caption>
+                                <thead>
 
+                                </thead>
+                                <tbody>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
 {% block js %}

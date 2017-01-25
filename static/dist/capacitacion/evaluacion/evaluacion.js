@@ -9,6 +9,7 @@ $(function () {
     if (session.rol__id == 3 || session.rol__id == 1) {
         $('#no_distrital').hide();
         $('#no_distrital_filtro').hide();
+        $('#btn_exportar_evaluacion').hide();
     } else {
         $('#tabla_reporte').hide();
     }

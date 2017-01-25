@@ -4,7 +4,7 @@
 
 $(function () {
     getDepartamentos();
-    getCursos();
+    //getCursos();
 });
 
 $('#departamentos').change(function () {
@@ -48,13 +48,13 @@ function getUbigeoQueryParameters() {
     }
     return queryParameters;
 }
-
 function getReporte() {
     "use strict";
     getUbigeoQueryParameters();
     $.getJSON(`${url_directorio_local}${queryParameters}`, response => {
         let html = '';
         reporte_data = response;
+        //console.log(reporte_data);
         reporte_data.map((key, val) => {
             html += `<tr>`;
             html += `<td>${parseInt(val) + 1}</td><td>${key.ubigeo__departamento}</td><td>${key.ubigeo__provincia}</td><td>${key.ubigeo__distrito}</td><td>${key.id_curso__nombre_curso}</td><td>${key.nombre_local}</td>
@@ -62,7 +62,7 @@ function getReporte() {
                      <td>${key.responsable_nombre}</td><td>${key.responsable_telefono}</td><td>${key.dcount}</td>`;
             html += `</tr>`;
         });
-        $('#tabla_reporte').find('tbody').html(html)
+        $('#tabla_reporte').find('tbody').html(html);
     });
 }
 
