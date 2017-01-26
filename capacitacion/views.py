@@ -23,7 +23,7 @@ def modulo_registro(request):
                                                    'nombre', 'dni')
     context = {
         'titulo_padre': 'Capacitacion',
-        'titulo_hijo': 'REGISTRO DE LOCAL',
+        'titulo_hijo': 'Modulo de registro de local',
         'funcionarios': funcionarios,
     }
     return HttpResponse(template.render(context, request))
@@ -54,7 +54,7 @@ def distribucion(request):
     template = loader.get_template('capacitacion/distribucion.html')
     context = {
         'titulo_padre': 'Capacitacion',
-        'titulo_hijo': 'Modulo de Distribucion'
+        'titulo_hijo': 'Modulo de Distribucion de PEA'
     }
     return HttpResponse(template.render(context, request))
 
@@ -64,8 +64,7 @@ def evaluacion(request):
 
     context = {
         'titulo_padre': 'Capacitacion',
-        'titulo_hijo': 'Modulo de Evaluacion',
-
+        'titulo_hijo': 'Modulo de registro de notas y resultado',
     }
     return HttpResponse(template.render(context, request))
 
@@ -555,7 +554,8 @@ def distribucion_curso4(ubigeo, zona, curso, alta=None):
 
 
 def distribucion_curso1():
-    personas = PEA.objects.filter(dni__in=['25709168', '10172799', '08158910']).values_list('id_pea', flat=True)
+    personas = PEA.objects.exclude(id_pea__in=PEA_AULA.objects.values('id_pea')).filter(
+        dni__in=['25709168', '10172799', '08158910']).values_list('id_pea', flat=True)
     locales = Local.objects.all().filter(id_curso=1)
     for i in locales:
         for l in i.localambiente_set.all():

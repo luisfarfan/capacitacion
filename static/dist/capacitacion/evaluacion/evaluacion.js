@@ -136,6 +136,7 @@ function getPEA(id_localambiente) {
         url: `${BASEURL}/peaaulaasistencia/${id_localambiente}/`,
         type: 'GET',
         success: response => {
+            peaaula = response;
             let count = 1;
             $.each(response, (i, v) => {
                     $.ajax({
@@ -155,6 +156,7 @@ function getPEA(id_localambiente) {
                     $.each(criterios, k => {
                         if (criterios[k].id_criterio == 2) {
                             $.each(response[i].peaaulas, a => {
+                                let count_falta = 0;
                                 switch (response[i].peaaulas[a].turno_manana) {
                                     case 1:
                                         nota_asistencia = nota_asistencia - 0.5;
@@ -228,11 +230,11 @@ function calcularPromedio(input) {
     $.each(criterios, i => {
         let input_nota = $($(`input[name="${criterios[i].id_cursocriterio}"]`)[rowindex]).val();
         input_nota == '' ? input_nota = 0 : '';
-        promedio = promedio + (parseInt(input_nota) * (parseInt(criterios[i].ponderacion) / 100));
+        promedio = promedio + (parseFloat(input_nota) * (parseFloat(criterios[i].ponderacion) / 100));
     })
     //$($(`input[name="nota_final"]`)[rowindex]).val(Math.round(promedio * 100) / 100);
-    promedio = Math.round(promedio * 1000) / 1000;
-    $(`input[name="nota_final"]`)[rowindex].value = Math.round(promedio * 1000) / 1000;
+    promedio = Math.round(promedio * 100) / 100;
+    $(`input[name="nota_final"]`)[rowindex].value = Math.round(promedio * 100) / 100;
     if (promedio >= 11) {
         $('input[name="aptos"]')[rowindex].checked = true
     } else {

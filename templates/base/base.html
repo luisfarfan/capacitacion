@@ -196,7 +196,7 @@
                     if (params[i].pk) {
                         html += `<td><ul class="icons-list"><li class="text-primary-600"><a data-popup="tooltip" title="Mostrar PEA por Aula"  onclick="getPEA(${val[params[i].pk]})"><i class="icon-pencil7"></i></a></li>`;
                         if (session.curso == '5') {
-
+                            
                         } else {
                             if (parseInt(val[params[2]]) < parseInt(val[params[3]])) {
                                 html += `<li class="text-danger-600"><a data-popup="tooltip" title="Redistribuir PEA" onclick="redistribuirAula(${val[params[i].pk]})" ><i class="icon-reload-alt"></i></a></li>`;

@@ -107,7 +107,6 @@ def AprobadosPorUbigeoCurso(request, ubigeo, zona, curso):
                                        'departamento', 'provincia', 'distrito', 'id_pea__ape_paterno',
                                        'id_pea__ape_materno', 'id_pea__nombre', 'cargo', 'nota_final',
                                        'id_pea__dni',
-                                       'zona', 'aprobado', 'seleccionado').order_by(
-        '-nota_final')
+                                       'zona', 'aprobado', 'seleccionado').order_by('-nota_final')
 
     return JsonResponse(list(query_return), safe=False)
