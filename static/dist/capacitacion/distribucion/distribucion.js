@@ -17,6 +17,8 @@ var id_ambiente = undefined;
 var locales = [];
 var local_selected = {};
 var peaaula = [];
+var ambientes = []
+var ambiente_selected = []
 //
 
 $('#local').change(e => {
@@ -52,7 +54,7 @@ if (session.curso == '4') {
 function getLocales() {
     let ubigeo = `${session.ccdd}${session.ccpp}${session.ccdi}`;
     //let url = session.rol == '3' ? `${BASE_URL}localubigeo/${ubigeo}/${session.curso}/` : `${BASE_URL}localzona/${session.id}/`;
-    let url = session.rol__id == 1 ? `${BASE_URL}localubigeo/${ubigeo}/${session.curso}/` : `${BASE_URL}localzona/${session.ccdd}${session.ccpp}${session.ccdi}/${session.curso}/${session.zona}`;
+    let url = session.rol__id == 1 || session.rol__id == 3 || session.rol__id == 4 ? `${BASE_URL}localubigeo/${ubigeo}/${session.curso}/` : `${BASE_URL}localzona/${session.ccdd}${session.ccpp}${session.ccdi}/${session.curso}/${session.zona}`;
     "use strict";
     $.ajax({
         url: url,
@@ -90,6 +92,7 @@ function getAmbientes(id_local, fecha = null) {
         url: url,
         type: 'GET',
         success: response => {
+            ambientes = response.ambientes;
             id_curso = response.id_curso;
             setTable2('tabla_detalle_ambientes', response.ambientes, ['nombre_ambiente', 'numero', 'capacidad', 'cant_pea', {pk: 'id_localambiente'}]);
         },
@@ -102,6 +105,7 @@ function getAmbientes(id_local, fecha = null) {
 function getPEA(id_ambiente) {
     "use strict";
     id_localambiente = id_ambiente;
+    ambiente_selected = findInObject2(ambientes, id_ambiente, 'id_localambiente')
     let ajax_options = {};
     if (session.curso == '4') {
         ajax_options = {
@@ -304,4 +308,13 @@ function set_reporte_pea_asistencia_blanco() {
         html += `</tr>`;
     });
     $('#tabla_reporte_pea_asistencia').find('tbody').html(html);
+    $('#descripcion_aula').text(session.curso__nombre_curso);
+    $('#listado_nombre_local').text(local_selected.nombre_local)
+    $('#listado_direccion_local').text(local_selected.nombre_via)
+    $('#listado_fecha_local').text(local_selected.fecha_inicio)
+    $('#listado_aula_local').text(ambiente_selected.numero)
 }
+
+$('#btn_exportar_evaluacion').on('click', e => {
+    Imprimir($('#tabla_reporte_pea_asistencia').parent().html());
+});

@@ -30,7 +30,8 @@
                     </button>
                     <button data-toggle="modal" onclick="getReserva()" class="btn btn-primary">PEA CONTINGENCIA
                     </button>
-                    <button onclick="reporte_pea_asistencia_blanco()" class="btn btn-primary">Ver Listado Reporte</button>
+                    <button onclick="reporte_pea_asistencia_blanco()" class="btn btn-primary">Ver Listado Reporte
+                    </button>
                 </div>
             </div>
         </div>
@@ -38,7 +39,7 @@
     <div class="col-md-5">
         <div class="panel panel-primary panel-bordered">
             <div class="panel-heading">
-                <h5 class="panel-title">Detalle Ambientes por Local</h5>
+                <h5 class="panel-title">Detalle ambientes por local</h5>
                 <div class="heading-elements">
                     <ul class="icons-list">
                         <li>
@@ -57,14 +58,14 @@
                             <thead>
                             <tr>
                                 <th>
-                                    <center>Aula de Capacitación</center>
+                                    <center>Aula de capacitación</center>
                                     <center>N°</center>
                                 </th>
                                 <th>Ambiente</th>
-                                <th>Número Ambiente</th>
+                                <th>Número de ambiente</th>
                                 <th>Capacidad</th>
                                 <th>Cantidad PEA <br>distribuida</th>
-                                <th>Pea por Aula</th>
+                                <th>Pea por aula</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -80,7 +81,7 @@
     <div class="col-md-7">
         <div class="panel panel-primary panel-bordered">
             <div class="panel-heading">
-                <h5 class="panel-title">PEA por Aula</h5>
+                <h5 class="panel-title">PEA por aula</h5>
                 <div class="heading-elements">
                     <ul class="icons-list">
                         <li>
@@ -210,7 +211,7 @@
     <div id="modal_reporte_pea_exportar" class="modal fade">
         <div class="modal-dialog modal-full">
             <div class="row">
-                <a href="#" download="" id="btn_exportar_evaluacion" class="btn btn-primary">Exportar</a>
+                <a href="#" id="btn_exportar_evaluacion" class="btn btn-primary">Exportar</a>
             </div>
             <div id="div_listado_reporte" class="modal-content">
                 <div class="modal-header bg-primary">
@@ -225,10 +226,18 @@
                                    id="tabla_reporte_pea_asistencia" class="table table-bordered">
                                 <caption>
                                     <center><h4 class="text-center">CENSOS NACIONALES 2017: XII DE POBLACIÓN, VII DE
-                                        VIVIENDA Y III DE COMNIDADES INDÍGENAS</h4>
+                                        VIVIENDA Y III DE COMUNIDADES INDÍGENAS</h4>
                                         <h4 class="text-center">CENSO EXPERIMENTAL</h4>
+                                        <h4 class="text-center">RELACIÓN DE PARTICIPANTES</h4>
                                         <h4 id="descripcion_curso_aula" class="text-center"></h4>
                                         <h4 id="descripcion_aula" class="text-center"></h4></center>
+                                </caption>
+                                <caption>
+                                    <label>NOMBRE DE LOCAL :</label><label id="listado_nombre_local"></label><br>
+                                    <label>DIRECCIÓN DE LOCAL :</label><label id="listado_direccion_local"></label><br>
+                                    <label>FECHA DE CAPACITACIÓN :</label><label
+                                        id="listado_fecha_local"></label><br>
+                                    <label>AULA :</label><label id="listado_aula_local"></label>
                                 </caption>
                                 <thead>
 

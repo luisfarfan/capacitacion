@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.db.models.sql.compiler import cursor_iter
 from rest_framework.views import APIView
 from django.db.models import Count, Value
@@ -22,8 +23,8 @@ def modulo_registro(request):
     funcionarios = FuncionariosINEI.objects.values('id_per', 'ape_paterno', 'ape_materno',
                                                    'nombre', 'dni')
     context = {
-        'titulo_padre': 'Capacitacion',
-        'titulo_hijo': 'Modulo de registro de local',
+        'titulo_padre': 'Capacitación /',
+        'titulo_hijo': 'Módulo de registro de local',
         'funcionarios': funcionarios,
     }
     return HttpResponse(template.render(context, request))
@@ -33,7 +34,7 @@ def cursos_evaluaciones(request):
     template = loader.get_template('capacitacion/cursos_evaluaciones.html')
 
     context = {
-        'titulo_padre': 'Capacitacion',
+        'titulo_padre': 'Capacitación /',
         'titulo_hijo': 'Cursos y Evaluaciones',
     }
     return HttpResponse(template.render(context, request))
@@ -43,7 +44,7 @@ def asistencia(request):
     template = loader.get_template('capacitacion/asistencia.html')
     instructores = Instructor.objects.all()
     context = {
-        'titulo_padre': 'Capacitacion',
+        'titulo_padre': 'Capacitación /',
         'titulo_hijo': 'Modulo de Asistencia',
         'instructores': instructores
     }
@@ -53,8 +54,8 @@ def asistencia(request):
 def distribucion(request):
     template = loader.get_template('capacitacion/distribucion.html')
     context = {
-        'titulo_padre': 'Capacitacion',
-        'titulo_hijo': 'Modulo de Distribucion de PEA'
+        'titulo_padre': 'Capacitación /',
+        'titulo_hijo': 'Módulo de Distribución de PEA'
     }
     return HttpResponse(template.render(context, request))
 
@@ -63,8 +64,8 @@ def evaluacion(request):
     template = loader.get_template('capacitacion/evaluacion.html')
 
     context = {
-        'titulo_padre': 'Capacitacion',
-        'titulo_hijo': 'Modulo de registro de notas y resultado',
+        'titulo_padre': 'Capacitación /',
+        'titulo_hijo': 'Módulo de registro de notas y resultado',
     }
     return HttpResponse(template.render(context, request))
 
@@ -373,7 +374,6 @@ def sobrantes_zona(request):
         else:
             sobrantes = PEA.objects.exclude(id_pea__in=PEA_AULA.objects.values('id_pea')).annotate(
                 cargo=F('id_cargofuncional__nombre_funcionario')).filter(ubigeo=ubigeo,
-                                                                         zona=zona,
                                                                          id_cargofuncional__cursofuncionario__id_curso_id=id_curso,
                                                                          contingencia=contingencia,
                                                                          baja_estado=0).order_by(
@@ -390,8 +390,7 @@ def getMeta(request):
         id_curso = request.POST['id_curso']
         ubigeo = request.POST['ubigeo']
         zona = request.POST['zona']
-        meta = PEA.objects.filter(id_cargofuncional__cursofuncionario__id_curso=id_curso, ubigeo=ubigeo,
-                                  zona=zona, contingencia=0).count()
+        meta = PEA.objects.filter(id_cargofuncional__cursofuncionario__id_curso=id_curso, ubigeo=ubigeo,contingencia=0).count()
 
         capacidad_zona = LocalAmbiente.objects.filter(id_local__zona=zona, id_local__ubigeo=ubigeo,
                                                       id_local__id_curso=id_curso).aggregate(
@@ -399,11 +398,11 @@ def getMeta(request):
         capacidad_distrito = LocalAmbiente.objects.filter(id_local__ubigeo=ubigeo,
                                                           id_local__id_curso=id_curso).aggregate(
             cantidad_distrito=Sum('capacidad'))
-        total_ambientes_distrito_query = Local.objects.filter(id_curso=id_curso, ubigeo=ubigeo, zona=zona).values(
+        total_ambientes_distrito_query = Local.objects.filter(id_curso=id_curso, ubigeo=ubigeo).values(
             'cantidad_usar_auditorios', 'cantidad_usar_aulas', 'cantidad_usar_computo', 'cantidad_usar_oficina',
             'cantidad_usar_otros', 'cantidad_usar_sala')
 
-        total_ambientes_zona_query = Local.objects.filter(id_curso=id_curso, ubigeo=ubigeo, zona=zona).values(
+        total_ambientes_zona_query = Local.objects.filter(id_curso=id_curso, ubigeo=ubigeo).values(
             'cantidad_usar_auditorios', 'cantidad_usar_aulas', 'cantidad_usar_computo', 'cantidad_usar_oficina',
             'cantidad_usar_otros', 'cantidad_usar_sala')
         total_ambientes_zona = 0
@@ -463,7 +462,7 @@ def asignar(request):
                     dar_alta.save()
             else:
                 if 'zona' in data:
-                    locales_zona = Local.objects.filter(ubigeo=ubigeo, zona=zona, id_curso=curso)
+                    locales_zona = Local.objects.filter(ubigeo=ubigeo, id_curso=curso)
                 else:
                     locales_zona = Local.objects.filter(ubigeo=ubigeo, id_curso=curso)
 
@@ -475,7 +474,7 @@ def asignar(request):
                             if 'alta' not in data:
                                 pea_ubicar = PEA.objects.exclude(
                                     id_pea__in=PEA_AULA.objects.values('id_pea')).filter(
-                                    ubigeo=ubigeo, zona=zona, contingencia=0, baja_estado=0,
+                                    ubigeo=ubigeo, contingencia=0, baja_estado=0,
                                     id_cargofuncional__in=Funcionario.objects.filter(id_curso=e.id_curso)).order_by(
                                     'ape_paterno')[:a.capacidad]
                             else:

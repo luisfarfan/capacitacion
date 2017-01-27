@@ -213,7 +213,7 @@ class PEA(models.Model):
     zona = models.CharField(max_length=5, blank=True, null=True, db_column='zona')
     ubigeo = models.ForeignKey('Ubigeo', db_column='ubigeo')
     contingencia = models.IntegerField(blank=True, null=True)
-    baja_estado = models.IntegerField(null=True, blank=True)
+    baja_estado = models.IntegerField(null=True, blank=True, default=0)
     alta_estado = models.IntegerField(null=True, blank=True, default=0)
     apto = models.IntegerField(null=True, blank=True, default=0)
 

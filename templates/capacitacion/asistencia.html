@@ -1,48 +1,50 @@
 {% extends 'base/base.html' %}
 {% load staticfiles %}
 {% block content %}
-    <div class="panel panel-primary panel-bordered">
-        <div class="panel-heading">
-            <h5 class="panel-title">Asistencia</h5>
-            <div class="heading-elements">
-                <ul class="icons-list">
-                    <li>
-                        <a data-action="collapse"></a>
-                    </li>
-                    <li>
-                        <a data-action="close"></a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-        <div class="panel-body">
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>Local</label>
-                        <select id="local" class="select form-control">
-                            <option value="">Seleccione</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <button data-toggle="modal" data-target="#modal_pea_dar_baja" onclick="setTablaDarBaja()"
-                            class="btn btn-primary">Dar
-                        Baja
-                    </button>
-                </div>
-                <div class="col-md-6">
-                    <button onclick="getContingencia()" class="btn btn-primary">Contingencia (Dar Alta)</button>
-                </div>
 
+    <div class="col-md-6">
+        <div class="panel panel-primary panel-bordered">
+            <div class="panel-heading">
+                <h5 class="panel-title">Seleccione su local</h5>
+                <div class="heading-elements">
+                    <ul class="icons-list">
+                        <li>
+                            <a data-action="collapse"></a>
+                        </li>
+                        <li>
+                            <a data-action="close"></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Local</label>
+                            <select id="local" class="select form-control">
+                                <option value="">Seleccione</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <button data-toggle="modal" data-target="#modal_pea_dar_baja" onclick="setTablaDarBaja()"
+                                class="btn btn-primary">Dar
+                            Baja
+                        </button>
+                    </div>
+                    <div class="col-md-6">
+                        <button onclick="getContingencia()" class="btn btn-primary">Contingencia (Dar Alta)</button>
+                    </div>
+
+                </div>
             </div>
         </div>
     </div>
-
-    <div class="col-md-5">
+    <div class="col-md-6">
         <div class="panel panel-primary panel-bordered">
             <div class="panel-heading">
-                <h5 class="panel-title">Detalle Ambientes por Local</h5>
+                <h5 class="panel-title">Detalle ambientes por local</h5>
                 <div class="heading-elements">
                     <ul class="icons-list">
                         <li>
@@ -61,13 +63,14 @@
                             <thead>
                             <tr>
                                 <th>
-                                    <center>Aula de Capacitación</center>
+                                    <center>Aula de</center>
+                                    <center>capacitación</center>
                                     <center>N°</center>
                                 </th>
-                                <th>Número Ambiente</th>
-                                <th>Capacidad</th>
                                 <th>Ambiente</th>
-                                <th>Pea Por Aula</th>
+                                <th>Número ambiente</th>
+                                <th>Capacidad</th>
+                                <th>Pea por aula</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -79,10 +82,12 @@
             </div>
         </div>
     </div>
-    <div class="col-md-7">
+
+
+    <div class="col-md-12">
         <div class="panel panel-primary panel-bordered">
             <div class="panel-heading">
-                <h5 class="panel-title">PEA por Aula</h5>
+                <h5 class="panel-title">Asistencia</h5>
                 <div class="heading-elements">
                     <ul class="icons-list">
                         <li>
@@ -245,7 +250,8 @@
                                    cellpadding="2" cellspacing="2" bordercolor="#DFDFDF"
                                    id="tabla_reporte_pea_asistencia" class="table table-bordered">
                                 <caption>
-                                    <center><h4 class="text-center">CENSOS NACIONALES 2017: XII DE POBLACIÓN, VII DE VIVIENDA Y III DE COMNIDADES INDÍGENAS</h4>
+                                    <center><h4 class="text-center">CENSOS NACIONALES 2017: XII DE POBLACIÓN, VII DE
+                                        VIVIENDA Y III DE COMNIDADES INDÍGENAS</h4>
                                         <h4 class="text-center">CENSO EXPERIMENTAL</h4>
                                         <h4 id="descripcion_curso_aula" class="text-center"></h4>
                                         <h4 id="descripcion_aula" class="text-center"></h4></center>

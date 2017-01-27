@@ -2,8 +2,8 @@
  * Created by LFarfan on 21/11/2016.
  */
 //BASE_URL = `http://localhost:8000/`;
-if (session.rol__id == 1) {
-    $('#zona').parent().remove();
+if (session.rol__id == 1 || session.rol__id == 3 || session.rol__id == 4) {
+    $('#zona').prop('disabled', false);
     //$('#zona_ubicacion_local').parent().remove()
 } else {
     $('#zona').parent().show();
@@ -18,7 +18,7 @@ var is_directorio = true;
 
 function getLocalesbyUbigeo() {
     var ubigeo = `${$('#departamentos').val()}${$('#provincias').val()}${$('#distritos').val()}`;
-    let url = session.rol__id == 1 ? `${BASE_URL}localubigeo/${ubigeo}/${session.curso}/` : `${BASE_URL}localzona/${session.ccdd}${session.ccpp}${session.ccdi}/${session.curso}/${session.zona}`;
+    let url = session.rol__id == 1 || session.rol__id == 3 || session.rol__id == 4 ? `${BASE_URL}localubigeo/${ubigeo}/${$('#cursos').val()}/` : `${BASE_URL}localzona/${session.ccdd}${session.ccpp}${session.ccdi}/${session.curso}/${session.zona}`;
     $.ajax({
         async: false,
         url: url,
@@ -87,11 +87,11 @@ function saveUsuarioLocal(element, id_local) {
         $.ajax({
             url: `${BASEURL}/rest/curso_local/`,
             type: 'POST',
-            data: {id_cursolocal: id_local, curso: session.curso},
+            data: {id_cursolocal: id_local, curso: $('#cursos').val()},
             success: (response) => {
                 $(element).prop('checked', true);
                 $.ajax({
-                    url: `${BASEURL}/copy_directorio_to_seleccionado/${id_local}/${session.curso}/`,
+                    url: `${BASEURL}/copy_directorio_to_seleccionado/${id_local}/${$('#cursos').val()}/`,
                     success: (data) => {
                         console.log(data);
                     }
@@ -317,6 +317,23 @@ function getMetaPea() {
             console.log(response);
             $('#cant_meta').val(response.cant);
             $('#cant_reclutada').val(1500);
+
+            if (session.curso == 2 && ubigeo == '120704') {
+                $('#capacidad_ambiente').val(response.total_ambientes_distrito)
+                $('#cant_meta').val(3);
+                $('#cant_reclutada').val(3);
+                $('#aulas_meta_cantidad').val(1);
+            } else if (session.curso == 2 && ubigeo == '110205') {
+                $('#capacidad_ambiente').val(response.total_ambientes_distrito)
+                $('#cant_meta').val(11);
+                $('#cant_reclutada').val(11);
+                $('#aulas_meta_cantidad').val(1);
+            } else if (session.curso == 2 && ubigeo == '160104') {
+                $('#capacidad_ambiente').val(response.total_ambientes_distrito)
+                $('#cant_meta').val(2);
+                $('#cant_reclutada').val(3);
+                $('#aulas_meta_cantidad').val(1);
+            }
             if (session.curso == '1') {
                 $('#capacidad_ambiente').val(response.total_ambientes_distrito)
                 $('#cant_meta').val(3);

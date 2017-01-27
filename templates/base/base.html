@@ -27,6 +27,10 @@
         .tr_selected {
             background-color: dodgerblue;
         }
+
+        label {
+            font-weight: bold;
+        }
     </style>
 </head>
 
@@ -93,14 +97,14 @@
                             <li>
                                 <a href="#"><i class="icon-stack"></i> <span>Capacitación</span></a>
                                 <ul>
-                                    <li id="modulo_registro"><a href="{% url 'modulo_registro' %}">Modulo de Registro de
+                                    <li id="modulo_registro"><a href="{% url 'modulo_registro' %}">Módulo de Registro de
                                         Local</a>
                                     </li>
-                                    <li id="distribucion"><a href="{% url 'distribucion' %}">Modulo Distribucion de
+                                    <li id="distribucion"><a href="{% url 'distribucion' %}">Módulo Distribucion de
                                         PEA</a></li>
-                                    <li id="asistencia"><a href="{% url 'asistencia' %}">Modulo de
+                                    <li id="asistencia"><a href="{% url 'asistencia' %}">Módulo de
                                         Asistencia</a></li>
-                                    <li id="notas"><a href="{% url 'evaluacion' %}">Modulo de Registro de Notas y
+                                    <li id="notas"><a href="{% url 'evaluacion' %}">Módulo de Registro de Notas y
                                         Resultado</a>
                                     </li>
 
@@ -196,7 +200,7 @@
                     if (params[i].pk) {
                         html += `<td><ul class="icons-list"><li class="text-primary-600"><a data-popup="tooltip" title="Mostrar PEA por Aula"  onclick="getPEA(${val[params[i].pk]})"><i class="icon-pencil7"></i></a></li>`;
                         if (session.curso == '5') {
-                            
+
                         } else {
                             if (parseInt(val[params[2]]) < parseInt(val[params[3]])) {
                                 html += `<li class="text-danger-600"><a data-popup="tooltip" title="Redistribuir PEA" onclick="redistribuirAula(${val[params[i].pk]})" ><i class="icon-reload-alt"></i></a></li>`;

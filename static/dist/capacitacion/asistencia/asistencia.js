@@ -68,7 +68,7 @@ function getLocales() {
     let ubigeo = `${session.ccdd}${session.ccpp}${session.ccdi}`;
     //let url = session.rol == '3' ? `${BASE_URL}localubigeo/${ubigeo}/${session.curso}/` : `${BASE_URL}localzona/${ubigeo}/${session.zona}/${session.curso}/`;
     //let url = session.rol == '3' ? `${BASE_URL}localubigeo/${ubigeo}/${session.curso}/` : `${BASE_URL}localzona/${session.id}/`;
-    let url = session.rol__id == 1 || session.rol__id == 2 ? `${BASE_URL}localubigeo/${ubigeo}/${session.curso}/` : `${BASE_URL}localzona/${session.ccdd}${session.ccpp}${session.ccdi}/${session.curso}/${session.zona}`;
+    let url = session.rol__id == 1 || session.rol__id == 3 || session.rol__id == 4 ? `${BASE_URL}localubigeo/${ubigeo}/${session.curso}/` : `${BASE_URL}localzona/${session.ccdd}${session.ccpp}${session.ccdi}/${session.curso}/${session.zona}`;
     "use strict";
     $.ajax({
         url: url,
@@ -89,7 +89,7 @@ function getAmbientes(id_local) {
         type: 'GET',
         success: response => {
             ambientes = response;
-            setTable('tabla_detalle_ambientes', response.ambientes, ['numero', 'capacidad', 'nombre_ambiente', {pk: 'id_localambiente'}]);
+            setTable('tabla_detalle_ambientes', response.ambientes, ['numero', 'nombre_ambiente', 'capacidad', {pk: 'id_localambiente'}]);
         },
         error: error => {
             console.log('ERROR!!', error);

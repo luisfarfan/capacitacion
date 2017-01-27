@@ -24,7 +24,7 @@ SECRET_KEY = ')$%2!h%pl$3aqv!t=i#1xc1z(i2=18d(k7#yq_n2$v0$6*fda!'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['172.16.2.205', 'localhost','192.168.200.123']
+ALLOWED_HOSTS = ['172.16.2.205', 'localhost', '192.168.200.123']
 
 DEPLOY = 'INEI'
 # Application definition
@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'capacitacion',
     'login',
     'reportes',
+    'consecucion_traspaso',
     'rest_framework',
 ]
 
@@ -102,10 +103,10 @@ if DEPLOY == 'INEI':
         },
         'consecucion': {
             'ENGINE': 'sql_server.pyodbc',
-            'NAME': 'INEI_BDRRHH_CONSECUCION',
-            'USER': 'rvila',
-            'PASSWORD': 'inei1202',
-            'HOST': '192.168.200.250',
+            'NAME': 'INEI_BDRRHH_CONSECUCION_CENSO',
+            'USER': 'us_inei_bdrrhh_consecucion',
+            'PASSWORD': 'nU6&beTRi',
+            'HOST': 'VMMAT-SQLPRD01',
             'OPTIONS': {
                 'driver': 'SQL Server',
                 'unicode_results': True,
