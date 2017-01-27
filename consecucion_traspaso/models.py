@@ -10,13 +10,10 @@ class PersonalCapacitacion(models.Model):
     ape_materno = models.CharField(max_length=100, blank=True, null=True, db_column='ape_materno')
     nombre = models.CharField(max_length=100, blank=True, null=True, db_column='nombre')
     id_cargofuncional = models.IntegerField()
-    id_convocatoria_cargo = models.IntegerField()
+    id_convocatoriacargo = models.IntegerField()
     zona = models.CharField(max_length=5, blank=True, null=True)
     contingencia = models.IntegerField(blank=True, null=True)
     ubigeo = models.CharField(max_length=6)
-    correo = models.CharField(max_length=100, blank=True, null=True)
-    telefono = models.CharField(max_length=100, blank=True, null=True)
-    celular = models.CharField(max_length=100, blank=True, null=True)
 
     class Meta:
         managed = False

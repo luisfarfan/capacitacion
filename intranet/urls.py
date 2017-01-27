@@ -18,6 +18,7 @@ from django.contrib import admin
 from capacitacion.views import *
 from capacitacion.urls import *
 from login.views import login, do_login
+from consecucion_traspaso.views import traer_consecucion,update_consecucion
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -72,5 +73,8 @@ urlpatterns = [
     url('^darAltaPea/$', darAltaPea),
     url('^redistribuir_aula/(?P<id_localambiente>.+)/$', redistribuir_aula),
     url('^save_aprobado_distrital/$', save_aprobado_distrital),
+    url('^traer_consecucion/$', traer_consecucion),
+    url('^update_consecucion/$', update_consecucion),
+
 
 ]
