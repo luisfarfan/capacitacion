@@ -15,6 +15,7 @@ class User(models.Model):
     zona = models.CharField(max_length=5, null=True, blank=True)
     curso = models.ForeignKey(Curso, null=True, blank=True)
     rol = models.ForeignKey('Rol', null=True)
+    cierre = models.IntegerField(default=0)
 
 
 @admin.register(User)

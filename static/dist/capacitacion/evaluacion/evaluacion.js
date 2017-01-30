@@ -10,8 +10,10 @@ $(function () {
         $('#no_distrital').hide();
         $('#no_distrital_filtro').hide();
         $('#btn_exportar_evaluacion').hide();
+        $('#btn_save_notas').hide();
     } else {
         $('#tabla_reporte').hide();
+        $('#btn_cerrar_curso').hide()
     }
     getReporte();
 });
@@ -147,7 +149,7 @@ function getPEA(id_localambiente) {
                             notas = nota
                         }
                     });
-                    body += `<tr ${response[i].id_pea.apto == 1 ? 'class="apto_selected"' : ''}>
+                    body += `<tr ${response[i].id_pea.apto == 1 ? 'class="apto_selected"' : ''} ${response[i].id_pea.baja_estado == 1 ? 'style="background-color: #f1a6a6"' : ''}>
                     <input type="hidden" name="id_peaaula" value="${response[i].id_peaaula}">   
                     <td>${count++}</td>
                     <td>${response[i].id_pea.ape_paterno} ${response[i].id_pea.ape_materno} ${response[i].id_pea.nombre}</td>
@@ -174,9 +176,9 @@ function getPEA(id_localambiente) {
                                         break;
                                 }
                             });
-                            body += `<td><input type="number" min="0" max="20" maxlength="2" disabled name="${criterios[k].id_cursocriterio}" value="${nota_asistencia}"></td>`;
+                            body += `<td><input type="number" min="0" max="20" maxlength="2" disabled name="${criterios[k].id_cursocriterio}" value="${response[i].id_pea.baja_estado == 0 ? nota_asistencia : '00'}"></td>`;
                         } else {
-                            body += `<td><input type="number" min="0" max="20" maxlength="2" name="${criterios[k].id_cursocriterio}" value="${findInObject(notas, criterios[k].id_cursocriterio)}"></td>`;
+                            body += `<td><input type="number" min="0" max="20" ${response[i].id_pea.baja_estado == 1 ? 'disabled' : ''} maxlength="2" name="${criterios[k].id_cursocriterio}" value="${findInObject(notas, criterios[k].id_cursocriterio)}"></td>`;
                         }
                     });
 
@@ -364,15 +366,14 @@ var reporte_data;
 function getReporte() {
     "use strict";
     let html = '';
-    let zona = session.zona == '' ? '00' : session.zona;
+    let zona = session.zona == '' || session.zona == null ? '00' : session.zona;
     $.getJSON(`${url}${session.ccdd}${session.ccpp}${session.ccdi}/${zona}/${session.curso}`, response => {
         reporte_data = response;
         response.map((k, v) => {
             html += `<tr>`;
             html += `<td>${k.departamento}</td><td>${k.provincia}</td><td>${k.distrito}</td>
                      <td>${k.id_pea__ape_paterno} ${k.id_pea__ape_materno} ${k.id_pea__nombre}</td>
-                     <td>${k.id_pea__dni}</td><td>${k.cargo}</td><td>${k.zona}</td><td>${k.nota_final}</td><td><input type="checkbox" ${k.aprobado == 1 ? 'checked' : ''} value="${k.id}" name="aprobado"></td>
-                     <td><input type="checkbox" ${k.seleccionado == 1 ? 'checked' : ''} value="${k.id}" name="seleccionado"></td>`;
+                     <td>${k.id_pea__dni}</td><td>${k.cargo}</td><td>${k.zona}</td><td>${k.nota_final}</td><td><input type="checkbox" ${k.aprobado == 1 ? 'checked' : ''} value="${k.id}" name="aprobado"></td>`;
             html += `</tr>`;
         });
         $('#tabla_reporte').find('tbody').append(html);
@@ -403,4 +404,14 @@ function saveDistrital() {
         }
 
     })
+}
+
+function cerrarCurso() {
+    alert_confirm(_cerrarCurso, 'Esta usted seguro de cerrar el curso, y mandar las notas al Sistema de Consecucion?, Una vez aceptado, las notas se bloquearan, y se NO podra editar las asistencias,ni las notas', 'success')
+}
+function _cerrarCurso() {
+    let url = `${BASEURL}/cerrarCurso/${session.id}`;
+    $.getJSON(url, response => {
+        console.log(response);
+    });
 }

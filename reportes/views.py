@@ -96,7 +96,10 @@ def AprobadosPorCargo(request, ubigeo, cargo):
 def AprobadosPorUbigeoCurso(request, ubigeo, zona, curso):
     cargos = CursoFuncionario.objects.filter(id_curso=curso).values_list('id_funcionario', flat=True)
     if zona == '00':
-        query = PeaNotaFinal.objects.filter(id_pea__dni__in=['25709168', '10172799', '08158910'])
+        if curso == "1":
+            query = PeaNotaFinal.objects.filter(id_pea__dni__in=['25709168', '10172799', '08158910'])
+        elif curso == "2":
+            query = PeaNotaFinal.objects.filter(id_pea__ubigeo=ubigeo, id_pea__id_cargofuncional__in=cargos)
     else:
         query = PeaNotaFinal.objects.filter(id_pea__ubigeo=ubigeo, id_pea__id_cargofuncional__in=cargos,
                                             id_pea__zona=zona)

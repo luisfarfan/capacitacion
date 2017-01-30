@@ -83,7 +83,7 @@ if DEPLOY == 'INEI':
     DATABASES = {
         'default': {
             'ENGINE': 'sql_server.pyodbc',
-            'NAME': 'CPV_CAPACITACION2',
+            'NAME': 'CPV_CAPACITACION_PRUEBA',
             'USER': 'us_capacitacion_web',
             'PASSWORD': 'cap5wegU$re',
             'HOST': '172.18.1.41',
@@ -106,10 +106,46 @@ if DEPLOY == 'INEI':
             'NAME': 'INEI_BDRRHH_CONSECUCION_CENSO',
             'USER': 'us_inei_bdrrhh_consecucion',
             'PASSWORD': 'nU6&beTRi',
-            'HOST': 'VMMAT-SQLPRD01',
+            'HOST': '192.168.203.160',
             'OPTIONS': {
                 'driver': 'SQL Server',
-                'unicode_results': True,
+                'unicode_results': True
+            },
+        },
+    }
+elif DEPLOY == 'DESARROLLO':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'sql_server.pyodbc',
+            'NAME': 'CPV_CAPACITACION_PRUEBA',
+            'USER': 'us_capacitacion_web',
+            'PASSWORD': 'cap5wegU$re',
+            'HOST': '172.18.1.41',
+            'OPTIONS': {
+                'driver': 'ODBC Driver 11 for SQL Server',
+                'unicode_results': True
+            },
+        },
+        'segmentacion': {
+            'ENGINE': 'sql_server.pyodbc',
+            'NAME': 'CPV_SEGMENTACION',
+            'USER': 'us_segmentacion_web',
+            'PASSWORD': 'u$s3g*mentaWeB',
+            'HOST': '172.18.1.41',
+            'OPTIONS': {
+                'driver': 'ODBC Driver 11 for SQL Server',
+                'unicode_results': True
+            },
+        },
+        'consecucion': {
+            'ENGINE': 'sql_server.pyodbc',
+            'NAME': 'INEI_BDRRHH_CONSECUCION_CENSO',
+            'USER': 'us_inei_bdrrhh_consecucion',
+            'PASSWORD': 'nU6&beTRi',
+            'HOST': '192.168.203.160',
+            'OPTIONS': {
+                'driver': 'ODBC Driver 11 for SQL Server',
+                'unicode_results': True
             },
         },
     }
@@ -152,10 +188,10 @@ elif DEPLOY == 'PRODUCTION':
         },
         'consecucion': {
             'ENGINE': 'sql_server.pyodbc',
-            'NAME': 'INEI_BDRRHH_CONSECUCION',
-            'USER': 'rvila',
-            'PASSWORD': 'inei1202',
-            'HOST': '192.168.200.250',
+            'NAME': 'INEI_BDRRHH_CONSECUCION_CENSO',
+            'USER': 'us_inei_bdrrhh_consecucion',
+            'PASSWORD': 'nU6&beTRi',
+            'HOST': '192.168.203.160',
             'OPTIONS': {
                 'driver': 'ODBC Driver 11 for SQL Server',
                 'unicode_results': True

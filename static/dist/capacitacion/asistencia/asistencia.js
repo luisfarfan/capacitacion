@@ -495,9 +495,9 @@ function set_reporte_pea_asistencia() {
     });
     $('#tabla_reporte_pea_asistencia').find('tbody').html(html);
 
-    $('#descripcion_curso_aula').text(`${session.descripcion_curso}`);
     let grupo_curso4 = session.curso == 4 ? `GRUPO ${$.inArray($('#fechas').val(), rangofechas) + 1}` : '';
     $('#descripcion_aula').text(`CONTROL DE ASISTENCIA DIARIA - AULA ${ambiente_selected.numero} ${grupo_curso4}`);
+    setDetalleCabecera()
 }
 
 
@@ -541,6 +541,7 @@ function set_reporte_pea_asistencia_blanco() {
         html += `</tr>`;
     });
     $('#tabla_reporte_pea_asistencia').find('tbody').html(html);
+    setDetalleCabecera()
 }
 
 $("#btn_exportar_evaluacion").on('click', function () {
@@ -577,4 +578,12 @@ function doAsignacion(alta, show = false) {
             $('#modal_pea_sobrante').unblock();
         }
     })
+}
+
+function setDetalleCabecera() {
+    $('#descripcion_aula').text(session.curso__nombre_curso);
+    $('#listado_nombre_local').text(local[0].nombre_local)
+    $('#listado_direccion_local').text(local[0].nombre_via)
+    $('#listado_fecha_local').text(local[0].fecha_inicio)
+    $('#listado_aula_local').text(ambiente_selected.numero)
 }
