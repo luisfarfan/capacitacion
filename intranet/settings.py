@@ -122,7 +122,7 @@ elif DEPLOY == 'DESARROLLO':
             'PASSWORD': 'cap5wegU$re',
             'HOST': '172.18.1.41',
             'OPTIONS': {
-                'driver': 'ODBC Driver 11 for SQL Server',
+                'driver': 'SQL Server',
                 'unicode_results': True
             },
         },
@@ -133,7 +133,7 @@ elif DEPLOY == 'DESARROLLO':
             'PASSWORD': 'u$s3g*mentaWeB',
             'HOST': '172.18.1.41',
             'OPTIONS': {
-                'driver': 'ODBC Driver 11 for SQL Server',
+                'driver': 'SQL Server',
                 'unicode_results': True
             },
         },

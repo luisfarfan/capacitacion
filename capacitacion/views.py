@@ -390,7 +390,8 @@ def getMeta(request):
         id_curso = request.POST['id_curso']
         ubigeo = request.POST['ubigeo']
         zona = request.POST['zona']
-        meta = PEA.objects.filter(id_cargofuncional__cursofuncionario__id_curso=id_curso, ubigeo=ubigeo,contingencia=0).count()
+        meta = PEA.objects.filter(id_cargofuncional__cursofuncionario__id_curso=id_curso, ubigeo=ubigeo,
+                                  contingencia=0).count()
 
         capacidad_zona = LocalAmbiente.objects.filter(id_local__zona=zona, id_local__ubigeo=ubigeo,
                                                       id_local__id_curso=id_curso).aggregate(
@@ -437,22 +438,31 @@ def asignar(request):
         if 'alta' in data:
             alta = data['alta']
 
+        if 'aulaambiente' in data:
+            id_aulaambiente = data['aulaambiente']
+
         if curso == '4':
             return JsonResponse(distribucion_curso4(ubigeo, zona, curso, alta), safe=False)
         elif curso == '1':
             return JsonResponse(distribucion_curso1(), safe=False)
         else:
             if 'alta' in data:
+                _pea_cantidad = PEA.objects.exclude(id_pea__in=PEA_AULA.objects.values('id_pea')).filter(ubigeo=ubigeo,
+                                                                                                         # zona=zona,
+                                                                                                         id_cargofuncional__in=cargos,
+                                                                                                         contingencia=0,
+                                                                                                         alta_estado=1).count()
                 pea_baja = PEA_AULA.objects.filter(id_localambiente__id_local__ubigeo=ubigeo,
-                                                   id_localambiente__id_local__zona=zona,
+                                                   # id_localambiente__id_local__zona=zona,
+                                                   id_localambiente=id_aulaambiente,
                                                    id_pea__id_cargofuncional__in=cargos,
                                                    id_pea__baja_estado=1).values('id_localambiente_id', 'id_pea_id',
-                                                                                 'pea_fecha')
+                                                                                 'pea_fecha')[:_pea_cantidad]
 
                 for i in pea_baja:
                     _pea = list(
                         PEA.objects.exclude(id_pea__in=PEA_AULA.objects.values('id_pea')).filter(ubigeo=ubigeo,
-                                                                                                 zona=zona,
+                                                                                                 # zona=zona,
                                                                                                  id_cargofuncional__in=cargos,
                                                                                                  contingencia=0,
                                                                                                  alta_estado=1).values_list(
@@ -476,7 +486,7 @@ def asignar(request):
                                     id_pea__in=PEA_AULA.objects.values('id_pea')).filter(
                                     ubigeo=ubigeo, contingencia=0, baja_estado=0,
                                     id_cargofuncional__in=Funcionario.objects.filter(id_curso=e.id_curso)).order_by(
-                                    'ape_paterno')[:a.capacidad]
+                                    'zona', 'ape_paterno')[:a.capacidad]
                             else:
                                 pea_ubicar = PEA.objects.exclude(
                                     id_pea__in=PEA_AULA.objects.filter(id_pea__baja_estado=0).values('id_pea')).filter(
@@ -697,7 +707,7 @@ def copy_directorio_to_seleccionado(request, id_directoriolocal, id_curso):
                   cantidad_total_computo=directorio.cantidad_total_computo,
                   cantidad_disponible_computo=directorio.cantidad_disponible_computo,
                   cantidad_usar_computo=directorio.cantidad_usar_computo,
-                  zona=directorio.zona, id_curso=directorio.id_curso)
+                  zona=directorio.zona, id_curso=Curso.objects.get(pk=id_curso))
     local.save()
     for i in localambientes:
         ambientes = LocalAmbiente(id_local_id=local.id_local, id_ambiente_id=i.id_ambiente_id, capacidad=i.capacidad,

@@ -562,7 +562,13 @@ function doAsignacion(alta, show = false) {
             zona: `${session.zona}`,
             id_curso: session.curso,
             alta: 1
-        } : {ubigeo: ubigeo, zona: `${session.zona}`, id_curso: session.curso, alta: alta};
+        } : {
+            ubigeo: ubigeo,
+            zona: `${session.zona}`,
+            id_curso: session.curso,
+            alta: alta,
+            aulaambiente: ambiente_selected.id_localambiente
+        };
     $.ajax({
         url: `${BASEURL}/asignacion/`,
         type: 'POST',

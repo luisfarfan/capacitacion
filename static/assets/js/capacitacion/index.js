@@ -15,6 +15,11 @@ var local_marco = [];
 var local_marco_selected = {};
 var is_directorio = true;
 
+$('#cursos').change(e => {
+    session.curso = e.target.value;
+    localStorage.setItem('usuario', JSON.stringify(session));
+});
+
 
 function getLocalesbyUbigeo() {
     var ubigeo = `${$('#departamentos').val()}${$('#provincias').val()}${$('#distritos').val()}`;
@@ -316,7 +321,7 @@ function getMetaPea() {
         success: response => {
             console.log(response);
             $('#cant_meta').val(response.cant);
-            $('#cant_reclutada').val(1500);
+            $('#cant_reclutada').val(0);
 
             if (session.curso == 2 && ubigeo == '120704') {
                 $('#capacidad_ambiente').val(response.total_ambientes_distrito)
