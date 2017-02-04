@@ -9,10 +9,10 @@ from django.db.models import F, Case, Value, When, IntegerField
 # Create your views here.
 
 def traer_consecucion(request):
-    #pea_consecucion = PersonalCapacitacion.objects.using('consecucion').filter(id_cargofuncional=51)
+    # pea_consecucion = PersonalCapacitacion.objects.using('consecucion').filter(id_cargofuncional=51)
     pea_consecucion = PersonalCapacitacion.objects.using('consecucion').filter(id_cargofuncional=548)
     for p in pea_consecucion:
-        pea_capa = PEA.objects.filter(id_per=p.id_per)
+        pea_capa = PEA.objects.filter(id_per=p.id_per, id_convocatoriacargo=p.id_convocatoriacargo)
         if pea_capa.count() == 0:
             if p.id_cargofuncional == 548:
                 pea = PEA(id_per=p.id_per, dni=p.dni, ape_paterno=p.ape_paterno, ape_materno=p.ape_materno,
@@ -24,6 +24,21 @@ def traer_consecucion(request):
     # pea_borrar = PEA.objects.filter(id_cargofuncional=904).delete()
     pea = PEA.objects.all().values()
     return JsonResponse(list(pea), safe=False)
+
+
+def traer_consecucion_curso3_grupo2(request):
+    # pea_consecucion = PersonalCapacitacion.objects.using('consecucion').filter(id_cargofuncional=51)
+    pea_consecucion = PersonalCapacitacion.objects.using('consecucion').all()
+    pea1 = PEA.objects.all().count()
+    for p in pea_consecucion:
+        pea = PEA(id_per=p.id_per, dni=p.dni, ape_paterno=p.ape_paterno, ape_materno=p.ape_materno,
+                  nombre=p.nombre,
+                  id_cargofuncional_id=165, ubigeo_id=p.ubigeo, zona=p.zona, contingencia=p.contingencia,
+                  id_convocatoriacargo=p.id_convocatoriacargo, is_grupo=1)
+        pea.save()
+    pea2 = PEA.objects.all().count()
+    # pea_borrar = PEA.objects.filter(id_cargofuncional=904).delete()
+    return JsonResponse({'cant1': pea1.count(), 'cant2': pea2}, safe=False)
 
 
 def update_consecucion(request):
@@ -41,8 +56,11 @@ def update_consecucion(request):
 def getMetaConsecucion(request, ubigeo, curso):
     cargos = CursoFuncionario.objects.filter(id_curso=curso).values_list('id_funcionario', flat=True)
     if curso == "2":
-        meta = MetaSeleccion.objects.get(ubigeo=ubigeo, id_cargofuncional=51)
-
+        meta = MetaSeleccion.objects.using('consecucion').get(ubigeo=ubigeo, id_cargofuncional=51)
+    elif curso == "3":
+        meta = MetaSeleccion.objects.using('consecucion').get(ubigeo=ubigeo, id_cargofuncional=548)
+    elif curso == "13":
+        meta = 9
     return JsonResponse({'meta': meta.meta})
 
 
@@ -55,12 +73,12 @@ def cerrarCurso(request, id_usuario):
     # cargos = CursoFuncionario.objects.filter(id_curso=curso).values_list('id_funcionario', flat=True)
     meta_cantidad = 0
     pea_return = []
-    if usuario.curso_id == 2:
+    if usuario.curso_id == 3:
         meta = MetaSeleccion.objects.using('consecucion').get(ccdd=usuario.ccdd, ccpp=usuario.ccpp, ccdi=usuario.ccdi,
-                                                              id_cargofuncional=51)
+                                                              id_cargofuncional=548)
         meta_cantidad = meta.meta
 
-        pea_titular = PEA.objects.filter(id_cargofuncional=904, ubigeo=meta.ubigeo, baja_estado=0,
+        pea_titular = PEA.objects.filter(id_cargofuncional=165, ubigeo=meta.ubigeo, baja_estado=0,
                                          peanotafinal__nota_final__gte=11).annotate(
             nota_final=F('peanotafinal__nota_final'), capacita=F('peanotafinal__aprobado'),
             seleccionado=F('peanotafinal__aprobado'), sw_titu=Value(1, IntegerField()), bandaprob=Case(
@@ -84,7 +102,7 @@ def cerrarCurso(request, id_usuario):
             ficha177.capacita = pt['capacita']
             ficha177.save()
 
-        pea_reserva = PEA.objects.exclude(id_pea__in=pea_titular_ids).filter(id_cargofuncional=904,
+        pea_reserva = PEA.objects.exclude(id_pea__in=pea_titular_ids).filter(id_cargofuncional=165,
                                                                              ubigeo=meta.ubigeo).annotate(
             nota_final=F('peanotafinal__nota_final'), capacita=F('peanotafinal__aprobado'),
             seleccionado=F('peanotafinal__aprobado'), sw_titu=Value(0, IntegerField()), bandaprob=Case(

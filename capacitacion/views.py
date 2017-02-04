@@ -372,13 +372,23 @@ def sobrantes_zona(request):
                                                                                              'ape_materno', 'nombre',
                                                                                              'cargo', 'id_pea')
         else:
-            sobrantes = PEA.objects.exclude(id_pea__in=PEA_AULA.objects.values('id_pea')).annotate(
-                cargo=F('id_cargofuncional__nombre_funcionario')).filter(ubigeo=ubigeo,
-                                                                         id_cargofuncional__cursofuncionario__id_curso_id=id_curso,
-                                                                         contingencia=contingencia,
-                                                                         baja_estado=0).order_by(
-                'ape_paterno').values('dni', 'ape_paterno', 'ape_materno', 'nombre',
-                                      'cargo', 'id_pea')
+            if id_curso == "13":
+                sobrantes = PEA.objects.exclude(id_pea__in=PEA_AULA.objects.values('id_pea')).annotate(
+                    cargo=F('id_cargofuncional__nombre_funcionario')).filter(ubigeo=ubigeo,
+                                                                             id_cargofuncional__cursofuncionario__id_curso_id=id_curso,
+                                                                             contingencia=contingencia,
+                                                                             baja_estado=0, is_grupo=1).order_by(
+                    'ape_paterno').values('dni', 'ape_paterno', 'ape_materno', 'nombre',
+                                          'cargo', 'id_pea')
+            else:
+                sobrantes = PEA.objects.exclude(id_pea__in=PEA_AULA.objects.values('id_pea')).annotate(
+                    cargo=F('id_cargofuncional__nombre_funcionario')).filter(ubigeo=ubigeo,
+                                                                             id_cargofuncional__cursofuncionario__id_curso_id=id_curso,
+                                                                             contingencia=contingencia,
+                                                                             baja_estado=0).order_by(
+                    'ape_paterno').values('dni', 'ape_paterno', 'ape_materno', 'nombre',
+                                          'cargo', 'id_pea')
+
         return JsonResponse(list(sobrantes), safe=False)
 
     return JsonResponse({'msg': False})
@@ -390,8 +400,16 @@ def getMeta(request):
         id_curso = request.POST['id_curso']
         ubigeo = request.POST['ubigeo']
         zona = request.POST['zona']
-        meta = PEA.objects.filter(id_cargofuncional__cursofuncionario__id_curso=id_curso, ubigeo=ubigeo,
-                                  contingencia=0).count()
+        if id_curso == "13":
+            meta = PEA.objects.filter(id_cargofuncional__cursofuncionario__id_curso=id_curso, ubigeo=ubigeo,
+                                      contingencia=0, alta_estado=0, is_grupo=1).count()
+            meta_reclutada = PEA.objects.filter(id_cargofuncional__cursofuncionario__id_curso=id_curso,
+                                                ubigeo=ubigeo, is_grupo=1).count()
+        else:
+            meta = PEA.objects.filter(id_cargofuncional__cursofuncionario__id_curso=id_curso, ubigeo=ubigeo,
+                                      contingencia=0, alta_estado=0, is_grupo=1).count()
+            meta_reclutada = PEA.objects.filter(id_cargofuncional__cursofuncionario__id_curso=id_curso,
+                                                ubigeo=ubigeo).count()
 
         capacidad_zona = LocalAmbiente.objects.filter(id_local__zona=zona, id_local__ubigeo=ubigeo,
                                                       id_local__id_curso=id_curso).aggregate(
@@ -418,10 +436,11 @@ def getMeta(request):
                 if i[v] is not None:
                     total_ambientes_distrito = total_ambientes_distrito + int(i[v])
 
-        return JsonResponse({'cant': meta, 'cantidad_zona': capacidad_zona['cantidad_zona'],
-                             'cantidad_distrito': capacidad_distrito['cantidad_distrito'],
-                             'total_ambientes_zona': total_ambientes_zona,
-                             'total_ambientes_distrito': total_ambientes_distrito}, safe=False)
+        return JsonResponse(
+            {'cant': meta, 'cant_reclutada': meta_reclutada, 'cantidad_zona': capacidad_zona['cantidad_zona'],
+             'cantidad_distrito': capacidad_distrito['cantidad_distrito'],
+             'total_ambientes_zona': total_ambientes_zona,
+             'total_ambientes_distrito': total_ambientes_distrito}, safe=False)
 
     return JsonResponse({'msg': False})
 
@@ -447,26 +466,44 @@ def asignar(request):
             return JsonResponse(distribucion_curso1(), safe=False)
         else:
             if 'alta' in data:
-                _pea_cantidad = PEA.objects.exclude(id_pea__in=PEA_AULA.objects.values('id_pea')).filter(ubigeo=ubigeo,
-                                                                                                         # zona=zona,
-                                                                                                         id_cargofuncional__in=cargos,
-                                                                                                         contingencia=0,
-                                                                                                         alta_estado=1).count()
-                pea_baja = PEA_AULA.objects.filter(id_localambiente__id_local__ubigeo=ubigeo,
-                                                   # id_localambiente__id_local__zona=zona,
-                                                   id_localambiente=id_aulaambiente,
-                                                   id_pea__id_cargofuncional__in=cargos,
-                                                   id_pea__baja_estado=1).values('id_localambiente_id', 'id_pea_id',
-                                                                                 'pea_fecha')[:_pea_cantidad]
+                if curso == "13":
+                    _pea_cantidad = PEA.objects.exclude(id_pea__in=PEA_AULA.objects.values('id_pea')).filter(
+                        ubigeo=ubigeo, id_cargofuncional__in=cargos, contingencia=0, is_grupo=1, alta_estado=1).count()
+                    pea_baja = PEA_AULA.objects.filter(id_localambiente__id_local__ubigeo=ubigeo,
+                                                       # id_localambiente__id_local__zona=zona,
+                                                       id_pea__is_grupo=1,
+                                                       id_localambiente=id_aulaambiente,
+                                                       id_pea__id_cargofuncional__in=cargos,
+                                                       id_pea__baja_estado=1).values('id_localambiente_id', 'id_pea_id',
+                                                                                     'pea_fecha')[:_pea_cantidad]
+                else:
+                    _pea_cantidad = PEA.objects.exclude(id_pea__in=PEA_AULA.objects.values('id_pea')).filter(
+                        ubigeo=ubigeo, id_cargofuncional__in=cargos, contingencia=0, alta_estado=1).count()
+                    pea_baja = PEA_AULA.objects.filter(id_localambiente__id_local__ubigeo=ubigeo,
+                                                       # id_localambiente__id_local__zona=zona,
+                                                       id_localambiente=id_aulaambiente,
+                                                       id_pea__id_cargofuncional__in=cargos,
+                                                       id_pea__baja_estado=1).values('id_localambiente_id', 'id_pea_id',
+                                                                                     'pea_fecha')[:_pea_cantidad]
 
                 for i in pea_baja:
-                    _pea = list(
-                        PEA.objects.exclude(id_pea__in=PEA_AULA.objects.values('id_pea')).filter(ubigeo=ubigeo,
-                                                                                                 # zona=zona,
-                                                                                                 id_cargofuncional__in=cargos,
-                                                                                                 contingencia=0,
-                                                                                                 alta_estado=1).values_list(
-                            'id_pea', flat=True))[:1]
+                    if curso == "13":
+                        _pea = list(
+                            PEA.objects.exclude(id_pea__in=PEA_AULA.objects.values('id_pea')).filter(ubigeo=ubigeo,
+                                                                                                     # zona=zona,
+                                                                                                     id_cargofuncional__in=cargos,
+                                                                                                     is_grupo=1,
+                                                                                                     contingencia=0,
+                                                                                                     alta_estado=1).values_list(
+                                'id_pea', flat=True))[:1]
+                    else:
+                        _pea = list(
+                            PEA.objects.exclude(id_pea__in=PEA_AULA.objects.values('id_pea')).filter(ubigeo=ubigeo,
+                                                                                                     # zona=zona,
+                                                                                                     id_cargofuncional__in=cargos,
+                                                                                                     contingencia=0,
+                                                                                                     alta_estado=1).values_list(
+                                'id_pea', flat=True))[:1]
                     dar_alta = PEA_AULA(id_localambiente_id=i['id_localambiente_id'], pea_fecha=i['pea_fecha'],
                                         id_pea_id=_pea[0])
                     dar_alta.save()
@@ -482,11 +519,20 @@ def asignar(request):
                         disponibilidad = disponibilidad_aula(a.id_localambiente)
                         if disponibilidad > 0:
                             if 'alta' not in data:
-                                pea_ubicar = PEA.objects.exclude(
-                                    id_pea__in=PEA_AULA.objects.values('id_pea')).filter(
-                                    ubigeo=ubigeo, contingencia=0, baja_estado=0,
-                                    id_cargofuncional__in=Funcionario.objects.filter(id_curso=e.id_curso)).order_by(
-                                    'zona', 'ape_paterno')[:a.capacidad]
+                                print curso == "13"
+                                if curso == "13":
+                                    pea_ubicar = PEA.objects.exclude(
+                                        id_pea__in=PEA_AULA.objects.values('id_pea')).filter(
+                                        ubigeo=ubigeo, contingencia=0, baja_estado=0,
+                                        id_cargofuncional__in=cargos,
+                                        is_grupo=1).order_by(
+                                        'zona', 'ape_paterno')[:a.capacidad]
+                                else:
+                                    pea_ubicar = PEA.objects.exclude(
+                                        id_pea__in=PEA_AULA.objects.values('id_pea')).filter(
+                                        ubigeo=ubigeo, contingencia=0, baja_estado=0,
+                                        id_cargofuncional__in=cargos).order_by(
+                                        'zona', 'ape_paterno')[:a.capacidad]
                             else:
                                 pea_ubicar = PEA.objects.exclude(
                                     id_pea__in=PEA_AULA.objects.filter(id_pea__baja_estado=0).values('id_pea')).filter(
@@ -497,7 +543,7 @@ def asignar(request):
                                 pea_aula = PEA_AULA(id_pea=pea, id_localambiente=aula)
                                 pea_aula.save()
 
-            return JsonResponse({'msg': True})
+            return JsonResponse({'msg': curso == "13"}, safe=False)
 
     return JsonResponse({'msg': False})
 

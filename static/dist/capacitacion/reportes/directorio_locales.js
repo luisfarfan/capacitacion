@@ -2,37 +2,28 @@
  * Created by LFarfan on 16/01/2017.
  */
 
-$(function () {
-    getDepartamentos();
-    //getCursos();
-});
-
-$('#departamentos').change(function () {
-    $('#provincias').find('option').remove();
-    $("#distritos").find('option').remove();
-    $("#zona").find('option').remove();
-    getProvincias();
-});
-
-$('#provincias').change(function () {
-    $("#distritos").find('option').remove();
-    $("#zona").find('option').remove();
-    getDistritos();
-});
-
-$('#distritos').change(function () {
-    $("#zona").find('option').remove();
-    $('#zona_ubicacion_local').find('option').remove();
-    getZonas();
-});
 
 /** APIS URL */
+
+$(function () {
+    listReportes();
+})
+
 var url_directorio_local = `${BASEURL}/reportes/api_directorio_locales/`;
+var url = {
+    lista_reporte: `${BASEURL}/reportes/getReportesList/`,
+}
 var reporte_data = [];
 var ubigeo = {ccdd: '', ccpp: '', ccdi: '', zona: ''};
 var queryParameters = '';
 var cursos = [];
 
+function listReportes() {
+    $.getJSON(url.lista_reporte, response => {
+        setSelect_v2('select_reportes_list', response, ['id', 'nombre']);
+         $('.bootstrap-select').selectpicker();
+    });
+}
 
 function getUbigeoQueryParameters() {
     "use strict";

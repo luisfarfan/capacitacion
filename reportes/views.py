@@ -2,6 +2,7 @@ from capacitacion.models import *
 from django.db.models import Count, Value, F
 from django.http import HttpResponse
 from django.http import JsonResponse
+from login.models import Menu
 from django.template import loader
 import inspect
 
@@ -30,20 +31,21 @@ def RelacionLocales(request):
     query = Local.objects.values('id_curso', 'id_curso__nombre_curso')
 
 
-def ApiAulasCoberturadasPorCurso(request, ubigeo, id_curso):
-    query = list(Local.objects.annotate(
-        dcount=Count('ambientes__localambiente__id_localambiente')).values('dcount').filter(ubigeo=ubigeo,
-                                                                                            id_curso=id_curso))
-    absoluto = 0
-    for i in query:
-        absoluto = absoluto + int(i['dcount'])
-
-    meta = list(UbigeoCursoMeta.objects.filter(ubigeo=ubigeo, curso=id_curso))
-    meta_cantidad = 0
-    if meta:
-        meta_cantidad = meta[0].cantidad
-
-    return JsonResponse({'absoluto': absoluto, 'meta': meta_cantidad})
+def ApiAulasCoberturadasPorCurso(request, id_curso, ccdd=None, ccpp=None, ccdi=None):
+    # query = list(Local.objects.annotate(
+    #     dcount=Count('ambientes__localambiente__id_localambiente')).values('dcount').filter(ubigeo=ubigeo,
+    #                                                                                         id_curso=id_curso))
+    # absoluto = 0
+    # for i in query:
+    #     absoluto = absoluto + int(i['dcount'])
+    #
+    # meta = list(UbigeoCursoMeta.objects.filter(ubigeo=ubigeo, curso=id_curso))
+    # meta_cantidad = 0
+    # if meta:
+    #     meta_cantidad = meta[0].cantidad
+    #
+    # return JsonResponse({'absoluto': absoluto, 'meta': meta_cantidad})
+    return True
 
 
 def TotalPostulantesSeleccionados(request):
@@ -114,3 +116,8 @@ def AprobadosPorUbigeoCurso(request, ubigeo, zona, curso):
                                        'zona', 'aprobado', 'seleccionado').order_by('-nota_final')
 
     return JsonResponse(list(query_return), safe=False)
+
+
+def getReportesList(request):
+    reportes_list = Menu.objects.all().values()
+    return JsonResponse(list(reportes_list), safe=False)

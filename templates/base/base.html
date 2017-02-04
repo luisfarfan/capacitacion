@@ -107,7 +107,8 @@
                                     <li id="notas"><a href="{% url 'evaluacion' %}">Módulo de Registro de Notas y
                                         Resultado</a>
                                     </li>
-
+                                    <li id="reportes"><a href="{% url 'reporte:reportes' %}">Reportes</a>
+                                    </li>
                                 </ul>
                             </li>
                             <!-- /main -->
@@ -164,7 +165,6 @@
         select2 ? $('#' + id).select2() : '';
     }
     function setSelect_v2(id, json, keys = [], select2 = false) {
-        console.log(keys);
         $('#' + id).find('option').remove();
 
         let html = '<option>Seleccione</option>';
@@ -510,7 +510,6 @@
             setSelect('cursos', array_cursos);
         });
     }
-
 
     function Imprimir(data) {
         var mywindow = window.open('', 'my div', 'height=1000,width=1200');

@@ -1,66 +1,76 @@
 {% extends 'base/base.html' %}
 {% load staticfiles %}
 {% block content %}
-    <div class="panel panel-primary panel-bordered">
-        <div class="panel-heading">
-            <h5 class="panel-title">FILTRO: UBICACIÓN GEOGRÁFICA</h5>
-            <div class="heading-elements">
-                <ul class="icons-list">
-                    <li>
-                        <a data-action="collapse"></a>
-                    </li>
-                    <li>
-                        <a data-action="close"></a>
-                    </li>
-                </ul>
-            </div>
-        </div>
+    <div class="panel panel-flat border-left-xlg border-left-info">
         <div class="panel-body">
-            <div class="row">
-                <div class="text-right">
-                    <button type="button" class="btn btn-primary btn-sm" onclick="getReporte()" id="buscarlocal"
-                            class="btn btn-primary">
-                        Buscar Local <i
-                            class="icon-arrow-right14 position-right"></i></button>
-                </div>
-            </div>
-            <br>
-            <div class="row">
-                <div class="col-md-3">
-                    <div class="form-group">
-                        <label class="text-bold">Departamento</label>
-                        <select id="departamentos" class="select">
-                            <option value="">Seleccione</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="form-group">
-                        <label class="text-bold">Provincia</label>
-                        <select id="provincias" class="select">
-                            <option value="">Seleccione</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="form-group">
-                        <label class="text-bold">Distrito</label>
-                        <select id="distritos" class="select">
-                            <option value="">Seleccione</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="form-group">
-                        <label class="text-bold">Zona</label>
-                        <select id="zona" class="select">
-                            <option value="0">Seleccione</option>
-                        </select>
-                    </div>
-                </div>
+            <div class="form-group">
+                <label>Seleccione el reporte a visualizar</label>
+                <select id="select_reportes_list" class="bootstrap-select" data-width="100%">
+
+                </select>
             </div>
         </div>
     </div>
+        <div class="panel panel-primary panel-bordered">
+            <div class="panel-heading">
+                <h5 class="panel-title">FILTRO: UBICACIÓN GEOGRÁFICA</h5>
+                <div class="heading-elements">
+                    <ul class="icons-list">
+                        <li>
+                            <a data-action="collapse"></a>
+                        </li>
+                        <li>
+                            <a data-action="close"></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="text-right">
+                        <button type="button" class="btn btn-primary btn-sm" onclick="getReporte()" id="buscarlocal"
+                                class="btn btn-primary">
+                            Buscar Local <i
+                                class="icon-arrow-right14 position-right"></i></button>
+                    </div>
+                </div>
+                <br>
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label class="text-bold">Departamento</label>
+                            <select id="departamentos" class="select">
+                                <option value="">Seleccione</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label class="text-bold">Provincia</label>
+                            <select id="provincias" class="select">
+                                <option value="">Seleccione</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label class="text-bold">Distrito</label>
+                            <select id="distritos" class="select">
+                                <option value="">Seleccione</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label class="text-bold">Zona</label>
+                            <select id="zona" class="select">
+                                <option value="0">Seleccione</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     <div class="col-md-12">
         <div class="panel panel-primary panel-bordered">
             <div class="panel-heading">
@@ -125,9 +135,35 @@
     <script type="text/javascript" src="{% static "assets/js/plugins/notifications/sweet_alert.min.js" %}"></script>
     <script type="text/javascript" src="{% static "assets/js/plugins/forms/selects/select2.min.js" %}"></script>
     <script type="text/javascript" src="{% static "assets/js/core/app.js" %}"></script>
-    <script type="text/javascript" src="{% static "dist/capacitacion/reportes/directorio_locales.js" %}"></script>
+    <script type="text/javascript"
+            src="{% static "assets/js/plugins/forms/selects/bootstrap_select.min.js" %}"></script>
     <script>
         $('#reportes').addClass('active');
         $('.select').select2();
+        $(function () {
+            getDepartamentos();
+            //getCursos();
+        });
+
+        $('#departamentos').change(function () {
+            $('#provincias').find('option').remove();
+            $("#distritos").find('option').remove();
+            $("#zona").find('option').remove();
+            getProvincias();
+        });
+
+        $('#provincias').change(function () {
+            $("#distritos").find('option').remove();
+            $("#zona").find('option').remove();
+            getDistritos();
+        });
+
+        $('#distritos').change(function () {
+            $("#zona").find('option').remove();
+            $('#zona_ubicacion_local').find('option').remove();
+            getZonas();
+        });
+
     </script>
+    <script type="text/javascript" src="{% static "dist/capacitacion/reportes/directorio_locales.js" %}"></script>
 {% endblock %}

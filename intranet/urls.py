@@ -75,8 +75,8 @@ urlpatterns = [
     url('^save_aprobado_distrital/$', save_aprobado_distrital),
     url('^traer_consecucion/$', traer_consecucion),
     url('^update_consecucion/$', update_consecucion),
-    url('^getMetaConsecusion/$', getMetaConsecucion),
+    url('^getMetaConsecucion/(?P<ubigeo>.+)/(?P<curso>.+)/$', getMetaConsecucion),
+    url('^traer_consecucion_curso3_grupo2/$', traer_consecucion_curso3_grupo2),
     url('^cerrarCurso/(?P<id_usuario>.+)/$', cerrarCurso),
-
 
 ]

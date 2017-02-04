@@ -216,6 +216,7 @@ class PEA(models.Model):
     baja_estado = models.IntegerField(null=True, blank=True, default=0)
     alta_estado = models.IntegerField(null=True, blank=True, default=0)
     apto = models.IntegerField(null=True, blank=True, default=0)
+    is_grupo = models.IntegerField(null=True, blank=True)
 
     class Meta:
         managed = True

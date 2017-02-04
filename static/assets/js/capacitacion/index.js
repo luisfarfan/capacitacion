@@ -319,9 +319,9 @@ function getMetaPea() {
         type: 'POST',
         data: {ubigeo: ubigeo, zona: session.zona, id_curso: id_curso},
         success: response => {
-            console.log(response);
             $('#cant_meta').val(response.cant);
             $('#cant_reclutada').val(0);
+            $('#cant_reclutada').val(response.cant_reclutada);
 
             if (session.curso == 2 && ubigeo == '120704') {
                 $('#capacidad_ambiente').val(response.total_ambientes_distrito)

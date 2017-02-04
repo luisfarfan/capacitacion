@@ -83,7 +83,7 @@ if DEPLOY == 'INEI':
     DATABASES = {
         'default': {
             'ENGINE': 'sql_server.pyodbc',
-            'NAME': 'CPV_CAPACITACION_PRUEBA',
+            'NAME': 'CPV_CAPACITACION2',
             'USER': 'us_capacitacion_web',
             'PASSWORD': 'cap5wegU$re',
             'HOST': '172.18.1.41',

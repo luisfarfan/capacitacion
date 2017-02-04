@@ -29,3 +29,4 @@ def do_login(request):
             return JsonResponse(list(user), safe=False)
 
         return JsonResponse({'msg': True}, safe=False)
+

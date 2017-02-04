@@ -38,6 +38,7 @@ class RolAdmin(admin.ModelAdmin):
 
 class Menu(models.Model):
     nombre = models.CharField(max_length=200)
+    order = models.IntegerField(default=0)
 
     class Meta:
         managed = True
@@ -46,4 +47,4 @@ class Menu(models.Model):
 
 @admin.register(Menu)
 class MenuAdmin(admin.ModelAdmin):
-    list_display = ('nombre',)
+    list_display = ('nombre', 'order')

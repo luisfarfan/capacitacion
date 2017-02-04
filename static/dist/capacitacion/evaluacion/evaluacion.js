@@ -11,9 +11,11 @@ $(function () {
         $('#no_distrital_filtro').hide();
         $('#btn_exportar_evaluacion').hide();
         $('#btn_save_notas').hide();
+        getMetaConsecucion()
     } else {
         $('#tabla_reporte').hide();
-        $('#btn_cerrar_curso').hide()
+        $('#btn_cerrar_curso').hide();
+        $('#btn_rankear').hide();
     }
     getReporte();
 });
@@ -27,6 +29,7 @@ var rangofechas = [];
 var columns = [];
 var position_nota_final = 0;
 var peaaula = [];
+var pea_meta = 0;
 
 
 $('#local').change(e => {
@@ -330,25 +333,6 @@ function saveNotas() {
 
 }
 
-
-$("#btn_exportar_evaluacion").on('click', function () {
-    $('#clone').html($('#tabla_pea').clone());
-    $('#clone').find('input[type="number"]').map((key, val) => {
-        "use strict";
-        $(val).parent().text($(val).val());
-    });
-    $('#clone').find('input[name="aptos"]').map((key, value) => {
-        $(value).remove()
-    });
-    var uri = $("#clone").battatech_excelexport({
-        containerid: "clone",
-        datatype: 'table',
-        returnUri: true
-    });
-
-    $(this).attr('download', 'reporte_evaluacion.xls').attr('href', uri).attr('target', '_blank');
-});
-
 function getPeaNotaFinal() {
     let data_nota_final = []
     $('input[name="nota_final"]').map((key, value) => {
@@ -367,10 +351,12 @@ function getReporte() {
     "use strict";
     let html = '';
     let zona = session.zona == '' || session.zona == null ? '00' : session.zona;
+    $('#tabla_reporte').find('tbody').html('');
     $.getJSON(`${url}${session.ccdd}${session.ccpp}${session.ccdi}/${zona}/${session.curso}`, response => {
         reporte_data = response;
         response.map((k, v) => {
             html += `<tr>`;
+            html += `<td>${parseInt(v) + 1}</td>`;
             html += `<td>${k.departamento}</td><td>${k.provincia}</td><td>${k.distrito}</td>
                      <td>${k.id_pea__ape_paterno} ${k.id_pea__ape_materno} ${k.id_pea__nombre}</td>
                      <td>${k.id_pea__dni}</td><td>${k.cargo}</td><td>${k.zona}</td><td>${k.nota_final}</td><td><input type="checkbox" ${k.aprobado == 1 ? 'checked' : ''} value="${k.id}" name="aprobado"></td>`;
@@ -412,6 +398,85 @@ function cerrarCurso() {
 function _cerrarCurso() {
     let url = `${BASEURL}/cerrarCurso/${session.id}`;
     $.getJSON(url, response => {
-        console.log(response);
+
     });
 }
+
+function getMetaConsecucion() {
+    $.getJSON(`${BASEURL}/getMetaConsecucion/${session.ccdd}${session.ccpp}${session.ccdi}/${session.curso}/`, response => {
+        pea_meta = response.meta;
+        $('#cant_meta').val(response.meta);
+        $('#cant_meta').prop('disabled', true);
+    });
+}
+
+function rankear() {
+    let pea_nota = $('input[name="aprobado"]');
+    let count = 0;
+    if (!$(pea_nota[0]).parent().parent().find('div').length) {
+        pea_nota.map((key, value) => {
+            count++;
+            if (count > pea_meta) {
+                let pea_object = findInObject2(reporte_data, value.value, 'id');
+                if (pea_object.nota_final == 0) {
+                    $(value).parent().parent().append(`<div class="alert alert-danger alert-styled-left alert-bordered">
+										<span class="text-semibold">DADO DE BAJA</span>
+								    </div>`)
+                } else {
+                    $(value).parent().parent().append(`<div class="alert alert-warning alert-styled-left">
+										<span class="text-semibold">RESERVA</span>
+								    </div>`)
+                }
+            } else {
+                pea_object = findInObject2(reporte_data, value.value, 'id');
+                if (pea_object.nota_final <= 11 && pea_object.nota_final >= 0) {
+                    $(value).parent().parent().append(`<div class="alert alert-danger alert-styled-left alert-bordered">
+										<span class="text-semibold">DADO DE BAJA</span>
+								    </div>`)
+                } else {
+                    $(value).parent().parent().append(`<td><div class="alert alert-success alert-styled-left alert-arrow-left alert-bordered">
+										<span class="text-semibold">TITULAR</span>
+								    </div></td>`)
+                }
+
+            }
+        });
+    }
+}
+
+var tableToExcel_CoberturaAC = (function () {
+    var uri = 'data:application/vnd.ms-excel;charset=ISO-8859-1;base64,'
+        , template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>'
+        , base64 = function (s) {
+        return window.btoa(unescape(encodeURIComponent(s)));
+    }
+        , format = function (s, c) {
+        return s.replace(/{(\w+)}/g, function (m, p) {
+            return c[p];
+        });
+    };
+    return function (table, name) {
+        if (!table.nodeType) table = document.getElementById(table);
+        var ctx = {worksheet: name || 'Worksheet', table: table.innerHTML};
+        window.location.href = uri + base64(format(template, ctx));
+    };
+})();
+
+
+$("#btn_exportar_evaluacion").on('click', function () {
+    $('#clone').html($('#tabla_pea').clone());
+    $('#clone').find('input[type="number"]').map((key, val) => {
+        "use strict";
+        $(val).parent().text($(val).val());
+    });
+    $('#clone').find('input').map((key, value) => {
+        $(value).remove()
+    });
+    var uri = $("#clone").battatech_excelexport({
+        containerid: "clone",
+        datatype: 'table',
+        returnUri: true
+    });
+
+    $(this).attr('download', 'reporte_evaluacion.xls').attr('href', uri).attr('target', '_blank');
+});
