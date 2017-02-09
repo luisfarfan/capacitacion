@@ -23,10 +23,9 @@ def do_login(request):
         clave = request.POST['clave']
         user = User.objects.filter(usuario=usuario, clave=clave).values('id', 'usuario', 'ccdd', 'ccpp', 'ccdi', 'zona',
                                                                         'curso', 'rol__rol', 'curso__nombre_curso',
-                                                                        'rol__id')
+                                                                        'rol__id', 'cierre')
 
         if user is not None:
             return JsonResponse(list(user), safe=False)
 
         return JsonResponse({'msg': True}, safe=False)
-

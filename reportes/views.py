@@ -1,10 +1,8 @@
 from capacitacion.models import *
-from django.db.models import Count, Value, F
-from django.http import HttpResponse
+from django.db.models import Count, Value, F, Sum
 from django.http import JsonResponse
 from login.models import Menu
-from django.template import loader
-import inspect
+from consecucion_traspaso.models import MetaSeleccion
 
 
 # Create your views here.
@@ -31,21 +29,25 @@ def RelacionLocales(request):
     query = Local.objects.values('id_curso', 'id_curso__nombre_curso')
 
 
-def ApiAulasCoberturadasPorCurso(request, id_curso, ccdd=None, ccpp=None, ccdi=None):
-    # query = list(Local.objects.annotate(
-    #     dcount=Count('ambientes__localambiente__id_localambiente')).values('dcount').filter(ubigeo=ubigeo,
-    #                                                                                         id_curso=id_curso))
-    # absoluto = 0
-    # for i in query:
-    #     absoluto = absoluto + int(i['dcount'])
-    #
-    # meta = list(UbigeoCursoMeta.objects.filter(ubigeo=ubigeo, curso=id_curso))
-    # meta_cantidad = 0
-    # if meta:
-    #     meta_cantidad = meta[0].cantidad
-    #
-    # return JsonResponse({'absoluto': absoluto, 'meta': meta_cantidad})
-    return True
+def ApiAulasCoberturadasPorCurso(request, id_curso, ccdd=None, ccpp=None, ccdi=None, zona=None):
+    query = Local.objects.annotate(
+        dcount=Count('ambientes__localambiente__id_localambiente'))
+
+    cargos = CursoFuncionario.objects.filter(id_curso=id_curso).values_list('id_funcionario__id_cargofuncional',
+                                                                            flat=True)
+    if ccdi is not None:
+        query_filter = query.values('dcount', 'ubigeo__ccdd', 'ubigeo__departamento', 'ubigeo__ccpp').filter(
+            id_curso=id_curso, ubigeo__ccdd=ccdd, ubigeo__ccpp=ccpp, ubigeo__ccdi=ccdi)
+    elif ccpp is not None and ccdi is None:
+        query_filter = query.values('dcount', 'ubigeo__ccdd', 'ubigeo__departamento', 'ubigeo__ccpp', 'ubigeo__ccdi',
+                                    'ubigeo__distrito').filter(id_curso=id_curso, ubigeo__ccdd=ccdd, ubigeo__ccpp=ccpp)
+    elif ccdd is not None and ccpp is None:
+        query_filter = query.values('dcount', 'ubigeo__ccdd', 'ubigeo__departamento', 'ubigeo__ccpp').filter(
+            id_curso=id_curso, ubigeo__ccdd=ccdd)
+    elif ccdd is None:
+        query_filter = query.values('dcount', 'ubigeo__ccdd', 'ubigeo__departamento').filter(id_curso=id_curso)
+
+    return JsonResponse(list(query_filter), safe=False)
 
 
 def TotalPostulantesSeleccionados(request):
@@ -101,6 +103,9 @@ def AprobadosPorUbigeoCurso(request, ubigeo, zona, curso):
     if zona == '00':
         if curso == "1":
             query = PeaNotaFinal.objects.filter(id_pea__dni__in=['25709168', '10172799', '08158910'])
+        elif curso == "5":
+            query = PeaNotaFinal.objects.filter(id_pea__ubigeo=ubigeo, id_pea__id_cargofuncional__in=[284],
+                                                id_pea__is_grupo=5)
         else:
             query = PeaNotaFinal.objects.filter(id_pea__ubigeo=ubigeo, id_pea__id_cargofuncional__in=cargos)
     else:

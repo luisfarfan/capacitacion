@@ -4,6 +4,34 @@
 /**
  * Created by lfarfan on 05/12/2016.
  */
+
+$('input[name="change_interfaz"]').change(event => {
+    interfaz_cerrarCurso($('input[name="change_interfaz"]:checked').val())
+});
+function interfaz_cerrarCurso(val) {
+    getLocales();
+    if (val == 1) {
+        $('#no_distrital').hide();
+        $('#no_distrital_filtro').hide();
+        $('#btn_exportar_evaluacion').hide();
+        $('#btn_save_notas').hide();
+        getMetaConsecucion();
+
+        $('#tabla_reporte').show();
+        $('#btn_cerrar_curso').show();
+        $('#btn_rankear').show();
+    } else {
+        $('#tabla_reporte').hide();
+        $('#btn_cerrar_curso').hide();
+        $('#btn_rankear').hide();
+
+        $('#no_distrital').show();
+        $('#no_distrital_filtro').show();
+        $('#btn_exportar_evaluacion').show();
+        $('#btn_save_notas').show();
+    }
+    getReporte();
+}
 $(function () {
     getLocales();
     if (session.rol__id == 3 || session.rol__id == 1) {
@@ -11,7 +39,7 @@ $(function () {
         $('#no_distrital_filtro').hide();
         $('#btn_exportar_evaluacion').hide();
         $('#btn_save_notas').hide();
-        getMetaConsecucion()
+        getMetaConsecucion();
     } else {
         $('#tabla_reporte').hide();
         $('#btn_cerrar_curso').hide();
@@ -252,7 +280,7 @@ function calcularPromedio(input) {
 
 function saveNotas() {
     "use strict";
-    if (session.rol__id == 3 || session.rol__id == 1) {
+    if (session.rol__id == 2 || session.rol__id == 1) {
         alert_confirm(saveDistrital, 'Esta usted seguro de guardar?')
     } else {
         let data_send = [];
@@ -420,7 +448,7 @@ function rankear() {
                 let pea_object = findInObject2(reporte_data, value.value, 'id');
                 if (pea_object.nota_final == 0) {
                     $(value).parent().parent().append(`<div class="alert alert-danger alert-styled-left alert-bordered">
-										<span class="text-semibold">DADO DE BAJA</span>
+										<span class="text-semibold">NO SELECCIONADO</span>
 								    </div>`)
                 } else {
                     $(value).parent().parent().append(`<div class="alert alert-warning alert-styled-left">
@@ -431,14 +459,13 @@ function rankear() {
                 pea_object = findInObject2(reporte_data, value.value, 'id');
                 if (pea_object.nota_final <= 11 && pea_object.nota_final >= 0) {
                     $(value).parent().parent().append(`<div class="alert alert-danger alert-styled-left alert-bordered">
-										<span class="text-semibold">DADO DE BAJA</span>
+										<span class="text-semibold">NO SELECCIONADO</span>
 								    </div>`)
                 } else {
                     $(value).parent().parent().append(`<td><div class="alert alert-success alert-styled-left alert-arrow-left alert-bordered">
 										<span class="text-semibold">TITULAR</span>
 								    </div></td>`)
                 }
-
             }
         });
     }

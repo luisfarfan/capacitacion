@@ -1,6 +1,19 @@
 {% extends 'base/base.html' %}
 {% load staticfiles %}
 {% block content %}
+    <div id="checkbox_interfaz" class="row">
+        <div class="form-group">
+            <label class="checkbox-inline">
+                <input value="1" name="change_interfaz" type="radio" checked="checked">
+                Interfaz Rankeo y Cerrar Curso
+            </label>
+
+            <label class="checkbox-inline">
+                <input value="2" name="change_interfaz" type="radio">
+                Interfaz Registro de Notas
+            </label>
+        </div>
+    </div>
     <div class="row">
         <div class="col-md-offset-10 col-md-2">
             <div class="col-sm-8">
@@ -21,9 +34,7 @@
                     </div>
                 </div>
             </div>
-
         </div>
-
     </div>
     <div class="panel panel-primary panel-bordered" id="no_distrital_filtro">
         <div class="panel-heading">

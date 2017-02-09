@@ -78,5 +78,8 @@ urlpatterns = [
     url('^getMetaConsecucion/(?P<ubigeo>.+)/(?P<curso>.+)/$', getMetaConsecucion),
     url('^traer_consecucion_curso3_grupo2/$', traer_consecucion_curso3_grupo2),
     url('^cerrarCurso/(?P<id_usuario>.+)/$', cerrarCurso),
-
+    url('^peaCurso6/(?P<ubigeo>.+)/$', peaCurso6),
+    url('^cerrarDia1Grupo6/(?P<ccdd>.+)/(?P<ccpp>.+)/(?P<ccdi>.+)/$', cerrarDia1Grupo6),
+    url('^saveAsistenciaCurso6/$', saveAsistenciaCurso6Dia1),
+    url('^saveAsistenciaCurso6Dia2/$', saveAsistenciaCurso6Dia2),
 ]

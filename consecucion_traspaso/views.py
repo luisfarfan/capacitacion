@@ -10,18 +10,15 @@ from django.db.models import F, Case, Value, When, IntegerField
 
 def traer_consecucion(request):
     # pea_consecucion = PersonalCapacitacion.objects.using('consecucion').filter(id_cargofuncional=51)
-    pea_consecucion = PersonalCapacitacion.objects.using('consecucion').filter(id_cargofuncional=548)
+    pea_consecucion = PersonalCapacitacion.objects.using('consecucion')
     for p in pea_consecucion:
-        pea_capa = PEA.objects.filter(id_per=p.id_per, id_convocatoriacargo=p.id_convocatoriacargo)
-        if pea_capa.count() == 0:
-            if p.id_cargofuncional == 548:
-                pea = PEA(id_per=p.id_per, dni=p.dni, ape_paterno=p.ape_paterno, ape_materno=p.ape_materno,
-                          nombre=p.nombre,
-                          id_cargofuncional_id=165, ubigeo_id=p.ubigeo, zona=p.zona, contingencia=p.contingencia,
-                          id_convocatoriacargo=p.id_convocatoriacargo)
-                pea.save()
+        cargofuncional = Funcionario.objects.get(id_cargofuncional=p.id_cargofuncional)
+        id_cargofuncional = cargofuncional.id_funcionario
+        pea = PEA(id_per=p.id_per, dni=p.dni, ape_paterno=p.ape_paterno, ape_materno=p.ape_materno, is_grupo=6,
+                  nombre=p.nombre, id_cargofuncional_id=id_cargofuncional, ubigeo_id=p.ubigeo, zona=p.zona,
+                  contingencia=p.contingencia, id_convocatoriacargo=p.id_convocatoriacargo)
+        pea.save()
 
-    # pea_borrar = PEA.objects.filter(id_cargofuncional=904).delete()
     pea = PEA.objects.all().values()
     return JsonResponse(list(pea), safe=False)
 
@@ -61,6 +58,10 @@ def getMetaConsecucion(request, ubigeo, curso):
         meta = MetaSeleccion.objects.using('consecucion').get(ubigeo=ubigeo, id_cargofuncional=548)
     elif curso == "13":
         meta = 9
+    elif curso == "4":
+        meta = MetaSeleccion.objects.using('consecucion').get(ubigeo=ubigeo, id_cargofuncional=547)
+    elif curso == "5":
+        meta = MetaSeleccion.objects.using('consecucion').get(ubigeo=ubigeo, id_cargofuncional=550)
     return JsonResponse({'meta': meta.meta})
 
 
@@ -73,13 +74,13 @@ def cerrarCurso(request, id_usuario):
     # cargos = CursoFuncionario.objects.filter(id_curso=curso).values_list('id_funcionario', flat=True)
     meta_cantidad = 0
     pea_return = []
-    if usuario.curso_id == 3:
+    if usuario.curso_id == 5:
         meta = MetaSeleccion.objects.using('consecucion').get(ccdd=usuario.ccdd, ccpp=usuario.ccpp, ccdi=usuario.ccdi,
-                                                              id_cargofuncional=548)
+                                                              id_cargofuncional=550)
         meta_cantidad = meta.meta
 
-        pea_titular = PEA.objects.filter(id_cargofuncional=165, ubigeo=meta.ubigeo, baja_estado=0,
-                                         peanotafinal__nota_final__gte=11).annotate(
+        pea_titular = PEA.objects.filter(id_cargofuncional=284, ubigeo=meta.ubigeo, baja_estado=0,
+                                         peanotafinal__nota_final__gte=11,is_grupo=5).annotate(
             nota_final=F('peanotafinal__nota_final'), capacita=F('peanotafinal__aprobado'),
             seleccionado=F('peanotafinal__aprobado'), sw_titu=Value(1, IntegerField()), bandaprob=Case(
                 When(alta_estado=1, then=Value(3)),
@@ -102,8 +103,8 @@ def cerrarCurso(request, id_usuario):
             ficha177.capacita = pt['capacita']
             ficha177.save()
 
-        pea_reserva = PEA.objects.exclude(id_pea__in=pea_titular_ids).filter(id_cargofuncional=165,
-                                                                             ubigeo=meta.ubigeo).annotate(
+        pea_reserva = PEA.objects.exclude(id_pea__in=pea_titular_ids).filter(id_cargofuncional=284,
+                                                                             ubigeo=meta.ubigeo,is_grupo=5).annotate(
             nota_final=F('peanotafinal__nota_final'), capacita=F('peanotafinal__aprobado'),
             seleccionado=F('peanotafinal__aprobado'), sw_titu=Value(0, IntegerField()), bandaprob=Case(
                 When(baja_estado=1, then=Value(4)),
