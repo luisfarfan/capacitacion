@@ -23,9 +23,18 @@ def do_login(request):
         clave = request.POST['clave']
         user = User.objects.filter(usuario=usuario, clave=clave).values('id', 'usuario', 'ccdd', 'ccpp', 'ccdi', 'zona',
                                                                         'curso', 'rol__rol', 'curso__nombre_curso',
-                                                                        'rol__id', 'cierre')
+                                                                        'rol__id', 'cierre_dia1', 'cierre_dia2',
+                                                                        'cierre_dia3')
 
         if user is not None:
             return JsonResponse(list(user), safe=False)
 
         return JsonResponse({'msg': True}, safe=False)
+
+
+def updateUserSession(request, id):
+    user = User.objects.filter(pk=id).values('id', 'usuario', 'ccdd', 'ccpp', 'ccdi', 'zona',
+                                             'curso', 'rol__rol', 'curso__nombre_curso',
+                                             'rol__id', 'cierre', 'cierre_dia1', 'cierre_dia2',
+                                             'cierre_dia3')
+    return JsonResponse(list(user), safe=False)

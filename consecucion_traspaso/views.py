@@ -10,14 +10,16 @@ from django.db.models import F, Case, Value, When, IntegerField
 
 def traer_consecucion(request):
     # pea_consecucion = PersonalCapacitacion.objects.using('consecucion').filter(id_cargofuncional=51)
-    pea_consecucion = PersonalCapacitacion.objects.using('consecucion')
+    pea_consecucion = PersonalCapacitacion.objects.using('consecucion').all()
     for p in pea_consecucion:
         cargofuncional = Funcionario.objects.get(id_cargofuncional=p.id_cargofuncional)
         id_cargofuncional = cargofuncional.id_funcionario
-        pea = PEA(id_per=p.id_per, dni=p.dni, ape_paterno=p.ape_paterno, ape_materno=p.ape_materno, is_grupo=6,
-                  nombre=p.nombre, id_cargofuncional_id=id_cargofuncional, ubigeo_id=p.ubigeo, zona=p.zona,
-                  contingencia=p.contingencia, id_convocatoriacargo=p.id_convocatoriacargo)
-        pea.save()
+        pea_exist = PEA.objects.filter(id_per=p.id_per,id_convocatoriacargo=p.id_convocatoriacargo,id_cargofuncional=id_cargofuncional)
+        if pea_exist.count()==0:
+            pea = PEA(id_per=p.id_per, dni=p.dni, ape_paterno=p.ape_paterno, ape_materno=p.ape_materno, is_grupo=6,
+                      nombre=p.nombre, id_cargofuncional_id=id_cargofuncional, ubigeo_id=p.ubigeo, zona=p.zona,
+                      contingencia=p.contingencia, id_convocatoriacargo=p.id_convocatoriacargo)
+            pea.save()
 
     pea = PEA.objects.all().values()
     return JsonResponse(list(pea), safe=False)
@@ -80,7 +82,7 @@ def cerrarCurso(request, id_usuario):
         meta_cantidad = meta.meta
 
         pea_titular = PEA.objects.filter(id_cargofuncional=284, ubigeo=meta.ubigeo, baja_estado=0,
-                                         peanotafinal__nota_final__gte=11,is_grupo=5).annotate(
+                                         peanotafinal__nota_final__gte=11, is_grupo=5).annotate(
             nota_final=F('peanotafinal__nota_final'), capacita=F('peanotafinal__aprobado'),
             seleccionado=F('peanotafinal__aprobado'), sw_titu=Value(1, IntegerField()), bandaprob=Case(
                 When(alta_estado=1, then=Value(3)),
@@ -104,7 +106,7 @@ def cerrarCurso(request, id_usuario):
             ficha177.save()
 
         pea_reserva = PEA.objects.exclude(id_pea__in=pea_titular_ids).filter(id_cargofuncional=284,
-                                                                             ubigeo=meta.ubigeo,is_grupo=5).annotate(
+                                                                             ubigeo=meta.ubigeo, is_grupo=5).annotate(
             nota_final=F('peanotafinal__nota_final'), capacita=F('peanotafinal__aprobado'),
             seleccionado=F('peanotafinal__aprobado'), sw_titu=Value(0, IntegerField()), bandaprob=Case(
                 When(baja_estado=1, then=Value(4)),

@@ -16,6 +16,7 @@ from django.core.exceptions import ObjectDoesNotExist
 
 import json
 from random import sample
+from django.db.models import Q
 
 
 def modulo_registro(request):
@@ -380,6 +381,15 @@ def sobrantes_zona(request):
                                                                              baja_estado=0, is_grupo=1).order_by(
                     'ape_paterno').values('dni', 'ape_paterno', 'ape_materno', 'nombre',
                                           'cargo', 'id_pea')
+            elif id_curso == "5":
+                sobrantes = PEA.objects.exclude(id_pea__in=PEA_AULA.objects.values('id_pea')).annotate(
+                    cargo=F('id_cargofuncional__nombre_funcionario')).filter(ubigeo=ubigeo,
+                                                                             id_cargofuncional__cursofuncionario__id_curso_id=id_curso,
+                                                                             contingencia=contingencia,
+                                                                             is_grupo=5,
+                                                                             baja_estado=0).order_by(
+                    'ape_paterno').values('dni', 'ape_paterno', 'ape_materno', 'nombre',
+                                          'cargo', 'id_pea')
             else:
                 sobrantes = PEA.objects.exclude(id_pea__in=PEA_AULA.objects.values('id_pea')).annotate(
                     cargo=F('id_cargofuncional__nombre_funcionario')).filter(ubigeo=ubigeo,
@@ -408,9 +418,9 @@ def getMeta(request):
                                                 ubigeo=ubigeo, is_grupo=1).count()
         else:
             meta = PEA.objects.filter(id_cargofuncional__cursofuncionario__id_curso=id_curso, ubigeo=ubigeo,
-                                      contingencia=0, alta_estado=0, is_grupo=5).count()
+                                      contingencia=0, alta_estado=0, is_grupo=6).count()
             meta_reclutada = PEA.objects.filter(id_cargofuncional__cursofuncionario__id_curso=id_curso,
-                                                is_grupo=5, ubigeo=ubigeo).count()
+                                                is_grupo=6, ubigeo=ubigeo).count()
 
         capacidad_zona = LocalAmbiente.objects.filter(id_local__zona=zona, id_local__ubigeo=ubigeo,
                                                       id_local__id_curso=id_curso).aggregate(
@@ -461,7 +471,7 @@ def asignar(request):
         if 'aulaambiente' in data:
             id_aulaambiente = data['aulaambiente']
 
-        if curso == '6':
+        if curso == '7':
             return JsonResponse(distribucion_curso4(ubigeo, zona, curso, alta), safe=False)
         elif curso == '1':
             return JsonResponse(distribucion_curso1(), safe=False)
@@ -469,7 +479,7 @@ def asignar(request):
             if 'alta' in data:
                 if curso == "5":
                     _pea_cantidad = PEA.objects.exclude(id_pea__in=PEA_AULA.objects.values('id_pea')).filter(
-                        ubigeo=ubigeo, id_cargofuncional__in=cargos, contingencia=0, is_grupo=5, alta_estado=1).count()
+                        ubigeo=ubigeo, id_cargofuncional__in=cargos, contingencia=0, is_grupo=6, alta_estado=1).count()
                     pea_baja = PEA_AULA.objects.filter(id_localambiente__id_local__ubigeo=ubigeo,
                                                        # id_localambiente__id_local__zona=zona,
                                                        id_pea__is_grupo=5,
@@ -526,7 +536,7 @@ def asignar(request):
                                         ubigeo=ubigeo, contingencia=0, baja_estado=0,
                                         id_cargofuncional__in=cargos,
                                         is_grupo=5).order_by(
-                                        'zona', 'ape_paterno')[:a.capacidad]
+                                        'ape_paterno', 'zona')[:a.capacidad]
                                 else:
                                     pea_ubicar = PEA.objects.exclude(
                                         id_pea__in=PEA_AULA.objects.values('id_pea')).filter(
@@ -997,40 +1007,34 @@ def save_nota_final(request):
 
 @csrf_exempt
 def peaCurso6(request, ubigeo):
-    pea_dia1 = PEA.objects.all().filter(id_cargofuncional__id_funcionario=901, ubigeo=ubigeo).values()
+    pea_dia1 = PEA.objects.all().filter(Q(asistio_dia__isnull=True) | Q(asistio_dia=1),
+                                        id_cargofuncional__id_funcionario=901, ubigeo=ubigeo).values().order_by(
+        'ape_paterno')
     pea_dia2 = PEA.objects.all().exclude(
         id_pea__in=PEA.objects.filter(id_cargofuncional__id_funcionario=901, ubigeo=ubigeo,
-                                      asistio_dia__isnull=False).values_list('id_pea',
-                                                                             flat=True)).filter(
-        id_cargofuncional__id_funcionario=901, ubigeo=ubigeo).values()
+                                      asistio_dia=1).values_list('id_pea',
+                                                                 flat=True)).filter(
+        id_cargofuncional__id_funcionario=901, ubigeo=ubigeo).values().order_by(
+        'ape_paterno')
 
     return JsonResponse({'pea_dia1': list(pea_dia1), 'pea_dia2': list(pea_dia2)})
 
 
 @csrf_exempt
-def saveAsistenciaCurso6Dia1(request):
-    asistio_dia1 = request.POST.getlist('dia1[]')
-    asistio_dia2 = request.POST.getlist('dia2[]')
+def saveAsistenciaCurso6(request):
     data = request.POST
-
     json_data = json.loads(data['json_data'])
     for i in json_data:
         pea = PEA.objects.get(pk=i['id'])
-        if i['asistio'] == 1:
-            pea.asistio_dia = 1
-        else:
-            pea.asistio_dia = None
-        pea.save()
 
-    for i in asistio_dia2:
-        pea = PEA.objects.get(pk=i['id'])
-        if i['asistio'] == "2":
-            pea.asistio_dia = 2
+        if i['asistio'] == 1 or i['asistio'] == 2:
+            pea.asistio_dia = i['asistio']
         else:
             pea.asistio_dia = None
         pea.save()
 
     return JsonResponse({'msg': True}, safe=False)
+
 
 @csrf_exempt
 def saveAsistenciaCurso6Dia2(request):
@@ -1048,8 +1052,13 @@ def saveAsistenciaCurso6Dia2(request):
 
 
 @csrf_exempt
-def cerrarDia1Grupo6(request, ccdd, ccpp, ccdi):
-    User.objects.filter(ccdd=ccdd, ccpp=ccpp, ccdi=ccdi).update(cierre=1)
+def cerrarDia1Grupo6(request, ccdd, ccpp, ccdi, dia):
+    if dia == 1:
+        User.objects.filter(ccdd=ccdd, ccpp=ccpp, ccdi=ccdi).update(cierre_dia1=1)
+    elif dia == 2:
+        User.objects.filter(ccdd=ccdd, ccpp=ccpp, ccdi=ccdi).update(cierre_dia2=1)
+    elif dia == 3:
+        User.objects.filter(ccdd=ccdd, ccpp=ccpp, ccdi=ccdi).update(cierre_dia3=1)
     return JsonResponse({'msg': True})
 
 

@@ -3,11 +3,38 @@
  */
 $(function () {
     getLocales();
-    if (session.curso == "6") {
-        $('#div_is_not_6').hide();
-        getPeaCurso6(session.cierre);
-    }
+    updateUserSession();
 });
+var cierre;
+function updateUserSession() {
+    $.getJSON(`${BASEURL}/updateUserSession/${session.id}`, response => {
+        localStorage.removeItem('usuario');
+        localStorage.setItem('usuario', JSON.stringify(response[0]));
+        session = JSON.parse(localStorage.getItem('usuario'));
+        cierre = session.cierre;
+        if (session.curso == "6" || session.curso == "15" || session.curso == "16") {
+            if (session.curso == "6") {
+                dia_curso = 1
+                getPeaCurso6(session.cierre_dia1);
+            } else if (session.curso == "15") {
+                dia_curso = 2
+                getPeaCurso6(session.cierre_dia2);
+            } else if (session.curso == "16") {
+                dia_curso = 3
+                getPeaCurso6(session.cierre_dia3);
+            }
+            $('#div_is_not_6').hide();
+
+            if (session.rol__id == 3) {
+                $('#btn_cierre_dia1').show();
+            } else {
+                $('#btn_cierre_dia1').remove();
+            }
+        } else {
+            $('#div_is_6').hide();
+        }
+    })
+}
 
 var turno;
 var local = [];
@@ -602,17 +629,41 @@ function setDetalleCabecera() {
 
 var pea_dia1 = [];
 var pea_dia2 = [];
-var cierre = session.cierre;
+var contador = 0;
+var dia_curso;
+
 function getPeaCurso6(cierre) {
     $.getJSON(`${BASE_URL}peaCurso6/${session.ccdd}${session.ccpp}${session.ccdi}/`, response => {
         pea_dia1 = response.pea_dia1
         pea_dia2 = response.pea_dia2
         if (cierre == 0) {
+            $('#nombre_reporte').text('PRIMER DIA')
             renderPeaDia1();
         } else {
+            $('#nombre_reporte').text('SEGUNDO DIA')
             renderPeaDia2();
         }
+        getContador();
+
     });
+}
+
+function getContador() {
+    contador = 0;
+    if (session.cierre == 0) {
+        $('input[name="asistio_dia1"]').map((key, value) => {
+            if ($(value).is(':checked')) {
+                contador++;
+            }
+        });
+    } else if (session.cierre == 1) {
+        $('input[name="asistio_dia2"]').map((key, value) => {
+            if ($(value).is(':checked')) {
+                contador++;
+            }
+        });
+    }
+    $('#contador').text(contador)
 }
 
 function renderPeaDia1() {
@@ -622,7 +673,7 @@ function renderPeaDia1() {
     }
     pea_dia1.map((key, val) => {
         let checked = '';
-        if (key.asistio_dia1 == 1) {
+        if (key.asistio_dia == 1) {
             checked = 'checked = "checked"'
         } else {
             checked = '';
@@ -640,9 +691,13 @@ function renderPeaDia1() {
     $('#pea_total_distrito').DataTable({
         "paging": false
     });
+    $('input[name="asistio_dia1"]').click(() => {
+        getContador();
+    })
 }
 
 function renderPeaDia2() {
+    $('#btn_cierre_dia1').hide();
     let html = '';
     if ($.fn.DataTable.isDataTable('#pea_total_distrito')) {
         $('#pea_total_distrito').DataTable().destroy();
@@ -658,7 +713,7 @@ function renderPeaDia2() {
         html += `<td>${parseInt(val) + 1}</td><td>${key.ape_paterno}</td><td>${key.ape_materno}</td><td>${key.nombre}</td><td>${key.zona}</td><th>
                                         <div class="checkbox">
 											<label>
-												<input type="checkbox" name="asistio_dia1" class="styled" value="${key.id_pea}" ${checked}>
+												<input type="checkbox" name="asistio_dia2" class="styled" value="${key.id_pea}" ${checked}>
 											</label>
 										</div></th>`;
         html += `</tr>`;
@@ -667,6 +722,9 @@ function renderPeaDia2() {
     $('#pea_total_distrito').DataTable({
         "paging": false
     });
+    $('input[name="asistio_dia2"]').click(() => {
+        getContador();
+    })
 }
 
 function __saveCurso6(dia = 1) {
@@ -694,19 +752,39 @@ function __saveCurso6(dia = 1) {
     }
 }
 function cerrarAsistenciaDia1() {
-    $.getJSON(`${BASEURL}cerrarDia1Grupo6/${session.ccdd}/${session.ccpp}/${session.ccdi}/`, () => {
-        getPeaCurso6(1)
+    alert_confirm(__cerrarAsistenciaDia1, 'Esta usted seguro de cerrar la asistencia para el primer día?')
+}
+
+function __cerrarAsistenciaDia1() {
+    $.getJSON(`${BASEURL}/cerrarDia1Grupo6/${session.ccdd}/${session.ccpp}/${session.ccdi}/`, response => {
+        console.log(response);
+        getPeaCurso6(1);
     });
 }
 
 function saveCurso6() {
     let data = __saveCurso6(cierre == 0 ? 1 : 2);
-    console.log(data);
     alert_confirm(() => {
+        $('#div_is_6').block({
+            message: '<i class="icon-spinner4 spinner"></i><h5>Espere por favor, se esta realizando el proceso de asignación automática</h5>',
+            overlayCSS: {
+                backgroundColor: '#fff',
+                opacity: 0.8,
+                cursor: 'wait'
+            },
+            css: {
+                border: 0,
+                padding: 0,
+                backgroundColor: 'none'
+            }
+        });
         $.post(`${BASEURL}/saveAsistenciaCurso6/`, {
             json_data: JSON.stringify(data),
         }, response => {
-            console.log(response)
+            $('#div_is_6').unblock();
+            alert_success('Asistencia Guardada con éxito');
+            updateUserSession()
         })
     }, 'Esta usted seguro de guardar la asistencia?')
 }
+

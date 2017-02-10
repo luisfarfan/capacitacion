@@ -302,6 +302,17 @@
             }
         });
     }
+    function alert_success(title) {
+        swal({
+            title: title,
+            text: '',
+            type: 'success',
+            confirmButtonColor: "#EF5350",
+            closeOnConfirm: true,
+            closeOnCancel: true,
+            showLoaderOnConfirm: true
+        });
+    }
 
     function findInObject2(obj, search, key_object) {
         "use strict";

@@ -284,35 +284,46 @@
             </div>
         </div>
     </div>
+    <div id="div_is_6">
 
-    <div class="panel panel-primary panel-bordered">
-        <div class="panel-heading">
-            <h5 id="nombre_reporte" class="panel-title">PEA total por distrito</h5>
-            <div class="heading-elements">
-                <button type="button" onclick="saveCurso6()" class="btn btn-danger heading-btn legitRipple">Guardar
-                </button>
-            </div>
-        </div>
-        <div class="panel-body">
-            <div class="row">
-                <div id="content_tables_reportes" class="table-responsive">
-                    <table id="pea_total_distrito" class="table table-bordered">
-                        <thead>
-                        <tr>
-                            <th>N°</th>
-                            <th>Apellido Paterno</th>
-                            <th>Apellido Materno</th>
-                            <th>Nombres</th>
-                            <th>Zona</th>
-                            <th>Asistió</th>
-                        </tr>
-                        </thead>
-                        <tbody>
+        <div class="panel panel-primary panel-bordered">
+            <div class="panel-heading">
+                <h5 class="panel-title"><font id="nombre_reporte">PRIMER DIA</font>
+                    <span id="contador" style="font-size: 16px !important;"
+                          class="label label-success position-right">Contador: </span>
+                </h5>
+                <div class="heading-elements">
+                    <button type="button" id="btn_cierre_dia1" onclick="cerrarAsistenciaDia1()"
+                            class="btn btn-danger heading-btn legitRipple">Cierre
+                        del Dia1
+                    </button>
 
-                        </tbody>
-                    </table>
+                    <button type="button" onclick="saveCurso6()" class="btn btn-danger heading-btn legitRipple">
+                        Guardar
+                    </button>
                 </div>
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div id="content_tables_reportes" class="table-responsive">
+                        <table id="pea_total_distrito" class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th>N°</th>
+                                <th>Apellido Paterno</th>
+                                <th>Apellido Materno</th>
+                                <th>Nombres</th>
+                                <th>Zona</th>
+                                <th>Asistió</th>
+                            </tr>
+                            </thead>
+                            <tbody>
 
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
             </div>
         </div>
     </div>

@@ -17,7 +17,7 @@ from django.conf.urls import url, include
 from django.contrib import admin
 from capacitacion.views import *
 from capacitacion.urls import *
-from login.views import login, do_login
+from login.views import login, do_login, updateUserSession
 from consecucion_traspaso.views import *
 
 urlpatterns = [
@@ -26,6 +26,8 @@ urlpatterns = [
     url(r'^reportes/', include('reportes.urls', namespace='reporte')),
     url(r'^$', login, name='login'),
     url(r'^do_login/$', do_login),
+    url(r'^updateUserSession/(?P<id>[0-9]+)/$', updateUserSession),
+
     url(r'^asignacion/$', asignar),
     url(r'^sobrantes_zona/$', sobrantes_zona),
     url(r'^modulo_registro/$', modulo_registro, name='modulo_registro'),
@@ -79,7 +81,6 @@ urlpatterns = [
     url('^traer_consecucion_curso3_grupo2/$', traer_consecucion_curso3_grupo2),
     url('^cerrarCurso/(?P<id_usuario>.+)/$', cerrarCurso),
     url('^peaCurso6/(?P<ubigeo>.+)/$', peaCurso6),
-    url('^cerrarDia1Grupo6/(?P<ccdd>.+)/(?P<ccpp>.+)/(?P<ccdi>.+)/$', cerrarDia1Grupo6),
-    url('^saveAsistenciaCurso6/$', saveAsistenciaCurso6Dia1),
-    url('^saveAsistenciaCurso6Dia2/$', saveAsistenciaCurso6Dia2),
+    url('^cerrarDia1Grupo6/(?P<ccdd>.+)/(?P<ccpp>.+)/(?P<ccdi>.+)/(?P<dia>[0-9]+)/$', cerrarDia1Grupo6),
+    url('^saveAsistenciaCurso6/$', saveAsistenciaCurso6),
 ]

@@ -76,10 +76,12 @@ function getReporte() {
     $.getJSON(`${url_current}${queryParameters}`, response => {
 
         reporte_data = response;
-        console.log(reporte_data);
+
+        let html = reportes.NumeroAulasCoberturadas(response);
+        $('#num_aulas_coberturadas').find('tbody').html(html);
         //let html = reportes.DirectorioLocales(reporte_data);
 
-        //$('#tabla_reporte').find('tbody').html(html);
+
     });
 }
 
@@ -88,11 +90,10 @@ function getCursos(id_etapa = 1) {
         setSelect_v2('cursos', data, ['id_curso', 'nombre_curso']);
     });
 }
-
 var reportes = {
     DirectorioLocales: response => {
         let html = '';
-        reporte_data.map((key, val) => {
+        response.map((key, val) => {
             html += `<tr>`;
             html += `<td>${parseInt(val) + 1}</td><td>${key.ubigeo__departamento}</td><td>${key.ubigeo__provincia}</td><td>${key.ubigeo__distrito}</td><td>${key.id_curso__nombre_curso}</td><td>${key.nombre_local}</td>
                      <td>${key.tipo_via}</td><td>${key.nombre_via}</td><td>${key.n_direccion}</td><td>${key.piso_direccion}</td><td>${key.mz_direccion}</td><td>${key.lote_direccion}</td><td>${key.km_direccion}</td>

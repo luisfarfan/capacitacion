@@ -16,6 +16,9 @@ class User(models.Model):
     curso = models.ForeignKey(Curso, null=True, blank=True)
     rol = models.ForeignKey('Rol', null=True)
     cierre = models.IntegerField(default=0)
+    cierre_dia1 = models.IntegerField(default=0)
+    cierre_dia2 = models.IntegerField(default=0)
+    cierre_dia3 = models.IntegerField(default=0)
 
 
 @admin.register(User)
