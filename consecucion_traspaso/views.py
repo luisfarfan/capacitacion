@@ -14,8 +14,9 @@ def traer_consecucion(request):
     for p in pea_consecucion:
         cargofuncional = Funcionario.objects.get(id_cargofuncional=p.id_cargofuncional)
         id_cargofuncional = cargofuncional.id_funcionario
-        pea_exist = PEA.objects.filter(id_per=p.id_per,id_convocatoriacargo=p.id_convocatoriacargo,id_cargofuncional=id_cargofuncional)
-        if pea_exist.count()==0:
+        pea_exist = PEA.objects.filter(id_per=p.id_per, id_convocatoriacargo=p.id_convocatoriacargo,
+                                       id_cargofuncional=id_cargofuncional)
+        if pea_exist.count() == 0:
             pea = PEA(id_per=p.id_per, dni=p.dni, ape_paterno=p.ape_paterno, ape_materno=p.ape_materno, is_grupo=6,
                       nombre=p.nombre, id_cargofuncional_id=id_cargofuncional, ubigeo_id=p.ubigeo, zona=p.zona,
                       contingencia=p.contingencia, id_convocatoriacargo=p.id_convocatoriacargo)
@@ -58,8 +59,10 @@ def getMetaConsecucion(request, ubigeo, curso):
         meta = MetaSeleccion.objects.using('consecucion').get(ubigeo=ubigeo, id_cargofuncional=51)
     elif curso == "3":
         meta = MetaSeleccion.objects.using('consecucion').get(ubigeo=ubigeo, id_cargofuncional=548)
+    elif curso == "1":
+        meta = MetaSeleccion.objects.using('consecucion').get(ubigeo=ubigeo, id_cargofuncional=548)
     elif curso == "13":
-        meta = 9
+        return JsonResponse({'meta': 9})
     elif curso == "4":
         meta = MetaSeleccion.objects.using('consecucion').get(ubigeo=ubigeo, id_cargofuncional=547)
     elif curso == "5":

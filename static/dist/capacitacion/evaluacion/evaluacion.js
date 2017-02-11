@@ -4,7 +4,6 @@
 /**
  * Created by lfarfan on 05/12/2016.
  */
-
 $('input[name="change_interfaz"]').change(event => {
     interfaz_cerrarCurso($('input[name="change_interfaz"]:checked').val())
 });
@@ -46,6 +45,7 @@ $(function () {
         $('#btn_rankear').hide();
     }
     getReporte();
+    interfaz_cerrarCurso($('input[name="change_interfaz"]:checked').val())
 });
 
 var criterios = [];

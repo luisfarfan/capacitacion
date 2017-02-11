@@ -1,92 +1,44 @@
 {% extends 'base/base.html' %}
 {% load staticfiles %}
 {% block content %}
-    <div id="checkbox_interfaz" class="row">
-        <div class="form-group">
-            <label class="checkbox-inline">
-                <input value="1" name="change_interfaz" type="radio" checked="checked">
-                Interfaz Rankeo y Cerrar Curso
-            </label>
-
-            <label class="checkbox-inline">
-                <input value="2" name="change_interfaz" type="radio">
-                Interfaz Registro de Notas
-            </label>
+    <div id="is_not_curso6">
+        <div id="checkbox_interfaz" class="row">
+            <div class="form-group">
+                <label class="checkbox-inline">
+                    <input value="2" name="change_interfaz" type="radio" checked="checked">
+                    Interfaz Registro de Notas
+                </label>
+                <label class="checkbox-inline">
+                    <input value="1" name="change_interfaz" type="radio">
+                    Interfaz Rankeo y Cerrar Curso
+                </label>
+            </div>
         </div>
-    </div>
-    <div class="row">
-        <div class="col-md-offset-10 col-md-2">
-            <div class="col-sm-8">
-                <div class="panel panel-flat">
-                    <div class="table-responsive">
-                        <table class="table table-bordered">
-                            <thead>
-                            <tr class="bg-blue">
-                                <th>META</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <td><input type="text" class="form-control" id="cant_meta"></td>
-                            </tr>
-                            </tbody>
-                        </table>
+        <div class="row">
+            <div class="col-md-offset-10 col-md-2">
+                <div class="col-sm-8">
+                    <div class="panel panel-flat">
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                <tr class="bg-blue">
+                                    <th>META</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td><input type="text" class="form-control" id="cant_meta"></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="panel panel-primary panel-bordered" id="no_distrital_filtro">
-        <div class="panel-heading">
-            <h5 class="panel-title">Seleccione su local y aula</h5>
-            <div class="heading-elements">
-                <ul class="icons-list">
-                    <li>
-                        <a data-action="collapse"></a>
-                    </li>
-                    <li>
-                        <a data-action="close"></a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-        <div class="panel-body">
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label>Local</label>
-                        <select id="local" class="select form-control">
-                            <option value="">Seleccione</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="form-group">
-                        <label>Aula</label>
-                        <select id="aulas" class="select form-control">
-                            <option value="">Seleccione</option>
-                        </select>
-                    </div>
-                </div>
-                <div style="display: none" id="div_fechas" class="col-md-2">
-                    <div class="form-group">
-                        <label>Fechas</label>
-                        <select id="fechas" class="select form-control">
-                            <option value="">Seleccione</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <button id="btn_getpea" class="btn btn-primary">Mostrar PEA</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    </div>
-    <div class="col-md-12">
-        <div class="panel panel-primary panel-bordered">
+        <div class="panel panel-primary panel-bordered" id="no_distrital_filtro">
             <div class="panel-heading">
-                <h5 class="panel-title">Registro de notas</h5>
+                <h5 class="panel-title">Seleccione su local y aula</h5>
                 <div class="heading-elements">
                     <ul class="icons-list">
                         <li>
@@ -100,66 +52,114 @@
             </div>
             <div class="panel-body">
                 <div class="row">
-                    <div class="pull-left">
-                        <button id="btn_save_notas" onclick="saveNotas()" class="btn btn-primary">Guardar</button>
-                        <button type="button" id="btn_cerrar_curso" onclick="cerrarCurso()"
-                                class="btn bg-info-700 btn-raised active legitRipple">CERRAR CURSO
-                        </button>
-                        <button type="button" id="btn_rankear" onclick="rankear()"
-                                class="btn bg-danger-400 btn-raised active legitRipple">RANKEAR
-                        </button>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Local</label>
+                            <select id="local" class="select form-control">
+                                <option value="">Seleccione</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="pull-right">
-                        <a href="#" download="" id="btn_exportar_evaluacion" class="btn btn-primary">Exportar</a>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Aula</label>
+                            <select id="aulas" class="select form-control">
+                                <option value="">Seleccione</option>
+                            </select>
+                        </div>
                     </div>
-
-                </div>
-                <div class="row">
-                    <div class="table-responsive" id="no_distrital">
-                        <table id="tabla_pea" class="table table-responsive table-bordered">
-                            <caption>
-                                <center><h4 class="text-center">CENSOS NACIONALES 2017: XII DE POBLACIÓN, VII DE
-                                    VIVIENDA Y III DE COMUNIDADES INDÍGENAS</h4>
-                                    <h4 class="text-center">CENSO EXPERIMENTAL</h4>
-                                    <h4 id="descripcion_curso_aula" class="text-center"></h4>
-                                    <h4 class="text-center">REGISTRO DE NOTAS</h4>
-                                    <h4 id="descripcion_aula" class="text-center"></h4></center>
-                            </caption>
-                            <thead>
-                            </thead>
-                            <tbody>
-
-                            </tbody>
-                        </table>
+                    <div style="display: none" id="div_fechas" class="col-md-2">
+                        <div class="form-group">
+                            <label>Fechas</label>
+                            <select id="fechas" class="select form-control">
+                                <option value="">Seleccione</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="table-responsive">
-                        <table id="tabla_reporte" class="table table-bordered">
-                            <thead>
-                            <tr>
-                                <th>N°</th>
-                                <th>Departamento</th>
-                                <th>Provincia</th>
-                                <th>Distrito</th>
-                                <th>Apellidos y Nombres</th>
-                                <th>DNI</th>
-                                <th>Cargo</th>
-                                <th>Zona</th>
-                                <th>Nota Promedio Final</th>
-                                <th>Apto</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-
-                            </tbody>
-                        </table>
+                    <div class="col-md-2">
+                        <button id="btn_getpea" class="btn btn-primary">Mostrar PEA</button>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    <div id="clone" style="display: none">
+        <div class="col-md-12">
+            <div class="panel panel-primary panel-bordered">
+                <div class="panel-heading">
+                    <h5 class="panel-title">Registro de notas</h5>
+                    <div class="heading-elements">
+                        <ul class="icons-list">
+                            <li>
+                                <a data-action="collapse"></a>
+                            </li>
+                            <li>
+                                <a data-action="close"></a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="pull-left">
+                            <button id="btn_save_notas" onclick="saveNotas()" class="btn btn-primary">Guardar</button>
+                            <button type="button" id="btn_cerrar_curso" onclick="cerrarCurso()"
+                                    class="btn bg-info-700 btn-raised active legitRipple">CERRAR CURSO
+                            </button>
+                            <button type="button" id="btn_rankear" onclick="rankear()"
+                                    class="btn bg-danger-400 btn-raised active legitRipple">RANKEAR
+                            </button>
+                        </div>
+                        <div class="pull-right">
+                            <a href="#" download="" id="btn_exportar_evaluacion" class="btn btn-primary">Exportar</a>
+                        </div>
 
+                    </div>
+                    <div class="row">
+                        <div class="table-responsive" id="no_distrital">
+                            <table id="tabla_pea" class="table table-responsive table-bordered">
+                                <caption>
+                                    <center><h4 class="text-center">CENSOS NACIONALES 2017: XII DE POBLACIÓN, VII DE
+                                        VIVIENDA Y III DE COMUNIDADES INDÍGENAS</h4>
+                                        <h4 class="text-center">CENSO EXPERIMENTAL</h4>
+                                        <h4 id="descripcion_curso_aula" class="text-center"></h4>
+                                        <h4 class="text-center">REGISTRO DE NOTAS</h4>
+                                        <h4 id="descripcion_aula" class="text-center"></h4></center>
+                                </caption>
+                                <thead>
+                                </thead>
+                                <tbody>
+
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="table-responsive">
+                            <table id="tabla_reporte" class="table table-bordered">
+                                <thead>
+                                <tr>
+                                    <th>N°</th>
+                                    <th>Departamento</th>
+                                    <th>Provincia</th>
+                                    <th>Distrito</th>
+                                    <th>Apellidos y Nombres</th>
+                                    <th>DNI</th>
+                                    <th>Cargo</th>
+                                    <th>Zona</th>
+                                    <th>Nota Promedio Final</th>
+                                    <th>Apto</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="clone" style="display: none">
+        </div>
     </div>
+
 {% endblock %}
 
 
@@ -174,5 +174,8 @@
     <script type="text/javascript" src="{% static "dist/capacitacion/evaluacion/evaluacion.js" %}"></script>
     <script>
         $('#notas').addClass('active');
+        if (session.curso == "6") {
+            $('#is_not_curso6').hide();
+        }
     </script>
 {% endblock %}

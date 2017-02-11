@@ -18,6 +18,7 @@ var is_directorio = true;
 $('#cursos').change(e => {
     session.curso = e.target.value;
     localStorage.setItem('usuario', JSON.stringify(session));
+    setUserData();
 });
 
 

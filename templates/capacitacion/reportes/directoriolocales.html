@@ -3,8 +3,8 @@
 {% block content %}
     <div class="panel panel-flat border-left-xlg border-left-info">
         <div class="panel-body">
-            <div class="form-group">
-                <label>Seleccione el reporte a visualizar</label>
+            <div class="form-group  ">
+                <label class="">Seleccione el reporte a visualizar</label>
                 <select id="select_reportes_list" class="bootstrap-select" data-width="100%">
 
                 </select>
@@ -36,7 +36,15 @@
             </div>
             <br>
             <div class="row">
-                <div class="col-md-3">
+                <div id="div_cargos" class="col-md-3">
+                    <div class="form-group">
+                        <label class="text-bold">Cargos</label>
+                        <select id="select_cargos_list" class="select">
+                            <option value="">Seleccione</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="div_cursos" class="col-md-3">
                     <div class="form-group">
                         <label class="text-bold">Cursos</label>
                         <select id="cursos" class="select">
@@ -97,9 +105,26 @@
             <div class="panel-body">
                 <div class="row">
                     <div id="content_tables_reportes" class="table-responsive">
+                        <!--8 selected-->
                         <table id="directorio_locales" class="hidden table table-bordered">
                             <thead>
+                            <tr class="">
+
+                                <th colspan="2" class="bg-success">Departamento</th>
+                                <td colspan="3"></td>
+                            </tr>
                             <tr>
+                                <th colspan="2" class="bg-success">Privincia</th>
+                                <td colspan="3"></td>
+                            </tr>
+                            <tr>
+
+                                <th colspan="2" class="bg-success">Distrito</th>
+                                <td colspan="3"></td>
+                            </tr>
+                            </thead>
+                            <thead>
+                            <tr class="bg-teal-400">
                                 <th rowspan="2">N°</th>
                                 <th rowspan="2">Departamento</th>
                                 <th rowspan="2">Provincia</th>
@@ -113,7 +138,7 @@
                                 <th rowspan="2">Teléfono</th>
                                 <th rowspan="2">Número de ambientes (aulas)</th>
                             </tr>
-                            <tr>
+                            <tr class="bg-teal-400">
                                 <th>Tipo de Vía</th>
                                 <th>Nombre de la vía</th>
                                 <th>N°</th>
@@ -127,27 +152,252 @@
 
                             </tbody>
                         </table>
+                        <!--primero selected-->
                         <table id="num_aulas_coberturadas" class="hidden table table-bordered">
                             <thead>
-                            <tr id="tr_ubigeo">
+
+                            <tr id="tr_ubigeo" class="bg-info-700">
                                 <th rowspan="3">DEPARTAMENTO</th>
                                 <th rowspan="3">PROVINCIA</th>
                                 <th rowspan="3">DISTRITO</th>
-                                <th colspan="3">Curso</th>
+                                <th colspan="4" id="p">Curso</th>
                             </tr>
-                            <tr>
-                                <th rowspan="2">Total Aulas(Meta)</th>
-                                <th colspan="2">Aulas Disponibles</th>
+                            <tr class="bg-info-700">
+                                <th rowspan="2">Meta</th>
+                                <th rowspan="2">Cobertura</th>
+
+
                             </tr>
-                            <tr>
-                                <th>Absoluto</th>
-                                <th>%</th>
+                            <tr class="bg-info-700">
+                                <th>Meta Absoluto</th>
+                                <th>Cobertura %</th>
                             </tr>
+
+
                             </thead>
                             <tbody>
 
                             </tbody>
                         </table>
+
+                        <!--Segundo selected-->
+                        <table id="postulante_selec_curso" class="hidden table table-bordered">
+                            <thead>
+
+                            <tr id="tr_ubigeo" class="bg-warning">
+                                <th rowspan="3">DEPARTAMENTO</th>
+                                <th rowspan="3">PROVINCIA</th>
+                                <th rowspan="3">DISTRITO</th>
+                                <th colspan="4">Curso</th>
+                            </tr>
+                            <tr class="bg-warning">
+                                <th rowspan="2">Meta</th>
+                                <th rowspan="2">Cobertura</th>
+
+
+                            </tr>
+                            <tr class="bg-warning">
+                                <th>Meta Absoluto</th>
+                                <th>Cobertura %</th>
+                            </tr>
+
+                            </thead>
+
+                            <tbody>
+
+                            </tbody>
+                        </table>
+
+                        <!--tercero selected-->
+                        <table id="postulante_asistieron_curso" class="hidden table table-bordered">
+                            <thead>
+
+                            <tr id="tr_ubigeo" class="bg-teal-700">
+                                <th rowspan="3">DEPARTAMENTO</th>
+                                <th rowspan="3">PROVINCIA</th>
+                                <th rowspan="3">DISTRITO</th>
+                                <th colspan="4">Curso</th>
+                            </tr>
+                            <tr class="bg-teal-700">
+                                <th rowspan="2">Meta</th>
+                                <th rowspan="2">Cobertura</th>
+
+
+                            </tr>
+                            <tr class="bg-teal-700">
+                                <th>Meta Absoluto</th>
+                                <th>Cobertura %</th>
+                            </tr>
+
+                            </thead>
+
+                            <tbody>
+
+                            </tbody>
+                        </table>
+
+                        <!--cuarto sleected -->
+
+
+                        <table id="postulante_que_dio_baja" class="hidden table table-bordered">
+                            <thead>
+
+                            <tr id="tr_ubigeo">
+                                <th rowspan="3">DEPARTAMENTO</th>
+                                <th rowspan="3">PROVINCIA</th>
+                                <th rowspan="3">DISTRITO</th>
+                                <th colspan="4">Curso</th>
+                            </tr>
+                            <tr>
+                                <th rowspan="2">Meta</th>
+                                <th rowspan="2">Cobertura</th>
+
+
+                            </tr>
+                            <tr>
+                                <th>Meta Absoluto</th>
+                                <th>Cobertura %</th>
+                            </tr>
+
+                            </thead>
+
+                            <tbody>
+
+                            </tbody>
+                        </table>
+
+                        <!--quinta selected-->
+
+                        <table id="n_Postulantes_Capacitados" class="hidden table table-bordered">
+                            <thead>
+
+                            <tr id="tr_ubigeo">
+                                <th rowspan="3">DEPARTAMENTO</th>
+                                <th rowspan="3">PROVINCIA</th>
+                                <th rowspan="3">DISTRITO</th>
+                                <th colspan="4">Curso</th>
+                            </tr>
+                            <tr>
+                                <th rowspan="2">Meta</th>
+                                <th rowspan="2">Cobertura</th>
+
+
+                            </tr>
+                            <tr>
+                                <th>Meta Absoluto</th>
+                                <th>Cobertura %</th>
+                            </tr>
+
+                            </thead>
+
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                        <!--sexta selected-->
+
+                        <table id="personal_selec_para_trabajar" class="hidden table table-bordered">
+                            <thead>
+
+                            <tr id="tr_ubigeo">
+                                <th rowspan="3">DEPARTAMENTO</th>
+                                <th rowspan="3">PROVINCIA</th>
+                                <th rowspan="3">DISTRITO</th>
+                                <th colspan="4">Curso</th>
+                            </tr>
+                            <tr>
+                                <th rowspan="2">Meta</th>
+                                <th rowspan="2">Cobertura</th>
+
+
+                            </tr>
+                            <tr>
+                                <th>Meta Absoluto</th>
+                                <th>Cobertura %</th>
+                            </tr>
+
+                            </thead>
+
+                            <tbody>
+
+                            </tbody>
+                        </table>
+
+                        <!--7  selected-->
+
+
+                        <table id="direct_local_capacitacion_x_num_ambiente" class="hidden table table-bordered">
+                            <thead>
+                            <tr>
+
+                                <th colspan="2" class="bg-slate-600">Departamento</th>
+                                <td colspan="3"></td>
+                            </tr>
+                            <tr class="">
+                                <th colspan="2" class="bg-slate-600">Privincia</th>
+                                <td colspan="3"></td>
+                            </tr>
+                            <tr class="">
+
+                                <th colspan="2" class="bg-slate-600">Distrito</th>
+                                <td colspan="3"></td>
+                            </tr>
+                            </thead>
+                            <thead>
+                            <tr class="bg-success">
+                                <th rowspan="2">N°</th>
+                                <th rowspan="2">Departamento</th>
+                                <th rowspan="2">Provincia</th>
+                                <th rowspan="2">Distrito</th>
+                                <th rowspan="2">Curso</th>
+                                <th rowspan="2">Nombre del Local</th>
+                                <th colspan="7">
+                                    <center>DIRECCIÓN DEL LOCAL</center>
+                                </th>
+                                <th rowspan="2">Responsable del Local</th>
+                                <th rowspan="2">Teléfono</th>
+                                <th rowspan="2">Número de ambientes (aulas)</th>
+                            </tr>
+                            <tr class="bg-success">
+                                <th>Tipo de Vía</th>
+                                <th>Nombre de la vía</th>
+                                <th>N°</th>
+                                <th>Piso</th>
+                                <th>Mz.</th>
+                                <th>Lote</th>
+                                <th>Km</th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+
+                            </tbody>
+                        </table>
+
+                        <!--9 selected reporte-->
+                        <table id="reporte_titulares_reserva_selecc_baja_alta" class="hidden table table-bordered">
+                            <thead>
+
+                            <tr id="tr_ubigeo">
+                                <th>DEPARTAMENTO</th>
+                                <th>PROVINCIA</th>
+                                <th>DISTRITO</th>
+                                <th style="background-color: #4CAF50;color: #fff;">TITULARES</th>
+                                <th style="background-color: #00BCD4;color: #fff;">RESERVA</th>
+                                <th style="background-color: #FF5722;color: #fff;">NO SELECCIONADO</th>
+                                <th style="background-color: #F44336;color: #fff;">BAJAS</th>
+                                <th style="background-color: #00838F;color: #fff;">ALTAS</th>
+                            </tr>
+
+
+                            </thead>
+
+                            <tbody>
+
+                            </tbody>
+                        </table>
+
+
                     </div>
 
                 </div>

@@ -27,6 +27,12 @@ class CursoLocalSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class CargoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Funcionario
+        fields = '__all__'
+
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User

@@ -14,13 +14,14 @@ def ApiDirectorioLocales(request, id_curso, ccdd=None, ccpp=None, ccdi=None, zon
         'responsable_nombre', 'responsable_telefono', 'dcount')
     return_query = []
     if zona is not None:
-        return_query = query.filter(ubigeo__ccdd=ccdd, ubigeo__ccpp=ccpp, ubigeo__ccdi=ccdi, zona=zona,id_curso=id_curso)
+        return_query = query.filter(ubigeo__ccdd=ccdd, ubigeo__ccpp=ccpp, ubigeo__ccdi=ccdi, zona=zona,
+                                    id_curso=id_curso)
     elif ccdi is not None and zona is None:
-        return_query = query.filter(ubigeo__ccdd=ccdd, ubigeo__ccpp=ccpp, ubigeo__ccdi=ccdi,id_curso=id_curso)
+        return_query = query.filter(ubigeo__ccdd=ccdd, ubigeo__ccpp=ccpp, ubigeo__ccdi=ccdi, id_curso=id_curso)
     elif ccpp is not None and ccdi is None:
-        return_query = query.filter(ubigeo__ccdd=ccdd, ubigeo__ccpp=ccpp,id_curso=id_curso)
+        return_query = query.filter(ubigeo__ccdd=ccdd, ubigeo__ccpp=ccpp, id_curso=id_curso)
     elif ccdd is not None and ccpp is None:
-        return_query = query.filter(ubigeo__ccdd=ccdd,id_curso=id_curso)
+        return_query = query.filter(ubigeo__ccdd=ccdd, id_curso=id_curso)
 
     return JsonResponse(list(return_query), safe=False)
 
@@ -106,6 +107,12 @@ def AprobadosPorUbigeoCurso(request, ubigeo, zona, curso):
         elif curso == "5":
             query = PeaNotaFinal.objects.filter(id_pea__ubigeo=ubigeo, id_pea__id_cargofuncional__in=[284],
                                                 id_pea__is_grupo=5)
+        elif curso == "3":
+            query = PeaNotaFinal.objects.filter(id_pea__ubigeo=ubigeo, id_pea__id_cargofuncional__in=[165],
+                                                id_pea__is_grupo__isnull=True)
+        elif curso == "13":
+            query = PeaNotaFinal.objects.filter(id_pea__ubigeo=ubigeo, id_pea__id_cargofuncional__in=[165],
+                                                id_pea__is_grupo=1)
         else:
             query = PeaNotaFinal.objects.filter(id_pea__ubigeo=ubigeo, id_pea__id_cargofuncional__in=cargos)
     else:
@@ -126,3 +133,29 @@ def AprobadosPorUbigeoCurso(request, ubigeo, zona, curso):
 def getReportesList(request):
     reportes_list = Menu.objects.all().values()
     return JsonResponse(list(reportes_list), safe=False)
+
+
+def ReporteTitularesBajasAltasReservasEtc(request, id_funcionario, ccdd, ccpp, ccdi):
+    ubigeo = ccdd + ccpp + ccdi
+    funcionario = Funcionario.objects.get(pk=id_funcionario)
+    id_cargofuncional = funcionario.id_cargofuncional
+
+    meta = MetaSeleccion.objects.using('consecucion').get(ccdd=ccdd, ccpp=ccpp, ccdi=ccdi,
+                                                          id_cargofuncional=id_cargofuncional)
+
+    titulares_query = PEA.objects.filter(ubigeo=ubigeo, id_cargofuncional=id_funcionario, baja_estado=0,
+                                         peanotafinal__nota_final__gte=11)
+    titulares_values_list = titulares_query.values_list('id_pea', flat=True)
+    __titulares = titulares_query[:meta.meta].count()
+    __reserva = PEA.objects.exclude(id_pea__in=titulares_values_list).filter(ubigeo=ubigeo,
+                                                                             id_cargofuncional=id_funcionario,
+                                                                             baja_estado=0).count()
+    __no_seleccionados = PEA.objects.filter(ubigeo=ubigeo, id_cargofuncional=id_funcionario, baja_estado=1).count()
+    __baja = PEA.objects.filter(ubigeo=ubigeo, id_cargofuncional=id_funcionario, baja_estado=1).count()
+    __alta = PEA.objects.filter(ubigeo=ubigeo, id_cargofuncional=id_funcionario, alta_estado=1).count()
+    ubigeo_nombres = Ubigeo.objects.get(ubigeo=ubigeo)
+
+    return JsonResponse(
+        [{'titulares': __titulares, 'reservas': __reserva, 'no_seleccionados': __no_seleccionados, 'bajas': __baja,
+          'altas': __alta, 'departamento': ubigeo_nombres.departamento, 'provincia': ubigeo_nombres.provincia,
+          'distrito': ubigeo_nombres.distrito}], safe=False)

@@ -218,6 +218,7 @@ class PEA(models.Model):
     apto = models.IntegerField(null=True, blank=True, default=0)
     is_grupo = models.IntegerField(null=True, blank=True)
     asistio_dia = models.IntegerField(default=1)
+    id_usuario = models.IntegerField(null=True, blank=True)
 
     class Meta:
         managed = True

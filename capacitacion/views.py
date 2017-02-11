@@ -274,6 +274,11 @@ class DirectorioLocalAmbienteViewSet(viewsets.ModelViewSet):
     serializer_class = DirectorioLocalAmbienteSerializer
 
 
+class CargosViewSet(viewsets.ModelViewSet):
+    queryset = Funcionario.objects.all()
+    serializer_class = CargoSerializer
+
+
 class CursoLocalViewSet(viewsets.ModelViewSet):
     queryset = CursoLocal.objects.all()
     serializer_class = CursoLocalSerializer
@@ -1006,18 +1011,24 @@ def save_nota_final(request):
 
 
 @csrf_exempt
-def peaCurso6(request, ubigeo):
-    pea_dia1 = PEA.objects.all().filter(Q(asistio_dia__isnull=True) | Q(asistio_dia=1),
-                                        id_cargofuncional__id_funcionario=901, ubigeo=ubigeo).values().order_by(
+def peaCurso6(request, ubigeo, grupo):
+    pea_dia1 = PEA.objects.all().filter(id_cargofuncional__id_funcionario=901, is_grupo=grupo,
+                                        ubigeo=ubigeo).values().order_by(
         'ape_paterno')
     pea_dia2 = PEA.objects.all().exclude(
         id_pea__in=PEA.objects.filter(id_cargofuncional__id_funcionario=901, ubigeo=ubigeo,
                                       asistio_dia=1).values_list('id_pea',
                                                                  flat=True)).filter(
-        id_cargofuncional__id_funcionario=901, ubigeo=ubigeo).values().order_by(
+        id_cargofuncional__id_funcionario=901, ubigeo=ubigeo, is_grupo=grupo).values().order_by(
+        'ape_paterno')
+    pea_dia3 = PEA.objects.all().exclude(
+        id_pea__in=PEA.objects.filter(id_cargofuncional__id_funcionario=901, ubigeo=ubigeo,
+                                      asistio_dia__in=[1, 2]).values_list('id_pea',
+                                                                          flat=True)).filter(
+        id_cargofuncional__id_funcionario=901, ubigeo=ubigeo, is_grupo=grupo).values().order_by(
         'ape_paterno')
 
-    return JsonResponse({'pea_dia1': list(pea_dia1), 'pea_dia2': list(pea_dia2)})
+    return JsonResponse({'pea_dia1': list(pea_dia1), 'pea_dia2': list(pea_dia2), 'pea_dia3': list(pea_dia3)})
 
 
 @csrf_exempt

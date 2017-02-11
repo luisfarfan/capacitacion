@@ -38,3 +38,12 @@ def updateUserSession(request, id):
                                              'rol__id', 'cierre', 'cierre_dia1', 'cierre_dia2',
                                              'cierre_dia3')
     return JsonResponse(list(user), safe=False)
+
+
+def updateLogin(request, id, curso):
+    User.objects.filter(pk=id).update(curso_id=curso)
+    user = User.objects.filter(pk=id).values('id', 'usuario', 'ccdd', 'ccpp', 'ccdi', 'zona',
+                                             'curso', 'rol__rol', 'curso__nombre_curso',
+                                             'rol__id', 'cierre', 'cierre_dia1', 'cierre_dia2',
+                                             'cierre_dia3')
+    return JsonResponse(list(user), safe=False)

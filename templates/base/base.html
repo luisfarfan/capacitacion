@@ -437,9 +437,18 @@
 
     function setUserData() {
         $('#usuario').text(`${session.rol__rol}`);
-        $('#tipo_cargo').text(`${session.curso__nombre_curso}`);
+        $.ajax({
+            url: `${BASEURL}/updateLogin/${session.id}/${session.curso}/`,
+            type: 'GET',
+            success: response => {
+                localStorage.removeItem('usuario');
+                localStorage.setItem('usuario', JSON.stringify(response[0]));
+                cierre_actual = session.cierre;
+                session = JSON.parse(localStorage.getItem('usuario'));
+                $('#tipo_cargo').text(`${session.curso__nombre_curso}`);
+            }
+        })
     }
-
 
     function getDepartamentos() {
         let array_departamentos = [{id: '', text: 'Seleccione'}];

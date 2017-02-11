@@ -10,18 +10,13 @@ function updateUserSession() {
     $.getJSON(`${BASEURL}/updateUserSession/${session.id}`, response => {
         localStorage.removeItem('usuario');
         localStorage.setItem('usuario', JSON.stringify(response[0]));
+        cierre_actual = session.cierre;
         session = JSON.parse(localStorage.getItem('usuario'));
         cierre = session.cierre;
         if (session.curso == "6" || session.curso == "15" || session.curso == "16") {
             if (session.curso == "6") {
                 dia_curso = 1
                 getPeaCurso6(session.cierre_dia1);
-            } else if (session.curso == "15") {
-                dia_curso = 2
-                getPeaCurso6(session.cierre_dia2);
-            } else if (session.curso == "16") {
-                dia_curso = 3
-                getPeaCurso6(session.cierre_dia3);
             }
             $('#div_is_not_6').hide();
 
@@ -32,6 +27,7 @@ function updateUserSession() {
             }
         } else {
             $('#div_is_6').hide();
+            $('#div_is_not_6').show();
         }
     })
 }
@@ -185,7 +181,7 @@ function getPEA(id_localambiente) {
                 }
 
                 $.each(pea_por_fecha, (key, val) => {
-                    html += `<tr ${val.id_pea.baja_estado == 1 ? 'style="background-color: #f1a6a6"' : "" }>`;
+                    html += `<tr ${val.id_pea.baja_estado == 1 ? 'style="background-color: #f1a6a6"' : "" } ${val.id_pea.alta_estado == 1 ? 'style="background-color: #caeacb"' : "" }>`;
                     html += `<td>${key + 1}</td>`;
                     html += `<td>${val.id_pea.ape_paterno} ${val.id_pea.ape_materno} ${val.id_pea.nombre}</td><td>${val.id_pea.id_cargofuncional.nombre_funcionario}</td>`;
 
@@ -632,8 +628,9 @@ var pea_dia2 = [];
 var contador = 0;
 var dia_curso;
 
+
 function getPeaCurso6(cierre) {
-    $.getJSON(`${BASE_URL}peaCurso6/${session.ccdd}${session.ccpp}${session.ccdi}/`, response => {
+    $.getJSON(`${BASE_URL}peaCurso6/${session.ccdd}${session.ccpp}${session.ccdi}/${session.curso}/`, response => {
         pea_dia1 = response.pea_dia1
         pea_dia2 = response.pea_dia2
         if (cierre == 0) {

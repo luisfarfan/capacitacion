@@ -11,8 +11,10 @@ urlpatterns = [
     url(r'^api_directorio_locales/$', ApiDirectorioLocales),
     url(r'^api_directorio_locales/(?P<id_curso>[0-9]+)/(?P<ccdd>[0-9]+)/$', ApiDirectorioLocales),
     url(r'^api_directorio_locales/(?P<id_curso>[0-9]+)/(?P<ccdd>[0-9]+)/(?P<ccpp>[0-9]+)/$', ApiDirectorioLocales),
-    url(r'^api_directorio_locales/(?P<id_curso>[0-9]+)/(?P<ccdd>[0-9]+)/(?P<ccpp>[0-9]+)/(?P<ccdi>[0-9]+)/$', ApiDirectorioLocales),
-    url(r'^api_directorio_locales/(?P<id_curso>[0-9]+)/(?P<ccdd>[0-9]+)/(?P<ccpp>[0-9]+)/(?P<ccdi>[0-9]+)/(?P<zona>[0-9]+)/$',
+    url(r'^api_directorio_locales/(?P<id_curso>[0-9]+)/(?P<ccdd>[0-9]+)/(?P<ccpp>[0-9]+)/(?P<ccdi>[0-9]+)/$',
+        ApiDirectorioLocales),
+    url(
+        r'^api_directorio_locales/(?P<id_curso>[0-9]+)/(?P<ccdd>[0-9]+)/(?P<ccpp>[0-9]+)/(?P<ccdi>[0-9]+)/(?P<zona>[0-9]+)/$',
         ApiDirectorioLocales),
     url(r'^api_aulas_coberturas_curso/(?P<id_curso>[0-9]+)/$', ApiAulasCoberturadasPorCurso),
     url(r'^api_aulas_coberturas_curso/(?P<id_curso>[0-9]+)/(?P<ccdd>[0-9]+)/$',
@@ -30,4 +32,6 @@ urlpatterns = [
         AprobadosPorCargo),
     url(r'^aprobados_curso/(?P<ubigeo>[0-9]+)/(?P<zona>[0-9]+)/(?P<curso>[0-9]+)/$',
         AprobadosPorUbigeoCurso),
+    url(r'^ReporteTotalCantidades/(?P<id_funcionario>[0-9]+)/(?P<ccdd>[0-9]+)/(?P<ccpp>[0-9]+)/(?P<ccdi>[0-9]+)/$',
+        ReporteTitularesBajasAltasReservasEtc),
 ]
