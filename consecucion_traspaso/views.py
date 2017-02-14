@@ -59,8 +59,6 @@ def getMetaConsecucion(request, ubigeo, curso):
         meta = MetaSeleccion.objects.using('consecucion').get(ubigeo=ubigeo, id_cargofuncional=51)
     elif curso == "3":
         meta = MetaSeleccion.objects.using('consecucion').get(ubigeo=ubigeo, id_cargofuncional=548)
-    elif curso == "1":
-        meta = MetaSeleccion.objects.using('consecucion').get(ubigeo=ubigeo, id_cargofuncional=548)
     elif curso == "13":
         return JsonResponse({'meta': 9})
     elif curso == "4":

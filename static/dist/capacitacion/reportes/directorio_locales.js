@@ -22,7 +22,7 @@ var url = {
     n_postulante_capacitados: `${BASEURL}`,
     personal_selec_para_trabajar: `${BASEURL}`,
     direct_local_capacitacion_x_num_ambiente: `${BASEURL}/reportes/api_directorio_locales/`,
-    directorio_locales: `${BASEURL}`,
+    api_locales_seleccionados: `${BASEURL}/reportes/api_locales_seleccionados/`,
 }
 var url_current = '';
 var reporte_data = [];
@@ -80,7 +80,7 @@ $('#select_reportes_list').change(event => {
         case "16":
             hiddenTables();
             $('#directorio_locales').removeClass('hidden');
-            url_current = directorio_locales;
+            url_current = url.api_locales_seleccionados;
             break;
         case "17":
             hiddenTables();
@@ -140,6 +140,7 @@ function getReporte() {
     $.getJSON(`${url_current}${queryParameters}`, response => {
         let report_id = $('#select_reportes_list').val();
         let html_body = '';
+        console.log(report_id);
         switch (report_id) {
             case "9":
                 let html1 = '';
@@ -149,11 +150,19 @@ function getReporte() {
                 $('#num_aulas_coberturadas').find('tbody').html(html1);
                 document.getElementById('p').textContent = texto_curso;
                 break;
-            case "16":
+            case "15":
                 let html = '';
                 reporte_data = response
                 html = reportes.DirectorioLocales(reporte_data);
+                console.log(html);
                 $('#direct_local_capacitacion_x_num_ambiente').find('tbody').html(html);
+                break;
+            case "16":
+                html_body = ''
+                reporte_data = response
+                html_body = reportes.LocalesSeleccionados(reporte_data);
+                console.log(html_body);
+                $('#directorio_locales').find('tbody').html(html_body);
                 break;
             case "17":
                 reporte_data = response
@@ -173,7 +182,11 @@ function getCursos(id_etapa = 1) {
 var reportes = {
     DirectorioLocales: response => {
         let html = '';
+
         response.map((key, val) => {
+            $('#span_departamento_directorio').text(key.ubigeo__departamento)
+            $('#span_provincia_directorio').text('ubigeo__provincia' in key ? key.ubigeo__provincia : '')
+            $('#span_distrito_directorio').text('ubigeo__distrito' in key ? key.ubigeo__distrito : '')
             html += `<tr>`;
             html += `<td>${parseInt(val) + 1}</td><td>${key.ubigeo__departamento}</td><td>${key.ubigeo__provincia}</td><td>${key.ubigeo__distrito}</td><td>${key.id_curso__nombre_curso}</td><td>${key.nombre_local}</td>
                      <td>${key.tipo_via}</td><td>${key.nombre_via}</td><td>${key.n_direccion}</td><td>${key.piso_direccion}</td><td>${key.mz_direccion}</td><td>${key.lote_direccion}</td><td>${key.km_direccion}</td>
@@ -212,6 +225,20 @@ var reportes = {
                      <td style="background-color: #FF5722;color: #fff;">${key.no_seleccionados}</td>
                      <td style="background-color: #F44336;color: #fff;">${key.bajas}</td>
                      <td style="background-color: #00838F;color: #fff;">${key.altas}</td>`
+            html += `</tr>`;
+        });
+        return html;
+    },
+    LocalesSeleccionados: response => {
+        let html = '';
+        response.map((key, val) => {
+            $('#span_departamento').text(key.ubigeo__departamento)
+            $('#span_provincia').text('ubigeo__provincia' in key ? key.ubigeo__provincia : '')
+            $('#span_distrito').text('ubigeo__distrito' in key ? key.ubigeo__distrito : '')
+            html += `<tr>`;
+            html += `<td>${parseInt(val) + 1}</td><td>${key.ubigeo__departamento}</td><td>${key.ubigeo__provincia}</td><td>${key.ubigeo__distrito}</td><td>${key.id_curso__nombre_curso}</td><td>${key.nombre_local}</td>
+                     <td>${key.tipo_via}</td><td>${key.nombre_via}</td><td>${key.n_direccion}</td><td>${key.piso_direccion}</td><td>${key.mz_direccion}</td><td>${key.lote_direccion}</td><td>${key.km_direccion}</td>
+                     <td>${key.responsable_nombre}</td><td>${key.responsable_telefono}</td><td>${key.dcount}</td>`;
             html += `</tr>`;
         });
         return html;

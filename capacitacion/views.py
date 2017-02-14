@@ -17,7 +17,7 @@ from django.core.exceptions import ObjectDoesNotExist
 import json
 from random import sample
 from django.db.models import Q
-
+from consecucion_traspaso.models import *
 
 def modulo_registro(request):
     template = loader.get_template('capacitacion/modulo_registro.html')
@@ -1063,13 +1063,23 @@ def saveAsistenciaCurso6Dia2(request):
 
 
 @csrf_exempt
-def cerrarDia1Grupo6(request, ccdd, ccpp, ccdi, dia):
-    if dia == 1:
-        User.objects.filter(ccdd=ccdd, ccpp=ccpp, ccdi=ccdi).update(cierre_dia1=1)
-    elif dia == 2:
-        User.objects.filter(ccdd=ccdd, ccpp=ccpp, ccdi=ccdi).update(cierre_dia2=1)
-    elif dia == 3:
-        User.objects.filter(ccdd=ccdd, ccpp=ccpp, ccdi=ccdi).update(cierre_dia3=1)
+def cerrarDia1Grupo6(request, ccdd, ccpp, ccdi):
+    ubigeo = ccdd+ccpp+ccdi
+    titulares=PEA.objects.filter(ubigeo = ubigeo,id_cargofuncional=901, is_grupo=6,asistio_dia__isnull=False)
+    reserva = PEA.objects.filter(ubigeo = ubigeo,id_cargofuncional=901, is_grupo=6,asistio_dia__isnull=True)
+    for i in titulares:
+        ficha177 = Ficha177.objects.using('consecucion').get(id_per=i.id_per)        
+        ficha177.sw_titu = 1
+        ficha177.seleccionado = 1
+        ficha177.capacita = 1
+        ficha177.save()
+
+    for i in reserva:
+        ficha177 = Ficha177.objects.using('consecucion').get(id_per=i.id_per)        
+        ficha177.sw_titu = 0
+        ficha177.seleccionado = 1
+        ficha177.capacita = 1
+        ficha177.save()
     return JsonResponse({'msg': True})
 
 

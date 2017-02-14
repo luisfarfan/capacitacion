@@ -172,7 +172,7 @@ function getPEA(id_localambiente) {
                 if ('id_instructor' in response[0]) {
                     response[0].id_instructor != null ? $('#instructor').val(response[0].id_instructor).trigger("change") : $('#instructor').val(-1).trigger("change");
                 }
-                if (session.curso == 4) {
+                if (session.curso == 10) {
                     pea_por_fecha = peaaula.filter(function (e) {
                         return e.pea_fecha == $('#fechas').val();
                     });
@@ -755,7 +755,7 @@ function cerrarAsistenciaDia1() {
 function __cerrarAsistenciaDia1() {
     $.getJSON(`${BASEURL}/cerrarDia1Grupo6/${session.ccdd}/${session.ccpp}/${session.ccdi}/`, response => {
         console.log(response);
-        getPeaCurso6(1);
+        getPeaCurso6(0);
     });
 }
 

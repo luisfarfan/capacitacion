@@ -8,10 +8,40 @@ from consecucion_traspaso.models import MetaSeleccion
 # Create your views here.
 
 def ApiDirectorioLocales(request, id_curso, ccdd=None, ccpp=None, ccdi=None, zona=None):
-    query = Local.objects.annotate(dcount=Count('localambiente__id_ambiente__localambiente')).values(
+    query = Local.objects.annotate(dcount=Count('localambiente__id_ambiente')).values(
         'ubigeo__departamento', 'ubigeo__provincia', 'ubigeo__distrito', 'id_curso__nombre_curso', 'nombre_local',
         'tipo_via', 'nombre_via', 'n_direccion', 'piso_direccion', 'mz_direccion', 'lote_direccion', 'km_direccion',
         'responsable_nombre', 'responsable_telefono', 'dcount')
+    return_query = []
+    if zona is not None:
+        return_query = query.filter(ubigeo__ccdd=ccdd, ubigeo__ccpp=ccpp, ubigeo__ccdi=ccdi, zona=zona,
+                                    id_curso=id_curso)
+    elif ccdi is not None and zona is None:
+        return_query = query.filter(ubigeo__ccdd=ccdd, ubigeo__ccpp=ccpp, ubigeo__ccdi=ccdi, id_curso=id_curso)
+    elif ccpp is not None and ccdi is None:
+        return_query = query.filter(ubigeo__ccdd=ccdd, ubigeo__ccpp=ccpp, id_curso=id_curso)
+    elif ccdd is not None and ccpp is None:
+        return_query = query.filter(ubigeo__ccdd=ccdd, id_curso=id_curso)
+
+    return JsonResponse(list(return_query), safe=False)
+
+
+def ApiLocalesSeleccionados(request, id_curso, ccdd=None, ccpp=None, ccdi=None, zona=None):
+    query = DirectorioLocal.objects.annotate(
+        dcount=Count('directoriolocalambiente__id_ambiente')).values('ubigeo__departamento',
+                                                                     'ubigeo__provincia',
+                                                                     'ubigeo__distrito',
+                                                                     'id_curso__nombre_curso',
+                                                                     'nombre_local',
+                                                                     'tipo_via', 'nombre_via',
+                                                                     'n_direccion',
+                                                                     'piso_direccion',
+                                                                     'mz_direccion',
+                                                                     'lote_direccion',
+                                                                     'km_direccion',
+                                                                     'responsable_nombre',
+                                                                     'responsable_telefono',
+                                                                     'dcount')
     return_query = []
     if zona is not None:
         return_query = query.filter(ubigeo__ccdd=ccdd, ubigeo__ccpp=ccpp, ubigeo__ccdi=ccdi, zona=zona,
